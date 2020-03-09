@@ -8,46 +8,41 @@ asmb:
     movq        %rdi, %rax                  # prepare return value
 
     movq        $0x9a9a9a9a9a9a9a9a, %rcx   # set up ('z' + 1 + min_t - 'a') vector
-    push        %rcx                        # 0x38(%rsp)
+    push        %rcx                        # padding for 128-bit-alignment
+    push        %rcx                        # 0x30(%rsp)
     push        %rcx
-    movdqu      (%rsp), %xmm15
 
     movq        $0x1f1f1f1f1f1f1f1f, %rcx   # set up (c + min_t - 'a') vector
-    push        %rcx                        # 0x28(%rsp)
+    push        %rcx                        # 0x20(%rsp)
     push        %rcx
-    movdqu      (%rsp), %xmm14
 
     movq        $0xe0e0e0e0e0e0e0e0, %rcx   # set up ('A' - 'a') vector
-    push        %rcx                        # 0x18(%rsp)
+    push        %rcx                        # 0x10(%rsp)
     push        %rcx
-    movdqu      (%rsp), %xmm13
 
     movq        $0x0000000000000000, %rcx   # set up bounds check vector
-    push        %rcx                        # 0x08(%rsp)
+    push        %rcx                        # 0x00(%rsp)
     push        %rcx
-
-    movq        %rdi, %rdx                  # initialize loop counter/pointer
 
 .L2:
 
-    movdqa      (%rdx), %xmm0               # copy 16 chars of string to vector register
+    movdqa      (%rdi), %xmm1               # copy 16 chars of string to vector register
 
-    paddb       %xmm14, %xmm0               # compute (c + min_t - 'a')
-    movdqa      %xmm15, %xmm1               # copy ('z' + 1 + min_t - 'a') to working vector
-    pcmpgtb     %xmm0, %xmm1                # generate ('z' + 1 + min_t - 'a') > (c + min_t - 'a') bit mask
-    pand        %xmm13, %xmm1               # sieve ('A' - 'a') with bit mask
-    movdqa      (%rdx), %xmm3               # copy 16 chars of string to vector register
-    paddb       %xmm1, %xmm3                # perform conditional computation of (c + ('A' - 'a'))
+    paddb       0x20(%rsp), %xmm1           # compute (c + min_t - 'a')
+    movdqa      0x30(%rsp), %xmm0           # copy ('z' + 1 + min_t - 'a') to working vector
+    pcmpgtb     %xmm1, %xmm0                # generate ('z' + 1 + min_t - 'a') > (c + min_t - 'a') bit mask
+    pand        0x10(%rsp), %xmm0           # sieve ('A' - 'a') with bit mask
+    paddb       (%rdi), %xmm0               # perform conditional computation of (c + ('A' - 'a'))
 
-    movdqa      %xmm3, (%rdx)               # write result
-    addq        $0x10, %rdx                 # increment loop counter/pointer
+    movdqa      %xmm0, (%rdi)               # write result
 
-    pcmpeqb     0x08(%rsp), %xmm3           # look for \0
-    pmovmskb    %xmm3, %esi                 # create bit mask of comparison
+    addq        $0x10, %rdi                 # increment loop counter/pointer
+    pcmpeqb     (%rsp), %xmm0               # look for \0
+    pmovmskb    %xmm0, %esi                 # create bit mask of comparison
     cmpw        $0, %si                     # check for \0
     je          .L2                         # keep on going
 
-    sub         $-0x40, %rsp                # restore stack pointer
+    sub         $-0x48, %rsp                # restore stack pointer
 
     rep ret                                 # return
     .cfi_endproc
