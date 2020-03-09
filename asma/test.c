@@ -3,8 +3,13 @@
 extern unsigned char *asma(unsigned char *s);
 
 int main() {
-    unsigned char message[] = "0aA(m-`uDc6{|}0247acef!%. BCEF";
-    printf("%s\n", message);
-    asma(message);
-    printf("%s\n", message);
+    unsigned char message1[] = "aaaaaaaabbbbbbbbccccccccddddddd";
+    printf("%s\n", message1);
+    asma(message1);
+    printf("%s\n", message1);
+
+    unsigned char message2[] = "0{47acef!%. BCEF0aA(m-`uDc6{|}a~c";
+    printf("%s\n", message2);
+    asma(message2);
+    printf("%s\n", message2);
 }
