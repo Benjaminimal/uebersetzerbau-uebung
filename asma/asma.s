@@ -7,7 +7,7 @@ asma:
     .cfi_startproc
     movq    %rdi, %rax                  # prepare return value
 
-    movdqa  (%rdi), %xmm0               # copy first 16 chars of string to vector register
+    movdqu  (%rdi), %xmm0               # copy first 16 chars of string to vector register
 
     movq    $0x9a9a9a9a9a9a9a9a, %rcx   # set up ('z' + 1 + min_t - 'a') vector
     push    %rcx
@@ -29,7 +29,7 @@ asma:
     pand    %xmm3, %xmm1                # sieve ('A' - 'a') with bit mask
     paddb   %xmm1, %xmm0                # perform conditional computation of (c + ('A' - 'a'))
 
-    movdqa  %xmm0, (%rax)               # write result
+    movdqu  %xmm0, (%rax)               # write result
 
     sub     $-48, %rsp                  # restore stack pointer
 
