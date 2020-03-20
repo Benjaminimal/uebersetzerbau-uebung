@@ -1,3 +1,11 @@
+# General 
 *.o
+
+# asm
 test
 test.s
+
+# scanner
+scanner.c
+scanner
+!scanner/
