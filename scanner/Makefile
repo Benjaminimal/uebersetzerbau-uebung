@@ -9,4 +9,4 @@ $(NAME).c: $(NAME).lex
 	flex -o $@ $<
 
 clean:
-	rm $(NAME).c $(NAME)
+	rm -f $(NAME).c $(NAME)
