@@ -44,7 +44,7 @@ WHITESPACE      [ \n\t]+
 int main(int argc, char *argv[]) {
     if (yylex() != 0) {
         (void) fprintf(stderr, "%s:%d: unexpected character '%s'\n", argv[0], num_lines, yytext);
-        exit(YY_EXIT_FAILURE);
+        exit(1);
     }
     exit(0);
 }
