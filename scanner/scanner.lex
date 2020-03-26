@@ -24,7 +24,7 @@ DECNUM          [0-9]+
 HEXNUM          0x[0-9a-fA-F]+
 KEYWORD         end|return|if|then|else|loop|break
 SPECIAL         \(|\)|,|;|:|:=|\*|-|\+|<=|#
-COMMENT         \/\/.*$
+COMMENT         \/\/.*$?
 WHITESPACE      [ \n\t]+
 
 %%
