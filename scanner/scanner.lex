@@ -22,7 +22,7 @@ ID              [a-zA-Z_][a-zA-Z0-9_]*
 NUM             {DECNUM}|{HEXNUM}
 DECNUM          [0-9]+
 HEXNUM          0x[0-9a-fA-F]+
-KEYWORD         end|return|if|then|else|loop|break
+KEYWORD         end|return|if|then|else|loop|break|cont|var|not|and
 SPECIAL         \(|\)|,|;|:|:=|\*|-|\+|<=|#
 COMMENT         \/\/.*$?
 WHITESPACE      [ \n\t]+
