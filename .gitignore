@@ -9,3 +9,8 @@ test.s
 scanner.c
 scanner
 !scanner/
+
+# parser
+parser.tab.c
+parser
+!parser/
