@@ -5,7 +5,7 @@ all: $(NAME)
 $(NAME): $(NAME).c
 	gcc -o $@ $< -lfl
 
-$(NAME).c: $(NAME).lex
+$(NAME).c: $(NAME).l
 	flex -o $@ $<
 
 clean:
