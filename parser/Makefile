@@ -6,12 +6,14 @@ PG = bison $(PG_FLAGS)
 
 LG = flex
 
-CC = gcc
+CC_FLAGS = -std=c99 -pedantic -Wall -g
+LD_FLAGS = -lfl
+CC = gcc $(CC_FLAGS)
 
 all: $(NAME)
 
 $(NAME): $(SCANNER).c $(NAME).tab.c
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ $(LD_FLAGS)
 
 $(NAME).tab.c: $(NAME).y
 	$(PG) $<

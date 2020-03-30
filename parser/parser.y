@@ -1,13 +1,18 @@
-%{
+//
+%locations
+%define api.pure full
 
+%code top{
 #include <stdlib.h>
 #include <stdio.h>
 
-void yyerror(const char *msg);
+#define YYERROR_VERBOSE 1
+}
 
-extern int yylex(void);
-
-%}
+%code {
+void yyerror(YYLTYPE *locp, char const *msg);
+extern int yylex(YYSTYPE *lvalp, YYLTYPE *llocp);
+}
 
 %token ID
 %token NUM
@@ -22,8 +27,8 @@ extern int yylex(void);
 %token VAR
 %token NOT
 %token AND
-%token ASSIGN
-%token LEQ
+%token ASSIGN ":="
+%token LEQ "<="
 
 %start Program
 
@@ -102,13 +107,25 @@ Term:
       '(' Expr ')'
     | NUM
     | ID
-    | ID '(' Expr ')'
+    | ID '(' Expr_list ')'
+    ;
+
+Expr_list:
+      /* empty */
+    | Expr
+    | Expr ',' Expr_list
     ;
 
 %%
 
-void yyerror(const char *msg) {
-    (void) fprintf(stderr, "Parse error: %s\n", msg);
+void yyerror(YYLTYPE *locp, char const *msg) {
+    (void) fprintf(
+        stderr,
+        "%d:%d: %s\n",
+        locp->first_line,
+        locp->first_column,
+        msg
+    );
     exit(2);
 }
 

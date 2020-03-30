@@ -1,25 +1,36 @@
  /**
-  * scanner.flex
+  * scanner.l
   * Description: TODO
   * Author: Benjamin Zinschitz (00940280)
   * Usage: TODO
   */
 
  /* C Definitions */
+%option yylineno
+%option bison-locations
+
 %{
 #include "parser.tab.h"
 
-#define YY_USER_ACTION num_chars += yyleng;
-#define PRINTLN(...) fprintf(yyout, __VA_ARGS__);
-#define PANIC() fprintf(stderr, "Lexical error:%d: Unexpected character '%s'\n", num_lines, yytext); exit(1);
+int yycolumn = 1;
 
-int count_char(char *cursor, char needle);
+#define YY_USER_ACTION \
+    yycolumn += yyleng; \
+    yylloc->first_line = yylloc->last_line; \
+    yylloc->last_line = yylineno; \
+    yylloc->first_column = yylloc->last_column; \
+    yylloc->last_column = yycolumn;
 
-int num_chars = 0;
-int num_lines = 0;
+#define PANIC() \
+    fprintf( \
+        stderr, \
+        "%d:%d: lexical error: unexpected character '%s'\n", \
+        yylloc->first_line, \
+        yylloc->first_column, \
+        yytext \
+    ); \
+    exit(1);
 %}
-
-%option noyywrap
 
  /* Name Definitions */
 ID              [a-zA-Z_][a-zA-Z0-9_]*
@@ -28,39 +39,28 @@ DECNUM          [0-9]+
 HEXNUM          0x[0-9a-fA-F]+
 SPECIAL         \(|\)|,|;|:|\*|-|\+|#
 COMMENT         \/\/.*$?
-WHITESPACE      [ \n\t]+
+WHITESPACE      [ \t]+
 
 %%
 
  /* Rules */
+\n+             yycolumn = 1;
+{WHITESPACE}    ;
 {COMMENT}       ;
-{WHITESPACE}    num_lines += count_char(yytext, '\n');
-"end"             return END;
-"return"          return RETURN;
-"if"              return IF;
-"then"            return THEN;
-"else"            return ELSE;
-"loop"            return LOOP;
-"break"           return BREAK;
-"cont"            return CONT;
-"var"             return VAR;
-"not"             return NOT;
-"and"             return AND;
-":="              return ASSIGN;
-"<="              return LEQ;
+"end"           return END;
+"return"        return RETURN;
+"if"            return IF;
+"then"          return THEN;
+"else"          return ELSE;
+"loop"          return LOOP;
+"break"         return BREAK;
+"cont"          return CONT;
+"var"           return VAR;
+"not"           return NOT;
+"and"           return AND;
+":="            return ASSIGN;
+"<="            return LEQ;
 {SPECIAL}       return (int) yytext[0];
 {ID}            return ID;
 {NUM}           return NUM;
 .               PANIC();
-
-%%
-
- /* User Code */
-int count_char(char *cursor, char needle) {
-    int cnt = 0;
-    while (strchr(cursor, needle) != NULL) {
-        cnt++;
-        cursor++;
-    }
-    return cnt;
-}
