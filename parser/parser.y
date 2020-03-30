@@ -27,8 +27,8 @@ extern int yylex(YYSTYPE *lvalp, YYLTYPE *llocp);
 %token VAR
 %token NOT
 %token AND
-%token ASSIGN ":="
-%token LEQ "<="
+%token ASSIGN
+%token LEQ
 
 %start program
 
@@ -60,8 +60,8 @@ stat:
     | ID ':' LOOP stats END
     | BREAK ID
     | CONT ID
-    | VAR ID ":=" expr
-    | lexpr ":=" expr
+    | VAR ID ASSIGN expr
+    | lexpr ASSIGN expr
     | expr
     ;
 
@@ -76,31 +76,40 @@ lexpr:
      ;
 
 expr:
-    | unary term
-    | term expr_add
-    | term expr_mul
-    | term expr_and
-    | term "<=" term
+      expr_unary
+    | expr_add
+    | expr_mul
+    | expr_and
+    | term LEQ term
     | term '#' term
     ;
+
 expr_add:
-      /* empty */
-    | '+' term expr_add
-    ;
-expr_mul:
-      /* empty */
-    | '*' term expr_mul
-    ;
-expr_and:
-      /* empty */
-    | AND term expr_and
+      term
+    | expr_add '+' term
     ;
 
-unary:
+expr_mul:
+      term
+    | expr_mul '*' term
+    ;
+
+expr_and:
+      term
+    | expr_and AND term
+    ;
+
+expr_unary:
+      NOT expr_unary
+    | '-' expr_unary
+    | '*' expr_unary
+    | term
+    ;
+
+expr_list:
       /* empty */
-    | NOT unary
-    | '-' unary
-    | '*' unary
+    | expr
+    | expr ',' expr_list
     ;
 
 term:
@@ -108,12 +117,6 @@ term:
     | NUM
     | ID
     | ID '(' expr_list ')'
-    ;
-
-expr_list:
-      /* empty */
-    | expr
-    | expr ',' expr_list
     ;
 
 %%
