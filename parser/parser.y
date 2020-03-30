@@ -30,90 +30,90 @@ extern int yylex(YYSTYPE *lvalp, YYLTYPE *llocp);
 %token ASSIGN ":="
 %token LEQ "<="
 
-%start Program
+%start program
 
 %%
 
-Program:
+program:
       /* empty */
-    | Program Funcdef ';'
+    | program funcdef ';'
     ;
 
-Funcdef:
-      ID '(' Pars ')' Stats END
+funcdef:
+      ID '(' pars ')' stats END
     ;
 
-Pars:
+pars:
       /* empty */
     | ID
-    | ID ',' Pars
+    | ID ',' pars
     ;
 
-Stats:
+stats:
       /* empty */
-    | Stat ';' Stats
+    | stat ';' stats
     ;
 
-Stat:
-      RETURN Expr
-    | IF Expr THEN Stats Else END
-    | ID ':' LOOP Stats END
+stat:
+      RETURN expr
+    | IF expr THEN stats else END
+    | ID ':' LOOP stats END
     | BREAK ID
     | CONT ID
-    | VAR ID ":=" Expr
-    | Lexpr ":=" Expr
-    | Expr
+    | VAR ID ":=" expr
+    | lexpr ":=" expr
+    | expr
     ;
 
-Else:
+else:
       /* empty */
-    | ELSE Stats
+    | ELSE stats
     ;
 
-Lexpr:
+lexpr:
        ID
-     | '*' Term
+     | '*' term
      ;
 
-Expr:
-    | Unary Term
-    | Term Expr_add
-    | Term Expr_mul
-    | Term Expr_and
-    | Term "<=" Term
-    | Term '#' Term
+expr:
+    | unary term
+    | term expr_add
+    | term expr_mul
+    | term expr_and
+    | term "<=" term
+    | term '#' term
     ;
-Expr_add:
+expr_add:
       /* empty */
-    | '+' Term Expr_add
+    | '+' term expr_add
     ;
-Expr_mul:
+expr_mul:
       /* empty */
-    | '*' Term Expr_mul
+    | '*' term expr_mul
     ;
-Expr_and:
+expr_and:
       /* empty */
-    | AND Term Expr_and
+    | AND term expr_and
     ;
 
-Unary:
+unary:
       /* empty */
-    | NOT Unary
-    | '-' Unary
-    | '*' Unary
+    | NOT unary
+    | '-' unary
+    | '*' unary
     ;
 
-Term:
-      '(' Expr ')'
+term:
+      '(' expr ')'
     | NUM
     | ID
-    | ID '(' Expr_list ')'
+    | ID '(' expr_list ')'
     ;
 
-Expr_list:
+expr_list:
       /* empty */
-    | Expr
-    | Expr ',' Expr_list
+    | expr
+    | expr ',' expr_list
     ;
 
 %%
