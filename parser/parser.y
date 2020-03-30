@@ -1,4 +1,29 @@
-%token ID NUM END RETURN IF THEN ELSE LOOP BREAK CONT VAR NOT AND
+%{
+
+#include <stdlib.h>
+#include <stdio.h>
+
+void yyerror(const char *msg);
+
+extern int yylex(void);
+
+%}
+
+%token ID
+%token NUM
+%token END
+%token RETURN
+%token IF
+%token THEN
+%token ELSE
+%token LOOP
+%token BREAK
+%token CONT
+%token VAR
+%token NOT
+%token AND
+%token ASSIGN
+%token LEQ
 
 %start Program
 
@@ -14,12 +39,9 @@ Funcdef:
     ;
 
 Pars:
-      Pars_r
-    | ID ',' Pars
-    ;
-Pars_r:
       /* empty */
     | ID
+    | ID ',' Pars
     ;
 
 Stats:
@@ -80,14 +102,17 @@ Term:
       '(' Expr ')'
     | NUM
     | ID
-    | ID '(' Expr_list ')'
+    | ID '(' Expr ')'
     ;
 
-Expr_list:
-      Expr_list_r
-    | Expr ',' Expr_list
-    ;
-Expr_list_r:
-      /* empty */
-    | Expr
-    ;
+%%
+
+void yyerror(const char *msg) {
+    (void) fprintf(stderr, "Parse error: %s\n", msg);
+    exit(2);
+}
+
+int main(int argc, char *argv[]) {
+    (void) yyparse();
+    return 0;
+}
