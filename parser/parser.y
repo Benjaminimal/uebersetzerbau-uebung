@@ -76,34 +76,45 @@ lexpr:
      ;
 
 expr:
-      expr_unary
-    | expr_add
-    | expr_mul
-    | expr_and
-    | term LEQ term
-    | term '#' term
-    ;
-
-expr_add:
       term
-    | expr_add '+' term
-    ;
-
-expr_mul:
-      term
-    | expr_mul '*' term
-    ;
-
-expr_and:
-      term
-    | expr_and AND term
+    | expr_unary
+    | expr_binary
     ;
 
 expr_unary:
       NOT expr_unary
     | '-' expr_unary
     | '*' expr_unary
-    | term
+    | NOT term
+    | '-' term
+    | '*' term
+    ;
+
+expr_binary:
+      expr_add
+    | expr_mul
+    | expr_and
+    | expr_rel
+    ;
+
+expr_add:
+      expr_add '+' term
+    | term '+' term
+    ;
+
+expr_mul:
+      expr_mul '*' term
+    | term '*' term
+    ;
+
+expr_and:
+      expr_and AND term
+    | term AND term
+    ;
+
+expr_rel:
+      term LEQ term
+    | term '#' term
     ;
 
 expr_list:
