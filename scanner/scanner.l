@@ -24,7 +24,6 @@ int num_column = 0;
 
  /* Name Definitions */
 ID              [a-zA-Z_][a-zA-Z0-9_]*
-NUM             {DECNUM}|{HEXNUM}
 DECNUM          [0-9]+
 HEXNUM          0x[0-9a-fA-F]+
 KEYWORD         end|return|if|then|else|loop|break|cont|var|not|and
@@ -40,7 +39,8 @@ WHITESPACE      [ \t]+
 {WHITESPACE}            ;
 {KEYWORD}|{SPECIAL}     PRINTLN("%s\n", yytext);
 {ID}                    PRINTLN("id %s\n", yytext);
-{NUM}                   PRINTLN("num %llu\n", strtoull(yytext, NULL, 0));
+{DECNUM}                PRINTLN("num %llu\n", strtoull(yytext, NULL, 10));
+{HEXNUM}                PRINTLN("num %llu\n", strtoull(yytext, NULL, 16));
 .                       PANIC();
 
 %%
