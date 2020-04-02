@@ -34,7 +34,6 @@ int yycolumn = 1;
 
  /* Name Definitions */
 ID              [a-zA-Z_][a-zA-Z0-9_]*
-NUM             {DECNUM}|{HEXNUM}
 DECNUM          [0-9]+
 HEXNUM          0x[0-9a-fA-F]+
 SPECIAL         \(|\)|,|;|:|\*|-|\+|#
@@ -62,5 +61,6 @@ WHITESPACE      [ \t]+
 "<="            return LEQ;
 {SPECIAL}       return (int) yytext[0];
 {ID}            return ID;
-{NUM}           return NUM;
+{HEXNUM}        return NUM;
+{DECNUM}        return NUM;
 .               PANIC();
