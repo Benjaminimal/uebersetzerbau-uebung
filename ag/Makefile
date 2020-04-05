@@ -30,4 +30,4 @@ $(OXOUT).y $(OXOUT).l: $(PARSER).y $(SCANNER).l
 	$(AGG) $^
 
 clean:
-	rm -f $(NAME) $(OXOUT).y $(OXOUT).l $(PARSER) $(PARSER).c $(PARSER).h $(PARSER).output $(SCANNER).c
+	rm -f $(NAME) $(OXOUT).y $(OXOUT).l $(OXOUT).h $(PARSER) $(PARSER).c $(PARSER).h $(PARSER).output $(SCANNER).c
