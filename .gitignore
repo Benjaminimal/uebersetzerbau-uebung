@@ -16,3 +16,10 @@ parser.tab.c
 parser.tab.h
 parser
 !parser/
+
+# ag
+oxout.*
+parser.c
+parser.h
+ag
+!ag/
