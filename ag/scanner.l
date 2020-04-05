@@ -10,6 +10,7 @@
 
 %{
 #include "parser.h"
+#include "id_list.h"
 
 int yycolumn = 1;
 
@@ -48,7 +49,7 @@ WHITESPACE      [ \n\t]+
 ":="            return ASSIGN;
 "<="            return LEQ;
 {SPECIAL}       return (int) yytext[0];
-{ID}            return ID;
+{ID}            return ID; @{ @ID.lexeme@ = strdup(yytext); @}
 {HEXNUM}        return NUM;
 {DECNUM}        return NUM;
 {WHITESPACE}    ;

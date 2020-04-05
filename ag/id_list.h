@@ -14,8 +14,7 @@ typedef struct id_list {
 
 id_list *empty_id_list();
 
-id_list *add_name(id_list *, char *);
-id_list *add_label(id_list *, char *);
+id_list *add_id(id_list *, char *, id_type);
 
 int contains_name(id_list *, char *);
 int contains_label(id_list *, char *);
