@@ -206,19 +206,19 @@ expr_unary:
 expr_binary:
       expr_add
       @{
-        @i @expr_add.i_ids@ = @expr_binary.i_ids;@;
+        @i @expr_add.i_ids@ = @expr_binary.i_ids@;
       @}
     | expr_mul
       @{
-        @i @expr_mul.i_ids@ = @expr_binary.i_ids;@;
+        @i @expr_mul.i_ids@ = @expr_binary.i_ids@;
       @}
     | expr_and
       @{
-        @i @expr_and.i_ids@ = @expr_binary.i_ids;@;
+        @i @expr_and.i_ids@ = @expr_binary.i_ids@;
       @}
     | expr_rel
       @{
-        @i @expr_rel.i_ids@ = @expr_binary.i_ids;@;
+        @i @expr_rel.i_ids@ = @expr_binary.i_ids@;
       @}
     ;
 
