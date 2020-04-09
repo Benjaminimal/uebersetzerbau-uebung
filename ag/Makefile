@@ -12,7 +12,7 @@ LG = flex
 
 CC = gcc $(CC_FLAGS)
 # CC_FLAGS = -std=c99 -pedantic -Wall -g
-CC_FLAGS = -pedantic -Wall -g
+CC_FLAGS = -g
 LD_FLAGS = -lfl
 
 all: $(NAME)
