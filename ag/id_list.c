@@ -22,16 +22,6 @@ id_list *add_id(id_list *list, char *lexeme, id_type type) {
     return head;
 }
 
-char *get_id(id_list *list, char *needle) {
-    while (list != NULL) {
-        if (strcmp(list->lexeme, needle) == 0)
-            return list->lexeme;
-    }
-
-    return NULL;
-}
-
-
 int contains_name(id_list *list, char *lexeme) {
     return _contains_id(list, lexeme, NAME);
 }

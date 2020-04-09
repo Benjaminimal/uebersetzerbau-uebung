@@ -1,6 +1,7 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "id_list.h"
 
 #define YYERROR_VERBOSE 1
@@ -57,11 +58,11 @@ id_list *add_label(id_list *, char *);
 @attributes { char *lexeme; } ID
 @attributes { id_list *i_ids, *s_ids; } pars
 @attributes { id_list *i_ids; } stats
-@attributes { id_list *s_ids, *i_ids; } stat
+@attributes { id_list *i_ids, *s_ids; } stat
 @attributes { id_list *i_ids; } else
-@attributes { id_list *i_ids; } lexpr
+@attributes { id_list *i_ids, *s_ids; } lexpr
 @attributes { id_list *i_ids; } expr
-@attributes { id_list *i_ids; } term
+@attributes { id_list *i_ids, *s_ids; } term
 @attributes { id_list *i_ids; } expr_unary
 @attributes { id_list *i_ids; } expr_binary
 @attributes { id_list *i_ids; } expr_add
@@ -80,7 +81,7 @@ program:
     ;
 
 funcdef:
-      ID '(' pars ')' stats END         /* funktion neu */ /* kollision mit funktion oder name oder label */
+      ID '(' pars ')' stats END
       @{
         @i @pars.i_ids@ = empty_id_list();
         @i @stats.i_ids@ = @pars.s_ids@;
@@ -116,26 +117,29 @@ stat:
       RETURN expr
       @{
         @i @expr.i_ids@ = @stat.i_ids@;
+        @i @stat.s_ids@ = @stat.i_ids@;
       @}
     | IF expr THEN stats else END
       @{
         @i @expr.i_ids@ = @stat.i_ids@;
         @i @stats.i_ids@ = @stat.i_ids@;
         @i @else.i_ids@ = @stat.i_ids@;
+        @i @stat.s_ids@ = @stat.i_ids@;
       @}
     | ID ':' LOOP stats END             /* label neu */ /* sichtbarkeit innerhalb der schleife */
       @{
         @i @stats.i_ids@ = add_label(@stat.i_ids@, @ID.lexeme@);
+        @i @stat.s_ids@ = @stat.i_ids@;
       @}
     | BREAK ID                          /* label bestehend */
       @{
-        @i (contains_label(@stat.i_ids@, @ID.lexeme@) != 0) || EXIT_DUPLICATE_ID_ERR(@ID.lexeme@);
+        @i @stat.s_ids@ = check_label(@stat.i_ids@, @ID.lexeme@);
       @}
     | CONT ID                           /* label bestehend */
       @{
-        @i (contains_label(@stat.i_ids@, @ID.lexeme@) != 0) || EXIT_DUPLICATE_ID_ERR(@ID.lexeme@);
+        @i @stat.s_ids@ = check_label(@stat.i_ids@, @ID.lexeme@);
       @}
-    | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stats */
+    | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stat */
       @{
         @i @expr.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = add_name(@stat.i_ids@, @ID.lexeme@);
@@ -144,10 +148,12 @@ stat:
       @{
         @i @lexpr.i_ids@ = @stat.i_ids@;
         @i @expr.i_ids@ = @stat.i_ids@;
+        @i @stat.s_ids@ = @stat.i_ids@;
       @}
     | expr
       @{
         @i @expr.i_ids@ = @stat.i_ids@;
+        @i @stat.s_ids@ = @stat.i_ids@;
       @}
     ;
 
@@ -162,11 +168,12 @@ else:
 lexpr:
        ID                               /* name bestehend */
       @{
-        @i (contains_name(@lexpr.i_ids@, @ID.lexeme@) != 0) || EXIT_DUPLICATE_ID_ERR(@ID.lexeme@);
+        @i @lexpr.s_ids@ = check_name(@lexpr.i_ids@, @ID.lexeme@);
       @}
      | '*' term
       @{
         @i @term.i_ids@ = @lexpr.i_ids@;
+        @i @lexpr.s_ids@ = @lexpr.i_ids@;
       @}
      ;
 
@@ -300,45 +307,63 @@ term:
       '(' expr ')'
       @{
         @i @expr.i_ids@ = @term.i_ids@;
+        @i @term.s_ids@ = @term.i_ids@;
       @}
     | NUM
+      @{
+        @i @term.s_ids@ = @term.i_ids@;
+      @}
     | ID                                /* name bestehend */
       @{
-        @i (contains_name(@term.i_ids@, @ID.lexeme@) != 0) || EXIT_DUPLICATE_ID_ERR(@ID.lexeme@);
+        @i @term.s_ids@ = check_name(@term.i_ids@, @ID.lexeme@);
       @}
     | ID '(' expr_list ')'              /* funktion beliebig */
       @{
-        @expr_list.i_ids@ = @term.i_ids@;
+        @i @expr_list.i_ids@ = @term.i_ids@;
+        @i @term.s_ids@ = @term.i_ids@;
       @}
     ;
 
 %%
 
-int is_visible_id(id_list *list, char *id) {
-    if (get_id(list, id) == NULL) {
-        EXIT_UNDEFINED_ID_ERR(id);
+id_list *check_name(id_list *list, char *lexeme) {
+    if (contains_name(list, lexeme) == 0) {
+        EXIT_UNDEFINED_ID_ERR(lexeme);
     }
-    return 1;
+
+    return list;
+}
+
+id_list *check_label(id_list *list, char *lexeme) {
+    if (contains_label(list, lexeme) == 0) {
+        EXIT_UNDEFINED_ID_ERR(lexeme);
+    }
+
+    return list;
 }
 
 id_list *add_name(id_list *list, char *lexeme) {
     id_list *succ;
-    if (contains_id(list, lexeme) != 0)
+    if (contains_id(list, lexeme) != 0) {
         EXIT_DUPLICATE_ID_ERR(lexeme);
+    }
 
-    if ((succ = add_id(list, lexeme, NAME)) == NULL)
+    if ((succ = add_id(list, lexeme, NAME)) == NULL) {
         EXIT_OOM_ERR();
+    }
     
     return succ;
 }
 
 id_list *add_label(id_list *list, char *lexeme) {
     id_list *succ;
-    if (contains_id(list, lexeme) != 0)
+    if (contains_id(list, lexeme) != 0) {
         EXIT_DUPLICATE_ID_ERR(lexeme);
+    }
 
-    if ((succ = add_id(list, lexeme, LABEL)) == NULL)
+    if ((succ = add_id(list, lexeme, LABEL)) == NULL) {
         EXIT_OOM_ERR();
+    }
     
     return succ;
 }
