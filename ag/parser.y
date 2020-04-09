@@ -5,10 +5,19 @@
 
 #define YYERROR_VERBOSE 1
 
-#define EXIT_SCOPE_ERR(lexeme) \
+#define EXIT_DUPLICATE_ID_ERR(lexeme) \
     fprintf( \
         stderr, \
         "%d: scope error, %s already defined\n", \
+        yylineno, \
+        lexeme \
+    ); \
+    exit(3);
+
+#define EXIT_UNDEFINED_ID_ERR(lexeme) \
+    fprintf( \
+        stderr, \
+        "%d: scope error, %s undefined\n", \
         yylineno, \
         lexeme \
     ); \
@@ -120,11 +129,11 @@ stat:
       @}
     | BREAK ID                          /* label bestehend */
       @{
-        @i (contains_label(@stat.i_ids@, @ID.lexeme@) != 0) || EXIT_SCOPE_ERR(@ID.lexeme@);
+        @i (contains_label(@stat.i_ids@, @ID.lexeme@) != 0) || EXIT_DUPLICATE_ID_ERR(@ID.lexeme@);
       @}
     | CONT ID                           /* label bestehend */
       @{
-        @i (contains_label(@stat.i_ids@, @ID.lexeme@) != 0) || EXIT_SCOPE_ERR(@ID.lexeme@);
+        @i (contains_label(@stat.i_ids@, @ID.lexeme@) != 0) || EXIT_DUPLICATE_ID_ERR(@ID.lexeme@);
       @}
     | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stats */
       @{
@@ -153,7 +162,7 @@ else:
 lexpr:
        ID                               /* name bestehend */
       @{
-        @i (contains_name(@lexpr.i_ids@, @ID.lexeme@) != 0) || EXIT_SCOPE_ERR(@ID.lexeme@);
+        @i (contains_name(@lexpr.i_ids@, @ID.lexeme@) != 0) || EXIT_DUPLICATE_ID_ERR(@ID.lexeme@);
       @}
      | '*' term
       @{
@@ -295,7 +304,7 @@ term:
     | NUM
     | ID                                /* name bestehend */
       @{
-        @i (contains_name(@term.i_ids@, @ID.lexeme@) != 0) || EXIT_SCOPE_ERR(@ID.lexeme@);
+        @i (contains_name(@term.i_ids@, @ID.lexeme@) != 0) || EXIT_DUPLICATE_ID_ERR(@ID.lexeme@);
       @}
     | ID '(' expr_list ')'              /* funktion beliebig */
       @{
@@ -305,10 +314,17 @@ term:
 
 %%
 
+int is_visible_id(id_list *list, char *id) {
+    if (get_id(list, id) == NULL) {
+        EXIT_UNDEFINED_ID_ERR(id);
+    }
+    return 1;
+}
+
 id_list *add_name(id_list *list, char *lexeme) {
     id_list *succ;
     if (contains_id(list, lexeme) != 0)
-        EXIT_SCOPE_ERR(lexeme);
+        EXIT_DUPLICATE_ID_ERR(lexeme);
 
     if ((succ = add_id(list, lexeme, NAME)) == NULL)
         EXIT_OOM_ERR();
@@ -319,7 +335,7 @@ id_list *add_name(id_list *list, char *lexeme) {
 id_list *add_label(id_list *list, char *lexeme) {
     id_list *succ;
     if (contains_id(list, lexeme) != 0)
-        EXIT_SCOPE_ERR(lexeme);
+        EXIT_DUPLICATE_ID_ERR(lexeme);
 
     if ((succ = add_id(list, lexeme, LABEL)) == NULL)
         EXIT_OOM_ERR();
