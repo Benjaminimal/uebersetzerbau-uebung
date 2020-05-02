@@ -50,8 +50,8 @@ WHITESPACE      [ \n\t]+
 "<="            return LEQ;
 {SPECIAL}       return (int) yytext[0];
 {ID}            return ID; @{ @ID.lexeme@ = strdup(yytext); @}
-{HEXNUM}        return NUM;
-{DECNUM}        return NUM;
+{HEXNUM}        return NUM; @{ @NUM.value@ = strtoull(yytext, NULL, 16); @}
+{DECNUM}        return NUM; @{ @NUM.value@ = strtoull(yytext, NULL, 10); @}
 {WHITESPACE}    ;
 {COMMENT}       ;
 .               EXIT_LEX_ERR();

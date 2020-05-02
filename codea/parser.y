@@ -57,6 +57,7 @@ id_list *add_label(id_list *, char *);
 %token LEQ
 
 @attributes { char *lexeme; } ID
+@attributes { long long value; } NUM
 @attributes { id_list *i_ids, *s_ids; } pars
 @attributes { id_list *i_ids; } stats
 @attributes { id_list *i_ids, *s_ids; } stat
