@@ -9,7 +9,7 @@ treenode *_newOperatorNode(int op, treenode *left, treenode *right) {
     newNode->kids[0] = left;
     newNode->kids[1] = right;
     newNode->id=0;
-    newNode->val=0;
+    newNode->value=0;
 
     return newNode;
 }
@@ -30,7 +30,7 @@ treenode *newIdentifierNode(char *identifier) {
 
 treenode *newNumberNode(long long num) {
     treenode *newNode = _newOperatorNode(OP_NUM, NULL, NULL);
-    newNode->val = num;
+    newNode->value = num;
     return newNode;
 }
 
