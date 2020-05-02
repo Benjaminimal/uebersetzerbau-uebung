@@ -1,14 +1,20 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include "treenode.h"
 
 treenode *_newOperatorNode(int op, treenode *left, treenode *right) {
     treenode *newNode = malloc(sizeof(treenode));
 
-    if (newNode == NULL) { printf("Out of memory.\n"); exit(4);}
+    if (newNode == NULL) {
+        // TODO: rephrase
+        fprintf(stderr, "Out of memory.\n");
+        exit(4);
+    }
 
     newNode->op = op;
     newNode->kids[0] = left;
     newNode->kids[1] = right;
-    newNode->id=0;
+    newNode->identifier=0;
     newNode->value=0;
 
     return newNode;
@@ -24,7 +30,7 @@ treenode *newUnaryOperatorNode(int op, treenode *kid) {
 
 treenode *newIdentifierNode(char *identifier) {
     treenode *newNode = _newOperatorNode(OP_ID, NULL, NULL);
-    newNode->regname = regname;
+    newNode->identifier = identifier;
     return newNode;
 }
 

@@ -17,7 +17,7 @@ LD_FLAGS = -lfl
 
 all: $(NAME)
 
-$(NAME): $(PARSER).c $(SCANNER).c id_list.c
+$(NAME): $(PARSER).c $(SCANNER).c id_list.c treenode.c
 	$(CC) -o $@ $^ $(LD_FLAGS)
 
 $(PARSER).c: $(OXOUT).y

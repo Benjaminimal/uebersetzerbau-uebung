@@ -11,6 +11,7 @@
 #define OP_NOT 8
 #define OP_NEG 9
 #define OP_DRF 10
+#define OP_RET 11
 
 #ifdef USE_IBURG
 #ifndef BURM
@@ -25,7 +26,7 @@ typedef struct s_node {
     struct s_node   *kids[2];
     STATEPTR_TYPE   state;
     /* user defined data fields follow here */
-    char            *id;
+    char            *identifier;
     long long       value;
 } treenode;
 

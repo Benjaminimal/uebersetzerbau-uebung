@@ -11,6 +11,7 @@
 %{
 #include "parser.h"
 #include "id_list.h"
+#include "treenode.h"
 
 int yycolumn = 1;
 
