@@ -9,15 +9,18 @@ typedef enum {
 typedef struct id_list {
     id_type type;
     char *lexeme;
+    int parameter_position;
     struct id_list *next;
 } id_list;
 
 id_list *empty_id_list();
 
-id_list *add_id(id_list *, char *, id_type);
+id_list *add_id(id_list *, char *, id_type, int);
 
 int contains_name(id_list *, char *);
 int contains_label(id_list *, char *);
 int contains_id(id_list *, char *);
+
+id_list *get_id(id_list *, char *);
 
 #endif /* _ID_LIST_H_ */
