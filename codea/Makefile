@@ -35,5 +35,9 @@ $(OXOUT).y $(OXOUT).l: $(PARSER).y $(SCANNER).l
 $(GENERATOR).c: $(GENERATOR).bfe
 	bfe < $< | iburg > $@
 
+# TODO: this is broken here but should work if copied to the shell
+check: all
+	for f in $(ls -d /home/ublu20/$(whoami)/test/codea/*); do echo -e "\n===================================================\n$(basename ${f})"; cat "${f}"; echo "---------------------------------------------------"; ./codea < "${f}"; done > test.out 2>&1
+
 clean:
-	rm -f $(NAME) $(GENERATOR).c $(OXOUT).y $(OXOUT).l $(OXOUT).h $(PARSER) $(PARSER).c $(PARSER).h $(PARSER).output $(SCANNER).c
+	rm -f $(NAME) $(GENERATOR).c $(OXOUT).y $(OXOUT).l $(OXOUT).h $(PARSER) $(PARSER).c $(PARSER).h $(PARSER).output $(SCANNER).c test.out
