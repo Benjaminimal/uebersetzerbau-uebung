@@ -1,7 +1,10 @@
-NAME = ag
+NAME = codea
+GENERATOR = codegen
 PARSER = parser
 SCANNER = scanner
 OXOUT = oxout
+
+LIBS = id_list.c treenode.c
 
 AGG = ox
 
@@ -12,12 +15,12 @@ LG = flex
 
 CC = gcc $(CC_FLAGS)
 # CC_FLAGS = -std=c99 -pedantic -Wall -g
-CC_FLAGS = -g
+CC_FLAGS = -g -DUSE_IBURG
 LD_FLAGS = -lfl
 
 all: $(NAME)
 
-$(NAME): $(PARSER).c $(SCANNER).c id_list.c treenode.c
+$(NAME): $(PARSER).c $(SCANNER).c $(GENERATOR).c $(LIBS)
 	$(CC) -o $@ $^ $(LD_FLAGS)
 
 $(PARSER).c: $(OXOUT).y
@@ -29,5 +32,8 @@ $(SCANNER).c: $(OXOUT).l
 $(OXOUT).y $(OXOUT).l: $(PARSER).y $(SCANNER).l
 	$(AGG) $^
 
+$(GENERATOR).c: $(GENERATOR).bfe
+	bfe < $< | iburg > $@
+
 clean:
-	rm -f $(NAME) $(OXOUT).y $(OXOUT).l $(OXOUT).h $(PARSER) $(PARSER).c $(PARSER).h $(PARSER).output $(SCANNER).c
+	rm -f $(NAME) $(GENERATOR).c $(OXOUT).y $(OXOUT).l $(OXOUT).h $(PARSER) $(PARSER).c $(PARSER).h $(PARSER).output $(SCANNER).c

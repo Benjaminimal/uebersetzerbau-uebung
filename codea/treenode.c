@@ -14,8 +14,8 @@ treenode *_newOperatorNode(int op, treenode *left, treenode *right) {
     newNode->op = op;
     newNode->kids[0] = left;
     newNode->kids[1] = right;
-    newNode->identifier=0;
-    newNode->value=0;
+    newNode->identifier = 0;
+    newNode->value = 0;
 
     return newNode;
 }

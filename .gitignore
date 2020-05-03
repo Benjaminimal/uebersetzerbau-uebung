@@ -23,3 +23,8 @@ parser.c
 parser.h
 ag
 !ag/
+
+# codea
+codegen.c
+codea
+!codea/

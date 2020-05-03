@@ -1,0 +1,30 @@
+%{
+/*
+ * vim: filetype=c
+ */
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include "treenode.h"
+
+%}
+
+%start ret
+%term OP_ID=1 OP_NUM=2 OP_LEQ=3 OP_DIF=4 OP_AND=5 OP_MUL=6 OP_ADD=7 OP_NOT=8 OP_NEG=9 OP_DRF=10 OP_RET=11
+
+%%
+
+ret:    OP_RET(num)         # 0 # printf("Found a NUM: %lld\n", kids[0]->value);
+
+num:    OP_NUM              # 0 
+
+%%
+
+extern treenode *root;
+extern int yyparse(void);
+void burm_reduce(NODEPTR_TYPE bnode, int goalnt);
+
+void invoke_burm(NODEPTR_TYPE root) {
+        burm_label(root);
+        burm_reduce(root, 1);
+}

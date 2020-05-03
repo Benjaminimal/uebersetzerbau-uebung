@@ -38,6 +38,8 @@ extern int yylineno;
 
 id_list *add_name(id_list *, char *);
 id_list *add_label(id_list *, char *);
+
+extern void invoke_burm(NODEPTR_TYPE root);
 %}
 
 %token ID
@@ -73,6 +75,8 @@ id_list *add_label(id_list *, char *);
 @attributes { id_list *i_ids; } expr_list
 @attributes { id_list *i_ids, *s_ids; treenode *s_n; } term
 
+@traversal @postorder codegen
+
 %start program
 
 %%
@@ -87,6 +91,7 @@ funcdef:
       @{
         @i @pars.i_ids@ = empty_id_list();
         @i @stats.i_ids@ = @pars.s_ids@;
+        // TODO: implement functions
       @}
     ;
 
@@ -112,6 +117,7 @@ stats:
       @{
         @i @stat.i_ids@ = @stats.0.i_ids@;
         @i @stats.1.i_ids@ = @stat.0.s_ids@;
+        @codegen invoke_burm(@stat.s_n@);
       @}
     ;
 

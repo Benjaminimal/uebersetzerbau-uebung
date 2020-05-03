@@ -14,12 +14,10 @@
 #define OP_RET 11
 
 #ifdef USE_IBURG
-#ifndef BURM
 typedef struct burm_state *STATEPTR_TYPE;
-#endif
-#else
+#else /* USE_IBURG */
 #define STATEPTR_TYPE int
-#endif
+#endif /* USE_IBURG */
 
 typedef struct s_node {
     int             op;
