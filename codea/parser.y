@@ -37,8 +37,11 @@ void yyerror(char const *msg);
 extern int yylex();
 extern int yylineno;
 
+id_list *add_parameter(id_list *, char *, int);
 id_list *add_name(id_list *, char *);
 id_list *add_label(id_list *, char *);
+
+char *get_arg_register_name(id_list *, char *);
 
 extern void invoke_burm(NODEPTR_TYPE root);
 %}
@@ -61,7 +64,7 @@ extern void invoke_burm(NODEPTR_TYPE root);
 
 @attributes { char *lexeme; } ID
 @attributes { long long value; } NUM
-@attributes { id_list *i_ids, *s_ids; } pars
+@attributes { id_list *i_ids, *s_ids; int i_position; } pars
 @attributes { id_list *i_ids; } stats
 @attributes { id_list *i_ids, *s_ids; treenode *s_n; } stat
 @attributes { id_list *i_ids; } else
@@ -91,9 +94,10 @@ funcdef:
       ID '(' pars ')' stats END
       @{
         @i @pars.i_ids@ = empty_id_list();
+        @i @pars.i_position@ = 0;
         @i @stats.i_ids@ = @pars.s_ids@;
-        @codegen @revorder (1) tr_function_start(@ID.lexeme@);
-        @codegen tr_function_end(@ID.lexeme@);
+        @codegen @revorder (1) function_start(@ID.lexeme@);
+        @codegen function_end(@ID.lexeme@);
       @}
     ;
 
@@ -104,12 +108,13 @@ pars:
       @}
     | ID                                /* name neu */  /* sichtbarkeit gesamte funktion */
       @{
-        @i @pars.s_ids@ = add_name(@pars.i_ids@, @ID.lexeme@);
+        @i @pars.s_ids@ = add_parameter(@pars.i_ids@, @ID.lexeme@, @pars.i_position@);
       @}
     | ID ',' pars                       /* name neu */  /* sichtbarkeit gesamte funktion */
       @{
         @i @pars.0.s_ids@ = @pars.1.s_ids@;
-        @i @pars.1.i_ids@ = add_name(@pars.0.i_ids@, @ID.lexeme@);
+        @i @pars.1.i_ids@ = add_parameter(@pars.0.i_ids@, @ID.lexeme@, @pars.0.i_position@);
+        @i @pars.1.i_position@ = @pars.0.i_position@ + 1;
       @}
     ;
 
@@ -357,7 +362,7 @@ term:
     | ID                                /* name bestehend */
       @{
         @i @term.s_ids@ = check_name(@term.i_ids@, @ID.lexeme@);
-        @i @term.s_n@ = newIdentifierNode(@ID.lexeme@);
+        @i @term.s_n@ = newIdentifierNode(@ID.lexeme@, get_arg_register_name(@term.s_ids@, @ID.lexeme@));
       @}
     | ID '(' expr_list ')'              /* funktion beliebig */
       @{
@@ -368,6 +373,15 @@ term:
     ;
 
 %%
+
+char *get_arg_register_name(id_list *list, char *lexeme) {
+    id_list *element = get_id(list, lexeme);
+    if (element == NULL) {
+        return NULL;
+    }
+
+    return get_argument_register(element->parameter_position);
+}
 
 id_list *check_name(id_list *list, char *lexeme) {
     if (contains_name(list, lexeme) == 0) {
@@ -385,13 +399,26 @@ id_list *check_label(id_list *list, char *lexeme) {
     return list;
 }
 
+id_list *add_parameter(id_list *list, char *lexeme, int position) {
+    id_list *succ;
+    if (contains_id(list, lexeme) != 0) {
+        EXIT_DUPLICATE_ID_ERR(lexeme);
+    }
+
+    if ((succ = add_id(list, lexeme, NAME, position)) == NULL) {
+        EXIT_OOM_ERR();
+    }
+    
+    return succ;
+}
+
 id_list *add_name(id_list *list, char *lexeme) {
     id_list *succ;
     if (contains_id(list, lexeme) != 0) {
         EXIT_DUPLICATE_ID_ERR(lexeme);
     }
 
-    if ((succ = add_id(list, lexeme, NAME)) == NULL) {
+    if ((succ = add_id(list, lexeme, NAME, -1)) == NULL) {
         EXIT_OOM_ERR();
     }
     
@@ -404,7 +431,7 @@ id_list *add_label(id_list *list, char *lexeme) {
         EXIT_DUPLICATE_ID_ERR(lexeme);
     }
 
-    if ((succ = add_id(list, lexeme, LABEL)) == NULL) {
+    if ((succ = add_id(list, lexeme, LABEL, -1)) == NULL) {
         EXIT_OOM_ERR();
     }
     

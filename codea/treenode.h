@@ -24,9 +24,9 @@ typedef struct s_node {
     struct s_node   *kids[2];
     STATEPTR_TYPE   state;
     /* user defined data fields follow here */
-    char            *regname;
+    char            *reg;
     char            *identifier;
-    long long       value;
+    long long       val;
 } treenode;
 
 typedef treenode *treenodep;

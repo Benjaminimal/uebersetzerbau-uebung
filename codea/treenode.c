@@ -16,9 +16,9 @@ treenode *_newOperatorNode(int op, treenode *left, treenode *right) {
     newNode->op = op;
     newNode->kids[0] = left;
     newNode->kids[1] = right;
-    newNode->regname = 0;
+    newNode->reg = 0;
     newNode->identifier = 0;
-    newNode->value = 0;
+    newNode->val = 0;
 
     return newNode;
 }
@@ -31,16 +31,16 @@ treenode *newUnaryOperatorNode(int op, treenode *kid) {
     return _newOperatorNode(op, kid, NULL);
 }
 
-treenode *newIdentifierNode(char *identifier, char *regname) {
+treenode *newIdentifierNode(char *identifier, char *reg) {
     treenode *newNode = _newOperatorNode(OP_ID, NULL, NULL);
     newNode->identifier = identifier;
-    newNode->regname = regname;
+    newNode->reg = reg;
     return newNode;
 }
 
 treenode *newNumberNode(long long num) {
     treenode *newNode = _newOperatorNode(OP_NUM, NULL, NULL);
-    newNode->value = num;
+    newNode->val = num;
     return newNode;
 }
 
