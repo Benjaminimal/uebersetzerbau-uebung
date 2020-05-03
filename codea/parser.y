@@ -4,6 +4,7 @@
 #include <string.h>
 #include "id_list.h"
 #include "treenode.h"
+#include "translator.h"
 
 #define YYERROR_VERBOSE 1
 
@@ -91,7 +92,8 @@ funcdef:
       @{
         @i @pars.i_ids@ = empty_id_list();
         @i @stats.i_ids@ = @pars.s_ids@;
-        // TODO: implement functions
+        @codegen @revorder (1) tr_function_start(@ID.lexeme@);
+        @codegen tr_function_end(@ID.lexeme@);
       @}
     ;
 
