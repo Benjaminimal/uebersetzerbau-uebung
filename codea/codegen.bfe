@@ -11,11 +11,12 @@
 %}
 
 %start stat
-%term OP_ID=1 OP_NUM=2 OP_LEQ=3 OP_DIF=4 OP_AND=5 OP_MUL=6 OP_ADD=7 OP_NOT=8 OP_NEG=9 OP_DRF=10 OP_RET=11
+%term OP_ID=1 OP_NUM=2 OP_LEQ=3 OP_DIF=4 OP_AND=5 OP_MUL=6 OP_ADD=7 OP_NOT=8 OP_NEG=9 OP_DRF=10 OP_RET=11 OP_NOP=12
 
 %%
 
 stat:   ret                 # 0
+stat:   nop                 # 0
 
 reg:    OP_LEQ(reg, reg)    # 3 # bnode->reg =  next_reg(); cmp(kids[0]->reg, kids[1]->reg); leq(bnode->reg); neg(bnode->reg);
 reg:    OP_LEQ(num, reg)    # 3 # bnode->reg =  next_reg(); cmp_i(kids[0]->val, kids[1]->reg); leq(bnode->reg); neg(bnode->reg);
@@ -53,11 +54,13 @@ num:    OP_DRF(num)         # 1 # bnode->reg = next_reg(); drf_i(kids[0]->val, b
 
 reg:    id                  # 0
 
-ret:    OP_RET(reg)         # 1 # move(kids[0]->reg, "rax");
-ret:    OP_RET(num)         # 1 # move_i(kids[0]->val, "rax");
+ret:    OP_RET(reg)         # 1 # move(kids[0]->reg, "rax"); ret();
+ret:    OP_RET(num)         # 1 # move_i(kids[0]->val, "rax"); ret();
+ret:    OP_RET(nop)         # 0
 
 num:    OP_NUM              # 0 
 id:     OP_ID               # 0 
+nop:    OP_NOP              # 0
 
 %%
 

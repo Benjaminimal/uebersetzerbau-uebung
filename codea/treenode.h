@@ -12,6 +12,7 @@
 #define OP_NEG 9
 #define OP_DRF 10
 #define OP_RET 11
+#define OP_NOP 12
 
 #ifdef USE_IBURG
 typedef struct burm_state *STATEPTR_TYPE;
@@ -42,6 +43,6 @@ treenode *new_binary_operator_node(int, treenode*, treenode*);
 treenode *new_unary_operator_node(int, treenode*);
 treenode *new_identifier_node(char*, char*);
 treenode *new_number_node(long long);
-treenode *new_null_node();
+treenode *new_nop_node();
 
 #endif /* _TREENODE_H_ */

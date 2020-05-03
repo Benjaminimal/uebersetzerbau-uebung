@@ -2,12 +2,14 @@
 #include <stdio.h>
 #include "treenode.h"
 
+
 treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     treenode *new_node = malloc(sizeof(treenode));
 
     if (new_node == NULL) {
         // TODO: rephrase
         fprintf(stderr, "Out of memory.\n");
+        // TODO: not sure if this should be 3
         exit(4);
     }
 
@@ -42,7 +44,6 @@ treenode *new_number_node(long long num) {
     return new_node;
 }
 
-// TODO: turn into a real NopNode
-treenode *new_null_node() {
-    return NULL;
+treenode *new_nop_node() {
+    return _new_operator_node(OP_NOP, NULL, NULL);
 }

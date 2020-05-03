@@ -141,42 +141,42 @@ stat:
         @i @stats.i_ids@ = @stat.i_ids@;
         @i @else.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = @stat.i_ids@;
-        @i @stat.s_n@ = new_null_node();
+        @i @stat.s_n@ = new_nop_node();
       @}
     | ID ':' LOOP stats END             /* label neu */ /* sichtbarkeit innerhalb der schleife */
       @{
         @i @stats.i_ids@ = add_label(@stat.i_ids@, @ID.lexeme@);
         @i @stat.s_ids@ = @stat.i_ids@;
-        @i @stat.s_n@ = new_null_node();
+        @i @stat.s_n@ = new_nop_node();
       @}
     | BREAK ID                          /* label bestehend */
       @{
         @i @stat.s_ids@ = check_label(@stat.i_ids@, @ID.lexeme@);
-        @i @stat.s_n@ = new_null_node();
+        @i @stat.s_n@ = new_nop_node();
       @}
     | CONT ID                           /* label bestehend */
       @{
         @i @stat.s_ids@ = check_label(@stat.i_ids@, @ID.lexeme@);
-        @i @stat.s_n@ = new_null_node();
+        @i @stat.s_n@ = new_nop_node();
       @}
     | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stat */
       @{
         @i @expr.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = add_name(@stat.i_ids@, @ID.lexeme@);
-        @i @stat.s_n@ = new_null_node();
+        @i @stat.s_n@ = new_nop_node();
       @}
     | lexpr ASSIGN expr
       @{
         @i @lexpr.i_ids@ = @stat.i_ids@;
         @i @expr.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = @stat.i_ids@;
-        @i @stat.s_n@ = new_null_node();
+        @i @stat.s_n@ = new_nop_node();
       @}
     | expr
       @{
         @i @expr.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = @stat.i_ids@;
-        @i @stat.s_n@ = new_null_node();
+        @i @stat.s_n@ = new_nop_node();
       @}
     ;
 
@@ -368,7 +368,7 @@ term:
       @{
         @i @expr_list.i_ids@ = @term.i_ids@;
         @i @term.s_ids@ = @term.i_ids@;
-        @i @term.s_n@ = new_null_node();
+        @i @term.s_n@ = new_nop_node();
       @}
     ;
 

@@ -34,7 +34,7 @@ void neg(char *);
 void drf(char *, char *);
 void drf_i(long long, char *);
 
-void ret(); // TODO: maybe make this explicit
+void ret();
 
 char *get_argument_register(int);
 char *next_reg();

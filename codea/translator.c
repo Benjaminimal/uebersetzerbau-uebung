@@ -83,8 +83,7 @@ void function_start(char *name) {
 }
 
 void function_end(char *name) {
-    // printf("\tpopq\t%%%s\n", RBP);
-    printf("\t%ret\n");
+    // printf("\tpopq\t%%%s\n", RBP); // TODO: might be moved to ret
     printf(".LFE%d:\n", function_count);
     printf("\t.size\t%s, .-%s\n", name, name);
     function_count++;
@@ -154,4 +153,8 @@ void drf(char *src, char *dst) {
 }
 void drf_i(long long val, char *dst) {
     printf("\tmovq\t($%lld), %%%s\n", val, dst);
+}
+
+void ret() {
+    printf("\tret\n");
 }
