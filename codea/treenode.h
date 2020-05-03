@@ -38,10 +38,10 @@ typedef treenode *treenodep;
 #define STATE_LABEL(p)  ((p)->state)
 #define PANIC           printf
 
-treenode *newBinaryOperatorNode(int, treenode*, treenode*);
-treenode *newUnaryOperatorNode(int, treenode*);
-treenode *newIdentifierNode(char*, char*);
-treenode *newNumberNode(long long);
-treenode *newNullNode();
+treenode *new_binary_operator_node(int, treenode*, treenode*);
+treenode *new_unary_operator_node(int, treenode*);
+treenode *new_identifier_node(char*, char*);
+treenode *new_number_node(long long);
+treenode *new_null_node();
 
 #endif /* _TREENODE_H_ */

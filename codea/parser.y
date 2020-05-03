@@ -133,7 +133,7 @@ stat:
       @{
         @i @expr.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = @stat.i_ids@;
-        @i @stat.s_n@ = newUnaryOperatorNode(OP_RET, @expr.s_n@);
+        @i @stat.s_n@ = new_unary_operator_node(OP_RET, @expr.s_n@);
       @}
     | IF expr THEN stats else END
       @{
@@ -141,42 +141,42 @@ stat:
         @i @stats.i_ids@ = @stat.i_ids@;
         @i @else.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = @stat.i_ids@;
-        @i @stat.s_n@ = newNullNode();
+        @i @stat.s_n@ = new_null_node();
       @}
     | ID ':' LOOP stats END             /* label neu */ /* sichtbarkeit innerhalb der schleife */
       @{
         @i @stats.i_ids@ = add_label(@stat.i_ids@, @ID.lexeme@);
         @i @stat.s_ids@ = @stat.i_ids@;
-        @i @stat.s_n@ = newNullNode();
+        @i @stat.s_n@ = new_null_node();
       @}
     | BREAK ID                          /* label bestehend */
       @{
         @i @stat.s_ids@ = check_label(@stat.i_ids@, @ID.lexeme@);
-        @i @stat.s_n@ = newNullNode();
+        @i @stat.s_n@ = new_null_node();
       @}
     | CONT ID                           /* label bestehend */
       @{
         @i @stat.s_ids@ = check_label(@stat.i_ids@, @ID.lexeme@);
-        @i @stat.s_n@ = newNullNode();
+        @i @stat.s_n@ = new_null_node();
       @}
     | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stat */
       @{
         @i @expr.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = add_name(@stat.i_ids@, @ID.lexeme@);
-        @i @stat.s_n@ = newNullNode();
+        @i @stat.s_n@ = new_null_node();
       @}
     | lexpr ASSIGN expr
       @{
         @i @lexpr.i_ids@ = @stat.i_ids@;
         @i @expr.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = @stat.i_ids@;
-        @i @stat.s_n@ = newNullNode();
+        @i @stat.s_n@ = new_null_node();
       @}
     | expr
       @{
         @i @expr.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = @stat.i_ids@;
-        @i @stat.s_n@ = newNullNode();
+        @i @stat.s_n@ = new_null_node();
       @}
     ;
 
@@ -222,32 +222,32 @@ expr_unary:
       NOT expr_unary
       @{
         @i @expr_unary.1.i_ids@ = @expr_unary.0.i_ids@;
-        @i @expr_unary.0.s_n@ = newUnaryOperatorNode(OP_NOT, @expr_unary.1.s_n@);
+        @i @expr_unary.0.s_n@ = new_unary_operator_node(OP_NOT, @expr_unary.1.s_n@);
       @}
     | '-' expr_unary
       @{
         @i @expr_unary.1.i_ids@ = @expr_unary.0.i_ids@;
-        @i @expr_unary.0.s_n@ = newUnaryOperatorNode(OP_NEG, @expr_unary.1.s_n@);
+        @i @expr_unary.0.s_n@ = new_unary_operator_node(OP_NEG, @expr_unary.1.s_n@);
       @}
     | '*' expr_unary
       @{
         @i @expr_unary.1.i_ids@ = @expr_unary.0.i_ids@;
-        @i @expr_unary.0.s_n@ = newUnaryOperatorNode(OP_DRF, @expr_unary.1.s_n@);
+        @i @expr_unary.0.s_n@ = new_unary_operator_node(OP_DRF, @expr_unary.1.s_n@);
       @}
     | NOT term
       @{
         @i @term.i_ids@ = @expr_unary.i_ids@;
-        @i @expr_unary.s_n@ = newUnaryOperatorNode(OP_NOT, @term.s_n@);
+        @i @expr_unary.s_n@ = new_unary_operator_node(OP_NOT, @term.s_n@);
       @}
     | '-' term
       @{
         @i @term.i_ids@ = @expr_unary.i_ids@;
-        @i @expr_unary.s_n@ = newUnaryOperatorNode(OP_NEG, @term.s_n@);
+        @i @expr_unary.s_n@ = new_unary_operator_node(OP_NEG, @term.s_n@);
       @}
     | '*' term
       @{
         @i @term.i_ids@ = @expr_unary.i_ids@;
-        @i @expr_unary.s_n@ = newUnaryOperatorNode(OP_DRF, @term.s_n@);
+        @i @expr_unary.s_n@ = new_unary_operator_node(OP_DRF, @term.s_n@);
       @}
     ;
 
@@ -279,13 +279,13 @@ expr_add:
       @{
         @i @expr_add.1.i_ids@ = @expr_add.0.i_ids@;
         @i @term.i_ids@ = @expr_add.0.i_ids@;
-        @i @expr_add.0.s_n@ = newBinaryOperatorNode(OP_ADD, @expr_add.1.s_n@, @term.s_n@);
+        @i @expr_add.0.s_n@ = new_binary_operator_node(OP_ADD, @expr_add.1.s_n@, @term.s_n@);
       @}
     | term '+' term
       @{
         @i @term.0.i_ids@ = @expr_add.i_ids@;
         @i @term.1.i_ids@ = @expr_add.i_ids@;
-        @i @expr_add.s_n@ = newBinaryOperatorNode(OP_ADD, @term.0.s_n@, @term.1.s_n@);
+        @i @expr_add.s_n@ = new_binary_operator_node(OP_ADD, @term.0.s_n@, @term.1.s_n@);
       @}
     ;
 
@@ -294,13 +294,13 @@ expr_mul:
       @{
         @i @expr_mul.1.i_ids@ = @expr_mul.0.i_ids@;
         @i @term.i_ids@ = @expr_mul.0.i_ids@;
-        @i @expr_mul.0.s_n@ = newBinaryOperatorNode(OP_MUL, @expr_mul.1.s_n@, @term.s_n@);
+        @i @expr_mul.0.s_n@ = new_binary_operator_node(OP_MUL, @expr_mul.1.s_n@, @term.s_n@);
       @}
     | term '*' term
       @{
         @i @term.0.i_ids@ = @expr_mul.i_ids@;
         @i @term.1.i_ids@ = @expr_mul.i_ids@;
-        @i @expr_mul.s_n@ = newBinaryOperatorNode(OP_MUL, @term.0.s_n@, @term.1.s_n@);
+        @i @expr_mul.s_n@ = new_binary_operator_node(OP_MUL, @term.0.s_n@, @term.1.s_n@);
       @}
     ;
 
@@ -309,13 +309,13 @@ expr_and:
       @{
         @i @expr_and.1.i_ids@ = @expr_and.0.i_ids@;
         @i @term.i_ids@ = @expr_and.0.i_ids@;
-        @i @expr_and.0.s_n@ = newBinaryOperatorNode(OP_AND, @expr_and.1.s_n@, @term.s_n@);
+        @i @expr_and.0.s_n@ = new_binary_operator_node(OP_AND, @expr_and.1.s_n@, @term.s_n@);
       @}
     | term AND term
       @{
         @i @term.0.i_ids@ = @expr_and.i_ids@;
         @i @term.1.i_ids@ = @expr_and.i_ids@;
-        @i @expr_and.s_n@ = newBinaryOperatorNode(OP_AND, @term.0.s_n@, @term.1.s_n@);
+        @i @expr_and.s_n@ = new_binary_operator_node(OP_AND, @term.0.s_n@, @term.1.s_n@);
       @}
     ;
 
@@ -324,13 +324,13 @@ expr_rel:
       @{
         @i @term.0.i_ids@ = @expr_rel.i_ids@;
         @i @term.1.i_ids@ = @expr_rel.i_ids@;
-        @i @expr_rel.s_n@ = newBinaryOperatorNode(OP_LEQ, @term.0.s_n@, @term.1.s_n@);
+        @i @expr_rel.s_n@ = new_binary_operator_node(OP_LEQ, @term.0.s_n@, @term.1.s_n@);
       @}
     | term '#' term
       @{
         @i @term.0.i_ids@ = @expr_rel.i_ids@;
         @i @term.1.i_ids@ = @expr_rel.i_ids@;
-        @i @expr_rel.s_n@ = newBinaryOperatorNode(OP_DIF, @term.0.s_n@, @term.1.s_n@);
+        @i @expr_rel.s_n@ = new_binary_operator_node(OP_DIF, @term.0.s_n@, @term.1.s_n@);
       @}
     ;
 
@@ -357,18 +357,18 @@ term:
     | NUM
       @{
         @i @term.s_ids@ = @term.i_ids@;
-        @i @term.s_n@ = newNumberNode(@NUM.value@);
+        @i @term.s_n@ = new_number_node(@NUM.value@);
       @}
     | ID                                /* name bestehend */
       @{
         @i @term.s_ids@ = check_name(@term.i_ids@, @ID.lexeme@);
-        @i @term.s_n@ = newIdentifierNode(@ID.lexeme@, get_arg_register_name(@term.s_ids@, @ID.lexeme@));
+        @i @term.s_n@ = new_identifier_node(@ID.lexeme@, get_arg_register_name(@term.s_ids@, @ID.lexeme@));
       @}
     | ID '(' expr_list ')'              /* funktion beliebig */
       @{
         @i @expr_list.i_ids@ = @term.i_ids@;
         @i @term.s_ids@ = @term.i_ids@;
-        @i @term.s_n@ = newNullNode();
+        @i @term.s_n@ = new_null_node();
       @}
     ;
 

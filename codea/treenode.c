@@ -2,49 +2,47 @@
 #include <stdio.h>
 #include "treenode.h"
 
-// TODO: get rid of all the camelCase
+treenode *_new_operator_node(int op, treenode *left, treenode *right) {
+    treenode *new_node = malloc(sizeof(treenode));
 
-treenode *_newOperatorNode(int op, treenode *left, treenode *right) {
-    treenode *newNode = malloc(sizeof(treenode));
-
-    if (newNode == NULL) {
+    if (new_node == NULL) {
         // TODO: rephrase
         fprintf(stderr, "Out of memory.\n");
         exit(4);
     }
 
-    newNode->op = op;
-    newNode->kids[0] = left;
-    newNode->kids[1] = right;
-    newNode->reg = 0;
-    newNode->identifier = 0;
-    newNode->val = 0;
+    new_node->op = op;
+    new_node->kids[0] = left;
+    new_node->kids[1] = right;
+    new_node->reg = 0;
+    new_node->identifier = 0;
+    new_node->val = 0;
 
-    return newNode;
+    return new_node;
 }
 
-treenode *newBinaryOperatorNode(int op, treenode *left, treenode *right) {
-    return _newOperatorNode(op, left, right);
+treenode *new_binary_operator_node(int op, treenode *left, treenode *right) {
+    return _new_operator_node(op, left, right);
 }
 
-treenode *newUnaryOperatorNode(int op, treenode *kid) {
-    return _newOperatorNode(op, kid, NULL);
+treenode *new_unary_operator_node(int op, treenode *kid) {
+    return _new_operator_node(op, kid, NULL);
 }
 
-treenode *newIdentifierNode(char *identifier, char *reg) {
-    treenode *newNode = _newOperatorNode(OP_ID, NULL, NULL);
-    newNode->identifier = identifier;
-    newNode->reg = reg;
-    return newNode;
+treenode *new_identifier_node(char *identifier, char *reg) {
+    treenode *new_node = _new_operator_node(OP_ID, NULL, NULL);
+    new_node->identifier = identifier;
+    new_node->reg = reg;
+    return new_node;
 }
 
-treenode *newNumberNode(long long num) {
-    treenode *newNode = _newOperatorNode(OP_NUM, NULL, NULL);
-    newNode->val = num;
-    return newNode;
+treenode *new_number_node(long long num) {
+    treenode *new_node = _new_operator_node(OP_NUM, NULL, NULL);
+    new_node->val = num;
+    return new_node;
 }
 
 // TODO: turn into a real NopNode
-treenode *newNullNode() {
+treenode *new_null_node() {
     return NULL;
 }
