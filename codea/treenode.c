@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "treenode.h"
 
+// TODO: get rid of all the camelCase
+
 treenode *_newOperatorNode(int op, treenode *left, treenode *right) {
     treenode *newNode = malloc(sizeof(treenode));
 
@@ -14,6 +16,7 @@ treenode *_newOperatorNode(int op, treenode *left, treenode *right) {
     newNode->op = op;
     newNode->kids[0] = left;
     newNode->kids[1] = right;
+    newNode->regname = 0;
     newNode->identifier = 0;
     newNode->value = 0;
 
@@ -28,9 +31,10 @@ treenode *newUnaryOperatorNode(int op, treenode *kid) {
     return _newOperatorNode(op, kid, NULL);
 }
 
-treenode *newIdentifierNode(char *identifier) {
+treenode *newIdentifierNode(char *identifier, char *regname) {
     treenode *newNode = _newOperatorNode(OP_ID, NULL, NULL);
     newNode->identifier = identifier;
+    newNode->regname = regname;
     return newNode;
 }
 
@@ -40,6 +44,7 @@ treenode *newNumberNode(long long num) {
     return newNode;
 }
 
+// TODO: turn into a real NopNode
 treenode *newNullNode() {
     return NULL;
 }
