@@ -106,15 +106,15 @@ void cmp_i(long long val, char *dst) {
 }
 
 void leq(char *dst) {
-    printf("\tsetle\t%%%s, %%%s\n", get_reg(dst)->b_name);
+    printf("\tsetle %%%s\n", get_reg(dst)->b_name);
 }
 
 void gt(char *dst) {
-    printf("\tsetg\t%%%s, %%%s\n", get_reg(dst)->b_name);
+    printf("\tsetg %%%s\n", get_reg(dst)->b_name);
 }
 
 void dif(char *dst) {
-    printf("\tsetne\t%%%s, %%%s\n", get_reg(dst)->b_name);
+    printf("\tsetne %%%s\n", get_reg(dst)->b_name);
 }
 
 void and(char *src, char *dst) {

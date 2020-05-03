@@ -43,10 +43,10 @@ reg:    OP_ADD(num, reg)    # 2 # bnode->reg = next_reg(); move_i(kids[0]->val, 
 reg:    OP_ADD(reg, num)    # 2 # bnode->reg = next_reg(); move_i(kids[1]->val, bnode->reg); add(kids[0]->reg, bnode->reg); // TODO: replace by leaq (l,r), d
 num:    OP_ADD(num, num)    # 0 # bnode->val = kids[0]->val + kids[1]->val;
 
-reg:    OP_NOT(reg)         # 1 # bnode->reg = next_reg(); not(bnode->reg);
+reg:    OP_NOT(reg)         # 2 # bnode->reg = next_reg(); move(kids[0]->reg, bnode->reg); not(bnode->reg);
 num:    OP_NOT(num)         # 0 # bnode->val = ~kids[0]->val;
 
-reg:    OP_NEG(reg)         # 1 # bnode->reg = next_reg(); neg(bnode->reg);
+reg:    OP_NEG(reg)         # 2 # bnode->reg = next_reg(); move(kids[0]->reg, bnode->reg); neg(bnode->reg);
 num:    OP_NEG(num)         # 0 # bnode->val = -kids[0]->val;
 
 reg:    OP_DRF(reg)         # 1 # bnode->reg = next_reg(); drf(kids[0]->reg, bnode->reg);
