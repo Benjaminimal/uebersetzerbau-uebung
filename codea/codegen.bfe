@@ -10,14 +10,54 @@
 
 %}
 
-%start ret
+%start stat
 %term OP_ID=1 OP_NUM=2 OP_LEQ=3 OP_DIF=4 OP_AND=5 OP_MUL=6 OP_ADD=7 OP_NOT=8 OP_NEG=9 OP_DRF=10 OP_RET=11
 
 %%
 
-ret:    OP_RET(num)         # 0 # printf("Found a NUM: %lld\n", kids[0]->value);
+stat:   ret                 # 0
+
+reg:    OP_LEQ(reg, reg)    # 1
+reg:    OP_LEQ(num, reg)    # 1
+reg:    OP_LEQ(reg, num)    # 1
+reg:    OP_LEQ(num, num)    # 1
+
+reg:    OP_DIF(reg, reg)    # 1
+reg:    OP_DIF(num, reg)    # 1
+reg:    OP_DIF(reg, num)    # 1
+reg:    OP_DIF(num, num)    # 1
+
+reg:    OP_AND(reg, reg)    # 1
+reg:    OP_AND(num, reg)    # 1
+reg:    OP_AND(reg, num)    # 1
+reg:    OP_AND(num, num)    # 1
+
+reg:    OP_MUL(reg, reg)    # 1
+reg:    OP_MUL(num, reg)    # 1
+reg:    OP_MUL(reg, num)    # 1
+reg:    OP_MUL(num, num)    # 1
+
+reg:    OP_ADD(reg, reg)    # 1
+reg:    OP_ADD(num, reg)    # 1
+reg:    OP_ADD(reg, num)    # 1
+reg:    OP_ADD(num, num)    # 1
+
+reg:    OP_NOT(reg)         # 1
+reg:    OP_NOT(num)         # 1
+
+reg:    OP_NEG(reg)         # 1
+reg:    OP_NEG(num)         # 1
+
+reg:    OP_DRF(reg)         # 1
+reg:    OP_DRF(num)         # 1
+
+reg:    id                  # 0
+
+ret:    OP_RET(reg)         # 1 # move(kids[0]->regname, "rax"); // TODO: add regname to tree
+ret:    OP_RET(num)         # 1 # move_num(kids[0]->value, "rax");
 
 num:    OP_NUM              # 0 
+id:     OP_ID               # 0 
 
 %%
 
