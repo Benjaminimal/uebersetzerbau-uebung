@@ -62,10 +62,6 @@ id_list *add_label(id_list *, char *);
 } ID
 
 @attributes {
-    id_list *i_ids;
-} stats
-
-@attributes {
     id_list *i_ids, *s_ids;
 } pars
 
@@ -73,12 +69,18 @@ id_list *add_label(id_list *, char *);
     @autoinh
     id_list *i_ids;
     id_list *s_ids;
-} stat lexpr term
+} stat
+
+@attributes {
+    id_list *i_ids;
+} stats
 
 @attributes {
     @autoinh
     id_list *i_ids;
-} expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel expr_list else
+} term lexpr expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel expr_list else
+
+@traversal idcheck
 
 %start program
 
@@ -138,11 +140,13 @@ stat:
       @}
     | BREAK ID                          /* label bestehend */
       @{
-        @i @stat.s_ids@ = check_label(@stat.i_ids@, @ID.lexeme@);
+        @idcheck check_label(@stat.i_ids@, @ID.lexeme@);
+        @i @stat.s_ids@ = @stat.i_ids@;
       @}
     | CONT ID                           /* label bestehend */
       @{
-        @i @stat.s_ids@ = check_label(@stat.i_ids@, @ID.lexeme@);
+        @idcheck check_label(@stat.i_ids@, @ID.lexeme@);
+        @i @stat.s_ids@ = @stat.i_ids@;
       @}
     | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stat */
       @{
@@ -169,12 +173,9 @@ else:
 lexpr:
        ID                               /* name bestehend */
       @{
-        @i @lexpr.s_ids@ = check_name(@lexpr.i_ids@, @ID.lexeme@);
+        @idcheck check_name(@lexpr.i_ids@, @ID.lexeme@);
       @}
      | '*' term
-      @{
-        @i @lexpr.s_ids@ = @lexpr.i_ids@;
-      @}
      ;
 
 expr:
@@ -227,21 +228,12 @@ expr_list:
 
 term:
       '(' expr ')'
-      @{
-        @i @term.s_ids@ = @term.i_ids@;
-      @}
     | NUM
-      @{
-        @i @term.s_ids@ = @term.i_ids@;
-      @}
     | ID                                /* name bestehend */
       @{
-        @i @term.s_ids@ = check_name(@term.i_ids@, @ID.lexeme@);
+        @idcheck check_name(@term.i_ids@, @ID.lexeme@);
       @}
     | ID '(' expr_list ')'              /* funktion beliebig */
-      @{
-        @i @term.s_ids@ = @term.i_ids@;
-      @}
     ;
 
 %%
