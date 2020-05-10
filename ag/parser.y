@@ -35,6 +35,8 @@ void yyerror(char const *msg);
 extern int yylex();
 extern int yylineno;
 
+id_list *err_list = NULL;
+
 id_list *add_name(id_list *, char *);
 id_list *add_label(id_list *, char *);
 %}
@@ -55,21 +57,28 @@ id_list *add_label(id_list *, char *);
 %token ASSIGN
 %token LEQ
 
-@attributes { char *lexeme; } ID
-@attributes { id_list *i_ids, *s_ids; } pars
-@attributes { id_list *i_ids; } stats
-@attributes { id_list *i_ids, *s_ids; } stat
-@attributes { id_list *i_ids; } else
-@attributes { id_list *i_ids, *s_ids; } lexpr
-@attributes { id_list *i_ids; } expr
-@attributes { id_list *i_ids, *s_ids; } term
-@attributes { id_list *i_ids; } expr_unary
-@attributes { id_list *i_ids; } expr_binary
-@attributes { id_list *i_ids; } expr_add
-@attributes { id_list *i_ids; } expr_mul
-@attributes { id_list *i_ids; } expr_and
-@attributes { id_list *i_ids; } expr_rel
-@attributes { id_list *i_ids; } expr_list
+@attributes {
+    char *lexeme;
+} ID
+
+@attributes {
+    id_list *i_ids;
+} stats
+
+@attributes {
+    id_list *i_ids, *s_ids;
+} pars
+
+@attributes {
+    @autoinh
+    id_list *i_ids;
+    id_list *s_ids;
+} stat lexpr term
+
+@attributes {
+    @autoinh
+    id_list *i_ids;
+} expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel expr_list else
 
 %start program
 
@@ -108,7 +117,6 @@ stats:
       /* empty */
     | stat ';' stats
       @{
-        @i @stat.i_ids@ = @stats.0.i_ids@;
         @i @stats.1.i_ids@ = @stat.0.s_ids@;
       @}
     ;
@@ -116,14 +124,11 @@ stats:
 stat:
       RETURN expr
       @{
-        @i @expr.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = @stat.i_ids@;
       @}
     | IF expr THEN stats else END
       @{
-        @i @expr.i_ids@ = @stat.i_ids@;
         @i @stats.i_ids@ = @stat.i_ids@;
-        @i @else.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = @stat.i_ids@;
       @}
     | ID ':' LOOP stats END             /* label neu */ /* sichtbarkeit innerhalb der schleife */
@@ -141,18 +146,14 @@ stat:
       @}
     | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stat */
       @{
-        @i @expr.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = add_name(@stat.i_ids@, @ID.lexeme@);
       @}
     | lexpr ASSIGN expr
       @{
-        @i @lexpr.i_ids@ = @stat.i_ids@;
-        @i @expr.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = @stat.i_ids@;
       @}
     | expr
       @{
-        @i @expr.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = @stat.i_ids@;
       @}
     ;
@@ -172,141 +173,61 @@ lexpr:
       @}
      | '*' term
       @{
-        @i @term.i_ids@ = @lexpr.i_ids@;
         @i @lexpr.s_ids@ = @lexpr.i_ids@;
       @}
      ;
 
 expr:
       term
-      @{
-        @i @term.i_ids@ = @expr.i_ids@;
-      @}
     | expr_unary
-      @{
-        @i @expr_unary.i_ids@ = @expr.i_ids@;
-      @}
     | expr_binary
-      @{
-        @i @expr_binary.i_ids@ = @expr.i_ids@;
-      @}
     ;
 
 expr_unary:
       NOT expr_unary
-      @{
-        @i @expr_unary.1.i_ids@ = @expr_unary.0.i_ids@;
-      @}
     | '-' expr_unary
-      @{
-        @i @expr_unary.1.i_ids@ = @expr_unary.0.i_ids@;
-      @}
     | '*' expr_unary
-      @{
-        @i @expr_unary.1.i_ids@ = @expr_unary.0.i_ids@;
-      @}
     | NOT term
-      @{
-        @i @term.i_ids@ = @expr_unary.i_ids@;
-      @}
     | '-' term
-      @{
-        @i @term.i_ids@ = @expr_unary.i_ids@;
-      @}
     | '*' term
-      @{
-        @i @term.i_ids@ = @expr_unary.i_ids@;
-      @}
     ;
 
 expr_binary:
       expr_add
-      @{
-        @i @expr_add.i_ids@ = @expr_binary.i_ids@;
-      @}
     | expr_mul
-      @{
-        @i @expr_mul.i_ids@ = @expr_binary.i_ids@;
-      @}
     | expr_and
-      @{
-        @i @expr_and.i_ids@ = @expr_binary.i_ids@;
-      @}
     | expr_rel
-      @{
-        @i @expr_rel.i_ids@ = @expr_binary.i_ids@;
-      @}
     ;
 
 expr_add:
       expr_add '+' term
-      @{
-        @i @expr_add.1.i_ids@ = @expr_add.0.i_ids@;
-        @i @term.i_ids@ = @expr_add.0.i_ids@;
-      @}
     | term '+' term
-      @{
-        @i @term.0.i_ids@ = @expr_add.i_ids@;
-        @i @term.1.i_ids@ = @expr_add.i_ids@;
-      @}
     ;
 
 expr_mul:
       expr_mul '*' term
-      @{
-        @i @expr_mul.1.i_ids@ = @expr_mul.0.i_ids@;
-        @i @term.i_ids@ = @expr_mul.0.i_ids@;
-      @}
     | term '*' term
-      @{
-        @i @term.0.i_ids@ = @expr_mul.i_ids@;
-        @i @term.1.i_ids@ = @expr_mul.i_ids@;
-      @}
     ;
 
 expr_and:
       expr_and AND term
-      @{
-        @i @expr_and.1.i_ids@ = @expr_and.0.i_ids@;
-        @i @term.i_ids@ = @expr_and.0.i_ids@;
-      @}
     | term AND term
-      @{
-        @i @term.0.i_ids@ = @expr_and.i_ids@;
-        @i @term.1.i_ids@ = @expr_and.i_ids@;
-      @}
     ;
 
 expr_rel:
       term LEQ term
-      @{
-        @i @term.0.i_ids@ = @expr_rel.i_ids@;
-        @i @term.1.i_ids@ = @expr_rel.i_ids@;
-      @}
     | term '#' term
-      @{
-        @i @term.0.i_ids@ = @expr_rel.i_ids@;
-        @i @term.1.i_ids@ = @expr_rel.i_ids@;
-      @}
     ;
 
 expr_list:
       /* empty */
     | expr
-      @{
-        @i @expr.i_ids@ = @expr_list.i_ids@;
-      @}
     | expr ',' expr_list
-      @{
-        @i @expr.i_ids@ = @expr_list.0.i_ids@;
-        @i @expr_list.1.i_ids@ = @expr_list.0.i_ids@;
-      @}
     ;
 
 term:
       '(' expr ')'
       @{
-        @i @expr.i_ids@ = @term.i_ids@;
         @i @term.s_ids@ = @term.i_ids@;
       @}
     | NUM
@@ -319,7 +240,6 @@ term:
       @}
     | ID '(' expr_list ')'              /* funktion beliebig */
       @{
-        @i @expr_list.i_ids@ = @term.i_ids@;
         @i @term.s_ids@ = @term.i_ids@;
       @}
     ;
