@@ -47,3 +47,47 @@ treenode *new_number_node(long long num) {
 treenode *new_nop_node() {
     return _new_operator_node(OP_NOP, NULL, NULL);
 }
+
+char *op_to_str(int op) {
+    switch (op) {
+        case OP_ID:
+            return "ID";
+        case OP_NUM:
+            return "NUM";
+        case OP_LEQ:
+            return "LEQ";
+        case OP_DIF:
+            return "DIF";
+        case OP_AND:
+            return "AND";
+        case OP_MUL:
+            return "MUL";
+        case OP_ADD:
+            return "ADD";
+        case OP_NOT:
+            return "NOT";
+        case OP_NEG:
+            return "NEG";
+        case OP_DRF:
+            return "DRF";
+        case OP_RET:
+            return "RET";
+        case OP_NOP:
+            return "NOP";
+    }
+}
+
+void _print_tree(treenode *node, int indent) {
+    if (node == NULL) return;
+    for (int i = 0; i < indent; i++) printf("\t");
+    printf("op: %s", op_to_str(node->op));
+    if (node->identifier != NULL) printf(" id: %s", node->identifier);
+    printf(" val: %lld", node->val);
+    printf("\n");
+    _print_tree(node->kids[0], indent + 1);
+    _print_tree(node->kids[1], indent + 1);
+}
+
+void print_tree(treenode *node) {
+    _print_tree(node, 0);
+}

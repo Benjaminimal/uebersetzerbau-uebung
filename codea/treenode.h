@@ -44,5 +44,6 @@ treenode *new_unary_operator_node(int, treenode*);
 treenode *new_identifier_node(char*, char*);
 treenode *new_number_node(long long);
 treenode *new_nop_node();
+void print_tree(treenode *);
 
 #endif /* _TREENODE_H_ */

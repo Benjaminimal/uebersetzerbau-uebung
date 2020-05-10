@@ -13,7 +13,7 @@ PG_FLAGS = -dv
 
 LG = flex
 
-CC = gcc $(CC_FLAGS)
+CC = gcc $(CC_FLAGS) $(U_FLAGS)
 # CC_FLAGS = -std=c99 -pedantic -Wall -g
 CC_FLAGS = -g -DUSE_IBURG
 LD_FLAGS = -lfl

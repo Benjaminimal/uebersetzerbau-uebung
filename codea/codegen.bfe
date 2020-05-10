@@ -71,4 +71,7 @@ void burm_reduce(NODEPTR_TYPE bnode, int goalnt);
 void invoke_burm(NODEPTR_TYPE root) {
         burm_label(root);
         burm_reduce(root, 1);
+#ifdef DBG
+        print_tree(root);
+#endif /* DBG */
 }
