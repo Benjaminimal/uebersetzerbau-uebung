@@ -9,7 +9,6 @@ treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     if (new_node == NULL) {
         // TODO: rephrase
         fprintf(stderr, "Out of memory.\n");
-        // TODO: not sure if this should be 3
         exit(4);
     }
 
