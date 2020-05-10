@@ -76,33 +76,28 @@ extern void invoke_burm(NODEPTR_TYPE root);
 } pars
 
 @attributes {
+    @autoinh
+    id_list *i_ids;
+    id_list *s_ids;
+    treenode *s_n;
+} stat
+
+@attributes {
     id_list *i_ids;
 } stats
 
 @attributes {
     @autoinh
     id_list *i_ids;
-    id_list *s_ids;
-} lexpr
+} lexpr expr_list else
 
 @attributes {
     @autoinh
     id_list *i_ids;
     treenode *s_n;
-} expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel
+} term expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel
 
-@attributes {
-    @autoinh
-    id_list *i_ids;
-} expr_list else
-
-@attributes {
-    @autoinh
-    id_list *i_ids;
-    id_list *s_ids;
-    treenode *s_n;
-} stat term
-
+@traversal idcheck
 @traversal @postorder codegen
 
 %start program
@@ -171,12 +166,14 @@ stat:
       @}
     | BREAK ID                          /* label bestehend */
       @{
-        @i @stat.s_ids@ = check_label(@stat.i_ids@, @ID.lexeme@);
+        @idcheck check_label(@stat.i_ids@, @ID.lexeme@);
+        @i @stat.s_ids@ = @stat.i_ids@;
         @i @stat.s_n@ = new_nop_node();
       @}
     | CONT ID                           /* label bestehend */
       @{
-        @i @stat.s_ids@ = check_label(@stat.i_ids@, @ID.lexeme@);
+        @idcheck check_label(@stat.i_ids@, @ID.lexeme@);
+        @i @stat.s_ids@ = @stat.i_ids@;
         @i @stat.s_n@ = new_nop_node();
       @}
     | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stat */
@@ -207,12 +204,9 @@ else:
 lexpr:
        ID                               /* name bestehend */
       @{
-        @i @lexpr.s_ids@ = check_name(@lexpr.i_ids@, @ID.lexeme@);
+        @idcheck check_name(@lexpr.i_ids@, @ID.lexeme@);
       @}
      | '*' term
-      @{
-        @i @lexpr.s_ids@ = @lexpr.i_ids@;
-      @}
      ;
 
 expr:
@@ -329,22 +323,19 @@ expr_list:
 term:
       '(' expr ')'
       @{
-        @i @term.s_ids@ = @term.i_ids@;
         @i @term.s_n@ = @expr.s_n@;
       @}
     | NUM
       @{
-        @i @term.s_ids@ = @term.i_ids@;
         @i @term.s_n@ = new_number_node(@NUM.value@);
       @}
     | ID                                /* name bestehend */
       @{
-        @i @term.s_ids@ = check_name(@term.i_ids@, @ID.lexeme@);
-        @i @term.s_n@ = new_identifier_node(@ID.lexeme@, get_arg_register_name(@term.s_ids@, @ID.lexeme@));
+        @idcheck check_name(@term.i_ids@, @ID.lexeme@);
+        @i @term.s_n@ = new_identifier_node(@ID.lexeme@, get_arg_register_name(@term.i_ids@, @ID.lexeme@));
       @}
     | ID '(' expr_list ')'              /* funktion beliebig */
       @{
-        @i @term.s_ids@ = @term.i_ids@;
         @i @term.s_n@ = new_nop_node();
       @}
     ;
