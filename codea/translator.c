@@ -126,10 +126,10 @@ void and_i(long long val, char *dst) {
 
 // TODO: check if this works for unsigned
 void mul(char *src, char *dst) {
-    printf("\tmulq\t%%%s, %%%s\n", src, dst);
+    printf("\timulq\t%%%s, %%%s\n", src, dst);
 }
 void mul_i(long long val, char *dst) {
-    printf("\tmulq\t$%lld, %%%s\n", val, dst);
+    printf("\timulq\t$%lld, %%%s\n", val, dst);
 }
 
 
