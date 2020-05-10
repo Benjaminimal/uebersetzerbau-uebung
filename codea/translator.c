@@ -77,15 +77,15 @@ void function_start(char *name) {
     printf("\t.globl\t%s\n", name);
     printf("\t.type\t%s, @function\n", name);
     printf("%s:\n", name);
-    printf(".LFB%d:\n", function_count);
+    // printf(".LFB%d:\n", function_count);
     // printf("\tpushq\t%%%s\n", RBP.name);
     // printf("\tmovq\t%%%s, %%%s\n", RSP.name, RBP.name);
 }
 
 void function_end(char *name) {
     // printf("\tpopq\t%%%s\n", RBP); // TODO: might be moved to ret
-    printf(".LFE%d:\n", function_count);
-    printf("\t.size\t%s, .-%s\n", name, name);
+    // printf(".LFE%d:\n", function_count);
+    // printf("\t.size\t%s, .-%s\n", name, name);
     function_count++;
 }
 
@@ -106,15 +106,15 @@ void cmp_i(long long val, char *dst) {
 }
 
 void leq(char *dst) {
-    printf("\tsetle %%%s\n", get_reg(dst)->b_name);
+    printf("\tsetle\t%%%s\n", get_reg(dst)->b_name);
 }
 
 void gt(char *dst) {
-    printf("\tsetg %%%s\n", get_reg(dst)->b_name);
+    printf("\tsetg\t%%%s\n", get_reg(dst)->b_name);
 }
 
 void dif(char *dst) {
-    printf("\tsetne %%%s\n", get_reg(dst)->b_name);
+    printf("\tsetne\t%%%s\n", get_reg(dst)->b_name);
 }
 
 void and(char *src, char *dst) {
