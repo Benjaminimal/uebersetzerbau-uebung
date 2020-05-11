@@ -42,7 +42,7 @@ const reg *reg_caller[] = {&RAX, &RCX, &RDX, &RSI, &RDI, &R8, &R9, &R10, &R11}; 
 const reg *reg_callee[] = {&RBX, &R12, &R13, &R14, &R15}; // TODO: rbp (and rsp) is missing
 */
 
-int num_digits(int n) {
+int _num_digits(int n) {
     int cnt = 0;
     while (n != 0) {
         n /= 10;
@@ -52,7 +52,7 @@ int num_digits(int n) {
 }
 
 char *next_label() {
-    char *label = malloc(LABEL_PREFIX_LEN + num_digits(label_count + 1));
+    char *label = malloc(LABEL_PREFIX_LEN + _num_digits(label_count + 1));
     if (label == NULL) {
         fprintf(stderr, "out of memory\n");
         exit(4);
@@ -104,7 +104,7 @@ void function_start(char *name) {
     }
     printf("\t.globl\t%s\n", name);
     printf("\t.type\t%s, @function\n", name);
-    lbl(name);
+    _lbl(name);
     // printf(".LFB%d:\n", function_count);
     // printf("\tpushq\t%%%s\n", RBP.name);
     // printf("\tmovq\t%%%s, %%%s\n", RSP.name, RBP.name);
@@ -118,133 +118,121 @@ void function_end(char *name) {
 }
 
 // TODO: rename to mov and mov_i
-void mov(char *src, char *dst) {
+void _mov(char *src, char *dst) {
     // TODO: check for reduntant move
     printf("\tmovq\t%%%s, %%%s\n", src, dst);
 }
 
-void mov_i(long long val, char *dst) {
+void _mov_i(long long val, char *dst) {
     printf("\tmovq\t$%lld, %%%s\n", val, dst);
 }
 
-void cmp(char *left, char *right) {
+void _cmp(char *left, char *right) {
     printf("\tcmpq\t%%%s, %%%s\n", left, right);
 }
-void cmp_i(long long val, char *dst) {
+void _cmp_i(long long val, char *dst) {
     printf("\tcmpq\t$%lld, %%%s\n", val, dst);
 }
 
-void leq(char *dst) {
-    printf("\tsetle\t%%%s\n", get_reg(dst)->b_name);
-}
-
-void gt(char *dst) {
-    printf("\tsetg\t%%%s\n", get_reg(dst)->b_name);
-}
-
-void dif(char *dst) {
-    printf("\tsetne\t%%%s\n", get_reg(dst)->b_name);
-}
-
-void and(char *src, char *dst) {
+void _and(char *src, char *dst) {
     printf("\tandq\t%%%s, %%%s\n", src, dst);
 }
-void and_i(long long val, char *dst) {
+void _and_i(long long val, char *dst) {
     printf("\tandq\t$%lld, %%%s\n", val, dst);
 }
 
-void mul(char *src, char *dst) {
+void _mul(char *src, char *dst) {
     printf("\timulq\t%%%s, %%%s\n", src, dst);
 }
-void mul_i(long long val, char *dst) {
+void _mul_i(long long val, char *dst) {
     printf("\timulq\t$%lld, %%%s\n", val, dst);
 }
 
 
-void add(char *src, char *dst) {
+void _add(char *src, char *dst) {
     printf("\taddq\t%%%s, %%%s\n", src, dst);
 }
-void add_i(long long val, char *dst) {
+void _add_i(long long val, char *dst) {
     printf("\taddq\t$%lld, %%%s\n", val, dst);
 }
 
-void not(char *src_dst) {
+void _not(char *src_dst) {
     printf("\tnotq\t%%%s\n", src_dst);
 }
 
-void neg(char *src_dst) {
+void _neg(char *src_dst) {
     printf("\tnegq\t%%%s\n", src_dst);
 }
 
-void drf(char *src, char *dst) {
+void _drf(char *src, char *dst) {
     printf("\tmovq\t(%%%s), %%%s\n", src, dst);
 }
-void drf_i(long long val, char *dst) {
+void _drf_i(long long val, char *dst) {
     printf("\tmovq\t($%lld), %%%s\n", val, dst);
 }
 
-void ret() {
+void _ret() {
     printf("\tret\n");
 }
 
-void jmp(char *loc) {
+void _jmp(char *loc) {
     printf("\tjmp\t%s\n", loc);
 }
 
-void jcc(char *cond, char *loc) {
+void _jcc(char *cond, char *loc) {
     printf("\tj%s\t%s\n", cond, loc);
 }
 
-void lbl(char *label) {
+void _lbl(char *label) {
     printf("%s:\n", label);
 }
 
-void cmp_cc(char *cond, char *lsrc, char *rsrc, char *dst) {
+void _cmp_cc(char *cond, char *lsrc, char *rsrc, char *dst) {
     char *label_true = next_label();
     char *label_end = next_label();
 
-    cmp(lsrc, rsrc);
-    jcc(cond, label_true);
-    mov_i(0, dst);
-    jmp(label_end);
-    lbl(label_true);
-    mov_i(-1, dst);
-    lbl(label_end);
+    _cmp(lsrc, rsrc);
+    _jcc(cond, label_true);
+    _mov_i(0, dst);
+    _jmp(label_end);
+    _lbl(label_true);
+    _mov_i(-1, dst);
+    _lbl(label_end);
 
     free(label_true);
     free(label_end);
 }
 
-void cmp_cc_i(char *cond, long long val, char *src, char *dst) {
+void _cmp_cc_i(char *cond, long long val, char *src, char *dst) {
     char *label_true = next_label();
     char *label_end = next_label();
 
-    cmp_i(val, src);
-    jcc(cond, label_true);
-    mov_i(0, dst);
-    jmp(label_end);
-    lbl(label_true);
-    mov_i(-1, dst);
-    lbl(label_end);
+    _cmp_i(val, src);
+    _jcc(cond, label_true);
+    _mov_i(0, dst);
+    _jmp(label_end);
+    _lbl(label_true);
+    _mov_i(-1, dst);
+    _lbl(label_end);
 
     free(label_true);
     free(label_end);
 }
 
 void cmp_leq(char *lsrc, char *rsrc, char *dst) {
-    cmp_cc("le", rsrc, lsrc, dst);
+    _cmp_cc("le", rsrc, lsrc, dst);
 }
 void cmp_leq_i(long long val, char *src, char *dst) {
-    cmp_cc_i("ge", val, src, dst);
+    _cmp_cc_i("ge", val, src, dst);
 }
 
 void cmp_geq_i(long long val, char *src, char *dst) {
-    cmp_cc_i("le", val, src, dst);
+    _cmp_cc_i("le", val, src, dst);
 }
 
 void cmp_dif(char *lsrc, char *rsrc, char *dst) {
-    cmp_cc("ne", lsrc, rsrc, dst);
+    _cmp_cc("ne", lsrc, rsrc, dst);
 }
 void cmp_dif_i(long long val, char *src, char *dst) {
-    cmp_cc_i("ne", val, src, dst);
+    _cmp_cc_i("ne", val, src, dst);
 }

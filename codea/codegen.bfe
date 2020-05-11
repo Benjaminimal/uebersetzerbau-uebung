@@ -11,6 +11,8 @@
  // TODO: hide instructions and expose minimal interface fro translator.c
  // TODO: expand tree grammar to be able to use less registers
  // TODO: is it a good idea to preassign registers in a traversal prior to the codegen
+ // TODO: figure out how to test drf operator
+ // TODO: test the empty program
 %}
 
 %start stat
@@ -31,34 +33,34 @@ reg:    OP_DIF(num, reg)    # 3 # bnode->reg =  next_reg(); cmp_dif_i(kids[0]->v
 reg:    OP_DIF(reg, num)    # 3 # bnode->reg =  next_reg(); cmp_dif_i(kids[1]->val, kids[0]->reg, bnode->reg);
 num:    OP_DIF(num, num)    # 0 # bnode->val = kids[0]->val != kids[1]->val ? -1 : 0;
 
-reg:    OP_AND(reg, reg)    # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); and(kids[1]->reg, bnode->reg);
-reg:    OP_AND(num, reg)    # 2 # bnode->reg = next_reg(); mov_i(kids[0]->val, bnode->reg); and(kids[1]->reg, bnode->reg);
-reg:    OP_AND(reg, num)    # 2 # bnode->reg = next_reg(); mov_i(kids[1]->val, bnode->reg); and(kids[0]->reg, bnode->reg);
+reg:    OP_AND(reg, reg)    # 2 # bnode->reg = next_reg(); _mov(kids[0]->reg, bnode->reg); _and(kids[1]->reg, bnode->reg);
+reg:    OP_AND(num, reg)    # 2 # bnode->reg = next_reg(); _mov_i(kids[0]->val, bnode->reg); _and(kids[1]->reg, bnode->reg);
+reg:    OP_AND(reg, num)    # 2 # bnode->reg = next_reg(); _mov_i(kids[1]->val, bnode->reg); _and(kids[0]->reg, bnode->reg);
 num:    OP_AND(num, num)    # 0 # bnode->val = kids[0]->val & kids[1]->val;
 
-reg:    OP_MUL(reg, reg)    # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); mul(kids[1]->reg, bnode->reg);
-reg:    OP_MUL(num, reg)    # 2 # bnode->reg = next_reg(); mov_i(kids[0]->val, bnode->reg); mul(kids[1]->reg, bnode->reg);
-reg:    OP_MUL(reg, num)    # 2 # bnode->reg = next_reg(); mov_i(kids[1]->val, bnode->reg); mul(kids[0]->reg, bnode->reg);
+reg:    OP_MUL(reg, reg)    # 2 # bnode->reg = next_reg(); _mov(kids[0]->reg, bnode->reg); _mul(kids[1]->reg, bnode->reg);
+reg:    OP_MUL(num, reg)    # 2 # bnode->reg = next_reg(); _mov_i(kids[0]->val, bnode->reg); _mul(kids[1]->reg, bnode->reg);
+reg:    OP_MUL(reg, num)    # 2 # bnode->reg = next_reg(); _mov_i(kids[1]->val, bnode->reg); _mul(kids[0]->reg, bnode->reg);
 num:    OP_MUL(num, num)    # 0 # bnode->val = kids[0]->val * kids[1]->val;
 
-reg:    OP_ADD(reg, reg)    # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); add(kids[1]->reg, bnode->reg); // TODO: replace by leaq (l,r), d
-reg:    OP_ADD(num, reg)    # 2 # bnode->reg = next_reg(); mov_i(kids[0]->val, bnode->reg); add(kids[1]->reg, bnode->reg); // TODO: replace by leaq (l,r), d
-reg:    OP_ADD(reg, num)    # 2 # bnode->reg = next_reg(); mov_i(kids[1]->val, bnode->reg); add(kids[0]->reg, bnode->reg); // TODO: replace by leaq (l,r), d
+reg:    OP_ADD(reg, reg)    # 2 # bnode->reg = next_reg(); _mov(kids[0]->reg, bnode->reg); _add(kids[1]->reg, bnode->reg); // TODO: replace by leaq (l,r), d
+reg:    OP_ADD(num, reg)    # 2 # bnode->reg = next_reg(); _mov_i(kids[0]->val, bnode->reg); _add(kids[1]->reg, bnode->reg); // TODO: replace by leaq (l,r), d
+reg:    OP_ADD(reg, num)    # 2 # bnode->reg = next_reg(); _mov_i(kids[1]->val, bnode->reg); _add(kids[0]->reg, bnode->reg); // TODO: replace by leaq (l,r), d
 num:    OP_ADD(num, num)    # 0 # bnode->val = kids[0]->val + kids[1]->val;
 
-reg:    OP_NOT(reg)         # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); not(bnode->reg);
+reg:    OP_NOT(reg)         # 2 # bnode->reg = next_reg(); _mov(kids[0]->reg, bnode->reg); _not(bnode->reg);
 num:    OP_NOT(num)         # 0 # bnode->val = ~kids[0]->val;
 
-reg:    OP_NEG(reg)         # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); neg(bnode->reg);
+reg:    OP_NEG(reg)         # 2 # bnode->reg = next_reg(); _mov(kids[0]->reg, bnode->reg); _neg(bnode->reg);
 num:    OP_NEG(num)         # 0 # bnode->val = -kids[0]->val;
 
-reg:    OP_DRF(reg)         # 1 # bnode->reg = next_reg(); drf(kids[0]->reg, bnode->reg);
-num:    OP_DRF(num)         # 1 # bnode->reg = next_reg(); drf_i(kids[0]->val, bnode->reg);
+reg:    OP_DRF(reg)         # 1 # bnode->reg = next_reg(); _drf(kids[0]->reg, bnode->reg);
+num:    OP_DRF(num)         # 1 # bnode->reg = next_reg(); _drf_i(kids[0]->val, bnode->reg);
 
 reg:    id                  # 0
 
-ret:    OP_RET(reg)         # 1 # mov(kids[0]->reg, "rax"); ret();
-ret:    OP_RET(num)         # 1 # mov_i(kids[0]->val, "rax"); ret();
+ret:    OP_RET(reg)         # 1 # _mov(kids[0]->reg, "rax"); _ret();
+ret:    OP_RET(num)         # 1 # _mov_i(kids[0]->val, "rax"); _ret();
 ret:    OP_RET(nop)         # 0
 
 num:    OP_NUM              # 0 
