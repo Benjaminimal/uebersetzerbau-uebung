@@ -12,6 +12,12 @@ void move_i(long long, char *);
 void cmp(char *, char *);
 void cmp_i(long long, char *);
 
+void cmp_leq(char *, char *, char *);
+void cmp_leq_i(long long, char *, char *);
+void cmp_gt_i(long long, char *, char *);
+void cmp_dif(char *, char *, char *);
+void cmp_dif_i(long long, char *, char *);
+
 void leq(char *);
 
 void gt(char *);
@@ -35,6 +41,8 @@ void drf(char *, char *);
 void drf_i(long long, char *);
 
 void ret();
+
+void lbl(char *);
 
 char *get_argument_register(int);
 char *next_reg();

@@ -1,6 +1,16 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "translator.h"
+
+#define T_VAL -1
+#define F_VAL 0
+
+#define LABEL_PREFIX ".L"
+#define LABEL_PREFIX_LEN 2
+
+int function_count = 0;
+int label_count = 0;
 
 typedef struct {
     char *name;
@@ -32,7 +42,25 @@ const reg *reg_caller[] = {&RAX, &RCX, &RDX, &RSI, &RDI, &R8, &R9, &R10, &R11}; 
 const reg *reg_callee[] = {&RBX, &R12, &R13, &R14, &R15}; // TODO: rbp (and rsp) is missing
 */
 
-int function_count = 0;
+int num_digits(int n) {
+    int cnt = 0;
+    while (n != 0) {
+        n /= 10;
+        cnt++;
+    }
+    return cnt;
+}
+
+char *next_label() {
+    char *label = malloc(LABEL_PREFIX_LEN + num_digits(label_count + 1));
+    if (label == NULL) {
+        fprintf(stderr, "out of memory\n");
+        exit(4);
+    }
+    sprintf(label, "%s%d", LABEL_PREFIX, label_count);
+    label_count++;
+    return label;
+}
 
 char *get_argument_register(int position) {
     if (position < 0 || position >= MAX_ARGS) {
@@ -76,7 +104,7 @@ void function_start(char *name) {
     }
     printf("\t.globl\t%s\n", name);
     printf("\t.type\t%s, @function\n", name);
-    printf("%s:\n", name);
+    lbl(name);
     // printf(".LFB%d:\n", function_count);
     // printf("\tpushq\t%%%s\n", RBP.name);
     // printf("\tmovq\t%%%s, %%%s\n", RSP.name, RBP.name);
@@ -89,6 +117,7 @@ void function_end(char *name) {
     function_count++;
 }
 
+// TODO: rename to mov and mov_i
 void move(char *src, char *dst) {
     // TODO: check for reduntant move
     printf("\tmovq\t%%%s, %%%s\n", src, dst);
@@ -156,4 +185,66 @@ void drf_i(long long val, char *dst) {
 
 void ret() {
     printf("\tret\n");
+}
+
+void jmp(char *loc) {
+    printf("\tjmp\t%s\n", loc);
+}
+
+void jcc(char *cond, char *loc) {
+    printf("\tj%s\t%s\n", cond, loc);
+}
+
+void lbl(char *label) {
+    printf("%s:\n", label);
+}
+
+void cmp_cc(char *cond, char *lsrc, char *rsrc, char *dst) {
+    char *label_true = next_label();
+    char *label_end = next_label();
+
+    cmp(lsrc, rsrc);
+    jcc(cond, label_true);
+    move_i(0, dst);
+    jmp(label_end);
+    lbl(label_true);
+    move_i(-1, dst);
+    lbl(label_end);
+
+    free(label_true);
+    free(label_end);
+}
+
+void cmp_cc_i(char *cond, long long val, char *src, char *dst) {
+    char *label_true = next_label();
+    char *label_end = next_label();
+
+    cmp_i(val, src);
+    jcc(cond, label_true);
+    move_i(0, dst);
+    jmp(label_end);
+    lbl(label_true);
+    move_i(-1, dst);
+    lbl(label_end);
+
+    free(label_true);
+    free(label_end);
+}
+
+void cmp_leq(char *lsrc, char *rsrc, char *dst) {
+    cmp_cc("le", rsrc, lsrc, dst);
+}
+void cmp_leq_i(long long val, char *src, char *dst) {
+    cmp_cc_i("ge", val, src, dst);
+}
+
+void cmp_gt_i(long long val, char *src, char *dst) {
+    cmp_cc_i("le", val, src, dst);
+}
+
+void cmp_dif(char *lsrc, char *rsrc, char *dst) {
+    cmp_cc("ne", lsrc, rsrc, dst);
+}
+void cmp_dif_i(long long val, char *src, char *dst) {
+    cmp_cc_i("ne", val, src, dst);
 }

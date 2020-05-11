@@ -18,14 +18,14 @@
 stat:   ret                 # 0
 stat:   nop                 # 0
 
-reg:    OP_LEQ(reg, reg)    # 3 # bnode->reg =  next_reg(); cmp(kids[0]->reg, kids[1]->reg); leq(bnode->reg); ;
-reg:    OP_LEQ(num, reg)    # 3 # bnode->reg =  next_reg(); cmp_i(kids[0]->val, kids[1]->reg); leq(bnode->reg); ;
-reg:    OP_LEQ(reg, num)    # 3 # bnode->reg =  next_reg(); cmp_i(kids[1]->val, kids[0]->reg); gt(bnode->reg); ;
+reg:    OP_LEQ(reg, reg)    # 3 # bnode->reg =  next_reg(); cmp_leq(kids[0]->reg, kids[1]->reg, bnode->reg);
+reg:    OP_LEQ(num, reg)    # 3 # bnode->reg =  next_reg(); cmp_leq_i(kids[0]->val, kids[1]->reg, bnode->reg);
+reg:    OP_LEQ(reg, num)    # 3 # bnode->reg =  next_reg(); cmp_gt_i(kids[1]->val, kids[0]->reg, bnode->reg);
 num:    OP_LEQ(num, num)    # 0 # bnode->val = kids[0]->val <= kids[1]->val ? -1 : 0;
 
-reg:    OP_DIF(reg, reg)    # 3 # bnode->reg =  next_reg(); cmp(kids[0]->reg, kids[1]->reg); dif(bnode->reg); ;
-reg:    OP_DIF(num, reg)    # 3 # bnode->reg =  next_reg(); cmp_i(kids[0]->val, kids[1]->reg); dif(bnode->reg); ;
-reg:    OP_DIF(reg, num)    # 3 # bnode->reg =  next_reg(); cmp_i(kids[1]->val, kids[0]->reg); dif(bnode->reg); ;
+reg:    OP_DIF(reg, reg)    # 3 # bnode->reg =  next_reg(); cmp_dif(kids[0]->reg, kids[1]->reg, bnode->reg);
+reg:    OP_DIF(num, reg)    # 3 # bnode->reg =  next_reg(); cmp_dif_i(kids[0]->val, kids[1]->reg, bnode->reg);
+reg:    OP_DIF(reg, num)    # 3 # bnode->reg =  next_reg(); cmp_dif_i(kids[1]->val, kids[0]->reg, bnode->reg);
 num:    OP_DIF(num, num)    # 0 # bnode->val = kids[0]->val != kids[1]->val ? -1 : 0;
 
 reg:    OP_AND(reg, reg)    # 2 # bnode->reg = next_reg(); move(kids[0]->reg, bnode->reg); and(kids[1]->reg, bnode->reg);
