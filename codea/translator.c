@@ -51,6 +51,8 @@ void _mul(char *, char *);
 void _mul_i(long long, char *);
 void _add(char *, char *);
 void _add_i(long long, char *);
+void _lea(char *, char *, char *);
+void _lea_i(long long, char *, char *);
 void _not(char *);
 void _neg(char *);
 void _drf(char *, char *);
@@ -176,11 +178,18 @@ void mul_i(long long val, char *src, char *dst) {
 
 void add(char *lsrc, char *rsrc, char *dst) {
     _mov(lsrc, dst);
-    _add(rsrc, dst); // TODO: replace by leaq (l,r), d
+    _add(rsrc, dst);
 }
 void add_i(long long val, char *src, char *dst) {
     _mov_i(val, dst);
-    _add(src, dst); // TODO: replace by leaq (l,r), d
+    _add(src, dst);
+}
+
+void lea(char *lsrc, char *rsrc, char *dst) {
+    _lea(lsrc, rsrc, dst);
+}
+void lea_i(long long val, char *src, char *dst) {
+    _lea_i(val, src, dst);
 }
 
 void not(char *src, char *dst) {
@@ -240,12 +249,18 @@ void _mul_i(long long val, char *dst) {
     printf("\timulq\t$%lld, %%%s\n", val, dst);
 }
 
-
 void _add(char *src, char *dst) {
     printf("\taddq\t%%%s, %%%s\n", src, dst);
 }
 void _add_i(long long val, char *dst) {
     printf("\taddq\t$%lld, %%%s\n", val, dst);
+}
+
+void _lea(char *lsrc, char *rsrc, char *dst) {
+    printf("\tleaq\t(%%%s, %%%s), %%%s\n", lsrc, rsrc, dst);
+}
+void _lea_i(long long val, char *src, char *dst) {
+    printf("\tleaq\t%lld(%%%s), %%%s\n", val, src, dst);
 }
 
 void _not(char *src_dst) {

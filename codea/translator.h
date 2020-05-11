@@ -26,6 +26,9 @@ void mul_i(long long, char *, char *);
 void add(char *, char *, char *);
 void add_i(long long, char *, char *);
 
+void lea(char *, char *, char *);
+void lea_i(long long, char *, char *);
+
 void drf(char *, char *);
 void drf_i(long long, char *);
 
