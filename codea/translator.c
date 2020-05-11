@@ -18,7 +18,6 @@ typedef struct {
     int taken;
 } reg;
 
-
 reg RAX = { .name = "rax", .b_name = "al", .taken = 0 };
 reg RBX = { .name = "rbx", .b_name = "bl", .taken = 0 };
 reg RCX = { .name = "rcx", .b_name = "cl", .taken = 0 };
@@ -41,6 +40,28 @@ reg *reg_args[] = {&RDI, &RSI, &RDX, &RCX, &R8, &R9};
 const reg *reg_caller[] = {&RAX, &RCX, &RDX, &RSI, &RDI, &R8, &R9, &R10, &R11}; // TODO: not sure if r10 can be used
 const reg *reg_callee[] = {&RBX, &R12, &R13, &R14, &R15}; // TODO: rbp (and rsp) is missing
 */
+
+void _mov(char *, char *);
+void _mov_i(long long, char *);
+void _cmp(char *, char *);
+void _cmp_i(long long, char *);
+void _and(char *, char *);
+void _and_i(long long , char *);
+void _mul(char *, char *);
+void _mul_i(long long, char *);
+void _add(char *, char *);
+void _add_i(long long, char *);
+void _not(char *);
+void _neg(char *);
+void _drf(char *, char *);
+void _drf_i(long long, char *);
+void _ret();
+void _jmp(char *);
+void _jcc(char *, char *);
+void _lbl(char *);
+void _cmp_cc(char *, char *, char *, char *);
+void _cmp_cc_i(char *, long long, char *, char *);
+
 
 int _num_digits(int n) {
     int cnt = 0;
@@ -117,7 +138,78 @@ void function_end(char *name) {
     function_count++;
 }
 
-// TODO: rename to mov and mov_i
+void cmp_leq(char *lsrc, char *rsrc, char *dst) {
+    _cmp_cc("le", rsrc, lsrc, dst);
+}
+void cmp_leq_i(long long val, char *src, char *dst) {
+    _cmp_cc_i("ge", val, src, dst);
+}
+
+void cmp_geq_i(long long val, char *src, char *dst) {
+    _cmp_cc_i("le", val, src, dst);
+}
+
+void cmp_dif(char *lsrc, char *rsrc, char *dst) {
+    _cmp_cc("ne", lsrc, rsrc, dst);
+}
+void cmp_dif_i(long long val, char *src, char *dst) {
+    _cmp_cc_i("ne", val, src, dst);
+}
+
+void and(char *lsrc, char *rsrc, char *dst) {
+    _mov(lsrc, dst);
+    _and(rsrc, dst);
+}
+void and_i(long long val, char *src, char *dst) {
+    _mov_i(val, dst);
+    _and(src, dst);
+}
+
+void mul(char *lsrc, char *rsrc, char *dst) {
+    _mov(lsrc, dst);
+    _mul(rsrc, dst);
+}
+void mul_i(long long val, char *src, char *dst) {
+    _mov_i(val, dst);
+    _mul(src, dst);
+}
+
+void add(char *lsrc, char *rsrc, char *dst) {
+    _mov(lsrc, dst);
+    _add(rsrc, dst); // TODO: replace by leaq (l,r), d
+}
+void add_i(long long val, char *src, char *dst) {
+    _mov_i(val, dst);
+    _add(src, dst); // TODO: replace by leaq (l,r), d
+}
+
+void not(char *src, char *dst) {
+    _mov(src, dst);
+    _not(dst);
+}
+
+void neg(char *src, char *dst) {
+    _mov(src, dst);
+    _neg(dst);
+}
+
+void drf(char *src, char *dst) {
+    _drf(src, dst);
+}
+void drf_i(long long val, char *dst) {
+    _drf_i(val, dst);
+}
+
+void ret(char *src) {
+    _mov(src, "rax");
+    _ret();
+}
+void ret_i(long long val) {
+    _mov_i(val, "rax");
+    _ret();
+}
+
+
 void _mov(char *src, char *dst) {
     // TODO: check for reduntant move
     printf("\tmovq\t%%%s, %%%s\n", src, dst);
@@ -217,22 +309,4 @@ void _cmp_cc_i(char *cond, long long val, char *src, char *dst) {
 
     free(label_true);
     free(label_end);
-}
-
-void cmp_leq(char *lsrc, char *rsrc, char *dst) {
-    _cmp_cc("le", rsrc, lsrc, dst);
-}
-void cmp_leq_i(long long val, char *src, char *dst) {
-    _cmp_cc_i("ge", val, src, dst);
-}
-
-void cmp_geq_i(long long val, char *src, char *dst) {
-    _cmp_cc_i("le", val, src, dst);
-}
-
-void cmp_dif(char *lsrc, char *rsrc, char *dst) {
-    _cmp_cc("ne", lsrc, rsrc, dst);
-}
-void cmp_dif_i(long long val, char *src, char *dst) {
-    _cmp_cc_i("ne", val, src, dst);
 }
