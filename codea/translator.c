@@ -118,12 +118,12 @@ void function_end(char *name) {
 }
 
 // TODO: rename to mov and mov_i
-void move(char *src, char *dst) {
+void mov(char *src, char *dst) {
     // TODO: check for reduntant move
     printf("\tmovq\t%%%s, %%%s\n", src, dst);
 }
 
-void move_i(long long val, char *dst) {
+void mov_i(long long val, char *dst) {
     printf("\tmovq\t$%lld, %%%s\n", val, dst);
 }
 
@@ -205,10 +205,10 @@ void cmp_cc(char *cond, char *lsrc, char *rsrc, char *dst) {
 
     cmp(lsrc, rsrc);
     jcc(cond, label_true);
-    move_i(0, dst);
+    mov_i(0, dst);
     jmp(label_end);
     lbl(label_true);
-    move_i(-1, dst);
+    mov_i(-1, dst);
     lbl(label_end);
 
     free(label_true);
@@ -221,10 +221,10 @@ void cmp_cc_i(char *cond, long long val, char *src, char *dst) {
 
     cmp_i(val, src);
     jcc(cond, label_true);
-    move_i(0, dst);
+    mov_i(0, dst);
     jmp(label_end);
     lbl(label_true);
-    move_i(-1, dst);
+    mov_i(-1, dst);
     lbl(label_end);
 
     free(label_true);
@@ -238,7 +238,7 @@ void cmp_leq_i(long long val, char *src, char *dst) {
     cmp_cc_i("ge", val, src, dst);
 }
 
-void cmp_gt_i(long long val, char *src, char *dst) {
+void cmp_geq_i(long long val, char *src, char *dst) {
     cmp_cc_i("le", val, src, dst);
 }
 

@@ -6,15 +6,15 @@
 void function_start(char *);
 void function_end(char *);
 
-void move(char *, char *);
-void move_i(long long, char *);
+void mov(char *, char *);
+void mov_i(long long, char *);
 
 void cmp(char *, char *);
 void cmp_i(long long, char *);
 
 void cmp_leq(char *, char *, char *);
 void cmp_leq_i(long long, char *, char *);
-void cmp_gt_i(long long, char *, char *);
+void cmp_geq_i(long long, char *, char *);
 void cmp_dif(char *, char *, char *);
 void cmp_dif_i(long long, char *, char *);
 
