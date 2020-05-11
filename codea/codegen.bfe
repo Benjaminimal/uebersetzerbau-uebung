@@ -13,6 +13,8 @@
  // TODO: is it a good idea to preassign registers in a traversal prior to the codegen
  // TODO: figure out how to test drf operator
  // TODO: test the empty program
+ // TODO: extend the symbol table with values and registers
+ // TODO: add a scope attribute to the tree pointing to the symbol table
 %}
 
 %start stat
