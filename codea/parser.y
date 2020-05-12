@@ -89,7 +89,7 @@ extern void invoke_burm(NODEPTR_TYPE root);
 @attributes {
     @autoinh
     id_list *i_ids;
-} lexpr expr_list else
+} lexpr expr_list else_stats
 
 @attributes {
     @autoinh
@@ -152,7 +152,7 @@ stat:
         @i @stat.s_ids@ = @stat.i_ids@;
         @i @stat.s_n@ = new_unary_operator_node(OP_RET, @expr.s_n@);
       @}
-    | IF expr THEN stats else END
+    | IF expr THEN stats else_stats END
       @{
         @i @stats.i_ids@ = @stat.i_ids@;
         @i @stat.s_ids@ = @stat.i_ids@;
@@ -193,11 +193,11 @@ stat:
       @}
     ;
 
-else:
+else_stats:
       /* empty */
     | ELSE stats
       @{
-        @i @stats.i_ids@ = @else.i_ids@;
+        @i @stats.i_ids@ = @else_stats.i_ids@;
       @}
     ;
 
