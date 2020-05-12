@@ -57,10 +57,19 @@ extern void invoke_burm(NODEPTR_TYPE root);
 %token BREAK
 %token CONT
 %token VAR
-%token NOT
-%token AND
+%token LPAREN
+%token RPAREN
+%token COMMA
+%token COLON
+%token SEMICOLON
 %token ASSIGN
 %token LEQ
+%token POUND
+%token AND
+%token PLUS
+%token ASTERISK
+%token HYPHEN
+%token NOT
 
 @attributes {
     char *lexeme;
@@ -106,11 +115,11 @@ extern void invoke_burm(NODEPTR_TYPE root);
 
 program:
       /* empty */
-    | program funcdef ';'
+    | program funcdef SEMICOLON
     ;
 
 funcdef:
-      ID '(' pars ')' stats END
+      ID LPAREN pars RPAREN stats END
       @{
         @i @pars.i_ids@ = empty_id_list();
         @i @pars.i_position@ = 0;
@@ -129,7 +138,7 @@ pars:
       @{
         @i @pars.s_ids@ = add_parameter(@pars.i_ids@, @ID.lexeme@, @pars.i_position@);
       @}
-    | ID ',' pars                       /* name neu */  /* sichtbarkeit gesamte funktion */
+    | ID COMMA pars                       /* name neu */  /* sichtbarkeit gesamte funktion */
       @{
         @i @pars.0.s_ids@ = @pars.1.s_ids@;
         @i @pars.1.i_ids@ = add_parameter(@pars.0.i_ids@, @ID.lexeme@, @pars.0.i_position@);
@@ -139,7 +148,7 @@ pars:
 
 stats:
       /* empty */
-    | stat ';' stats
+    | stat SEMICOLON stats
       @{
         @i @stats.1.i_ids@ = @stat.0.s_ids@;
         @codegen invoke_burm(@stat.s_n@);
@@ -158,7 +167,7 @@ stat:
         @i @stat.s_ids@ = @stat.i_ids@;
         @i @stat.s_n@ = new_nop_node();
       @}
-    | ID ':' LOOP stats END             /* label neu */ /* sichtbarkeit innerhalb der schleife */
+    | ID COLON LOOP stats END             /* label neu */ /* sichtbarkeit innerhalb der schleife */
       @{
         @i @stats.i_ids@ = add_label(@stat.i_ids@, @ID.lexeme@);
         @i @stat.s_ids@ = @stat.i_ids@;
@@ -206,7 +215,7 @@ lexpr:
       @{
         @idcheck check_name(@lexpr.i_ids@, @ID.lexeme@);
       @}
-     | '*' term
+     | ASTERISK term
      ;
 
 expr:
@@ -229,11 +238,11 @@ expr_unary:
       @{
         @i @expr_unary.0.s_n@ = new_unary_operator_node(OP_NOT, @expr_unary.1.s_n@);
       @}
-    | '-' expr_unary
+    | HYPHEN expr_unary
       @{
         @i @expr_unary.0.s_n@ = new_unary_operator_node(OP_NEG, @expr_unary.1.s_n@);
       @}
-    | '*' expr_unary
+    | ASTERISK expr_unary
       @{
         @i @expr_unary.0.s_n@ = new_unary_operator_node(OP_DRF, @expr_unary.1.s_n@);
       @}
@@ -241,11 +250,11 @@ expr_unary:
       @{
         @i @expr_unary.s_n@ = new_unary_operator_node(OP_NOT, @term.s_n@);
       @}
-    | '-' term
+    | HYPHEN term
       @{
         @i @expr_unary.s_n@ = new_unary_operator_node(OP_NEG, @term.s_n@);
       @}
-    | '*' term
+    | ASTERISK term
       @{
         @i @expr_unary.s_n@ = new_unary_operator_node(OP_DRF, @term.s_n@);
       @}
@@ -271,22 +280,22 @@ expr_binary:
     ;
 
 expr_add:
-      expr_add '+' term
+      expr_add PLUS term
       @{
         @i @expr_add.0.s_n@ = new_binary_operator_node(OP_ADD, @expr_add.1.s_n@, @term.s_n@);
       @}
-    | term '+' term
+    | term PLUS term
       @{
         @i @expr_add.s_n@ = new_binary_operator_node(OP_ADD, @term.0.s_n@, @term.1.s_n@);
       @}
     ;
 
 expr_mul:
-      expr_mul '*' term
+      expr_mul ASTERISK term
       @{
         @i @expr_mul.0.s_n@ = new_binary_operator_node(OP_MUL, @expr_mul.1.s_n@, @term.s_n@);
       @}
-    | term '*' term
+    | term ASTERISK term
       @{
         @i @expr_mul.s_n@ = new_binary_operator_node(OP_MUL, @term.0.s_n@, @term.1.s_n@);
       @}
@@ -308,7 +317,7 @@ expr_rel:
       @{
         @i @expr_rel.s_n@ = new_binary_operator_node(OP_LEQ, @term.0.s_n@, @term.1.s_n@);
       @}
-    | term '#' term
+    | term POUND term
       @{
         @i @expr_rel.s_n@ = new_binary_operator_node(OP_DIF, @term.0.s_n@, @term.1.s_n@);
       @}
@@ -317,11 +326,11 @@ expr_rel:
 expr_list:
       /* empty */
     | expr
-    | expr ',' expr_list
+    | expr COMMA expr_list
     ;
 
 term:
-      '(' expr ')'
+      LPAREN expr RPAREN
       @{
         @i @term.s_n@ = @expr.s_n@;
       @}
@@ -334,7 +343,7 @@ term:
         @idcheck check_name(@term.i_ids@, @ID.lexeme@);
         @i @term.s_n@ = new_identifier_node(@ID.lexeme@, get_arg_register_name(@term.i_ids@, @ID.lexeme@));
       @}
-    | ID '(' expr_list ')'              /* funktion beliebig */
+    | ID LPAREN expr_list RPAREN        /* funktion beliebig */
       @{
         @i @term.s_n@ = new_nop_node();
       @}

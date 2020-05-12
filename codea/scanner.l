@@ -29,7 +29,6 @@ int yycolumn = 1;
 ID              [a-zA-Z_][a-zA-Z0-9_]*
 DECNUM          [0-9]+
 HEXNUM          0x[0-9a-fA-F]+
-SPECIAL         \(|\)|,|;|:|\*|-|\+|#
 COMMENT         \/\/.*$?
 WHITESPACE      [ \n\t]+
 
@@ -49,7 +48,15 @@ WHITESPACE      [ \n\t]+
 "and"           return AND;
 ":="            return ASSIGN;
 "<="            return LEQ;
-{SPECIAL}       return (int) yytext[0];
+"("             return LPAREN;
+")"             return RPAREN;
+","             return COMMA;
+";"             return SEMICOLON;
+":"             return COLON;
+"*"             return ASTERISK;
+"-"             return HYPHEN;
+"+"             return PLUS;
+"#"             return POUND;
 {ID}            return ID; @{ @ID.lexeme@ = strdup(yytext); @}
 {HEXNUM}        return NUM; @{ @NUM.value@ = strtoull(yytext, NULL, 16); @}
 {DECNUM}        return NUM; @{ @NUM.value@ = strtoull(yytext, NULL, 10); @}
