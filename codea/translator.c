@@ -121,6 +121,12 @@ void free_reg(char *name) {
     }
 }
 
+void free_arg_regs() {
+    for (int i = 0; i < MAX_ARGS; i++) {
+        reg_args[i]->taken = 0;
+    }
+}
+
 void function_start(char *name) {
     if (function_count == 0) {
         printf("\t.text\n");
@@ -134,6 +140,7 @@ void function_start(char *name) {
 }
 
 void function_end(char *name) {
+    free_arg_regs();
     // printf("\tpopq\t%%%s\n", RBP); // TODO: might be moved to ret
     // printf(".LFE%d:\n", function_count);
     // printf("\t.size\t%s, .-%s\n", name, name);
