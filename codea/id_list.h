@@ -9,7 +9,7 @@ typedef enum {
 typedef struct id_list {
     id_type type;
     char *lexeme;
-    int parameter_position;
+    char par_pos;
     struct id_list *next;
 } id_list;
 
@@ -22,5 +22,7 @@ int contains_label(id_list *, char *);
 int contains_id(id_list *, char *);
 
 id_list *get_id(id_list *, char *);
+id_list *get_name(id_list *, char *);
+id_list *get_label(id_list *, char *);
 
 #endif /* _ID_LIST_H_ */

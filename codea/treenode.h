@@ -25,8 +25,9 @@ typedef struct s_node {
     struct s_node   *kids[2];
     STATEPTR_TYPE   state;
     /* user defined data fields follow here */
-    char            *reg;
-    char            *identifier;
+    char            reg;
+    char            *id;
+    char            par_pos;
     long long       val;
 } treenode;
 
@@ -41,7 +42,7 @@ typedef treenode *treenodep;
 
 treenode *new_binary_operator_node(int, treenode*, treenode*);
 treenode *new_unary_operator_node(int, treenode*);
-treenode *new_identifier_node(char*, char*);
+treenode *new_id_node(char*, char);
 treenode *new_number_node(long long);
 treenode *new_nop_node();
 void print_tree(treenode *);

@@ -8,6 +8,11 @@
 #include "treenode.h"
 #include "translator.h"
 
+ // TODO: add test for optimizations
+ // TODO: extend grammmar for optimizations
+ // TODO: add tests of more complex return statements
+ // TODO: add xin tests
+ // TODO: add lex and parse error tests
  // TODO: figure out how to test drf operator
  // TODO: test the empty program
  // TODO: extend the symbol table with values and registers
@@ -91,7 +96,7 @@ ret:    OP_RET(num)         # 1 # ret_i(kids[0]->val);
 ret:    OP_RET(nop)         # 0
 
 num:    OP_NUM              # 0 
-id:     OP_ID               # 0 
+id:     OP_ID               # 0 # bnode->reg = get_arg_reg(bnode->par_pos); mark_taken(bnode->reg);
 nop:    OP_NOP              # 0
 
 %%

@@ -15,8 +15,9 @@ treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     new_node->op = op;
     new_node->kids[0] = left;
     new_node->kids[1] = right;
-    new_node->reg = 0;
-    new_node->identifier = 0;
+    new_node->reg = -1;
+    new_node->id = NULL;
+    new_node->par_pos = -1;
     new_node->val = 0;
 
     return new_node;
@@ -30,10 +31,10 @@ treenode *new_unary_operator_node(int op, treenode *kid) {
     return _new_operator_node(op, kid, NULL);
 }
 
-treenode *new_identifier_node(char *identifier, char *reg) {
+treenode *new_id_node(char *id, char par_pos) {
     treenode *new_node = _new_operator_node(OP_ID, NULL, NULL);
-    new_node->identifier = identifier;
-    new_node->reg = reg;
+    new_node->id = id;
+    new_node->par_pos = par_pos;
     return new_node;
 }
 
@@ -80,7 +81,7 @@ void _print_tree(treenode *node, int indent) {
     if (node == NULL) return;
     for (int i = 0; i < indent; i++) printf("\t");
     printf("op: %s", op_to_str(node->op));
-    if (node->identifier != NULL) printf(" id: %s", node->identifier);
+    if (node->id != NULL) printf(" id: %s", node->id);
     printf(" val: %lld", node->val);
     printf("\n");
     _print_tree(node->kids[0], indent + 1);

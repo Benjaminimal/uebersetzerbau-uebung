@@ -37,12 +37,6 @@ void yyerror(char const *msg);
 extern int yylex();
 extern int yylineno;
 
-id_list *add_parameter(id_list *, char *, int);
-id_list *add_name(id_list *, char *);
-id_list *add_label(id_list *, char *);
-
-char *get_arg_register_name(id_list *, char *);
-
 extern void invoke_burm(NODEPTR_TYPE root);
 %}
 
@@ -341,7 +335,7 @@ term:
     | ID                                /* name bestehend */
       @{
         @idcheck check_name(@term.i_ids@, @ID.lexeme@);
-        @i @term.s_n@ = new_identifier_node(@ID.lexeme@, get_arg_register_name(@term.i_ids@, @ID.lexeme@));
+        @i @term.s_n@ = new_id_node(@ID.lexeme@, get_par_pos(@term.i_ids@, @ID.lexeme@));
       @}
     | ID LPAREN expr_list RPAREN        /* funktion beliebig */
       @{
@@ -351,13 +345,9 @@ term:
 
 %%
 
-char *get_arg_register_name(id_list *list, char *lexeme) {
-    id_list *element = get_id(list, lexeme);
-    if (element == NULL) {
-        return NULL;
-    }
-
-    return get_argument_register(element->parameter_position);
+char get_par_pos(id_list *list, char *name) {
+    id_list *needle = get_name(list, name);
+    return needle != NULL ? needle->par_pos : -1;
 }
 
 id_list *check_name(id_list *list, char *lexeme) {

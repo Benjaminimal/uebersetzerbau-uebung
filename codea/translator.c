@@ -14,28 +14,27 @@ int label_count = 0;
 
 typedef struct {
     char *name;
-    char *b_name;
     int taken;
 } reg;
 
-reg RAX = { .name = "rax", .b_name = "al", .taken = 0 };
-reg RBX = { .name = "rbx", .b_name = "bl", .taken = 0 };
-reg RCX = { .name = "rcx", .b_name = "cl", .taken = 0 };
-reg RDX = { .name = "rdx", .b_name = "dl", .taken = 0 };
-reg RSP = { .name = "rsp", .b_name = "sil", .taken = 0 };
-reg RBP = { .name = "rbp", .b_name = "dil", .taken = 0 };
-reg RSI = { .name = "rsi", .b_name = "bpl", .taken = 0 };
-reg RDI = { .name = "rdi", .b_name = "spl", .taken = 0 };
-reg R8 = { .name = "r8", .b_name = "r8b", .taken = 0 };
-reg R9 = { .name = "r9", .b_name = "r9b", .taken = 0 };
-reg R10 = { .name = "r10", .b_name = "r10b", .taken = 0 };
-reg R11 = { .name = "r11", .b_name = "r11b", .taken = 0 };
-reg R12 = { .name = "r12", .b_name = "r12b", .taken = 0 };
-reg R13 = { .name = "r13", .b_name = "r13b", .taken = 0 };
-reg R14 = { .name = "r14", .b_name = "r14b", .taken = 0 };
-reg R15 = { .name = "r15", .b_name = "r15b", .taken = 0 };
+reg RAX = { .name = "rax", .taken = 0 };
+reg RBX = { .name = "rbx", .taken = 0 };
+reg RCX = { .name = "rcx", .taken = 0 };
+reg RDX = { .name = "rdx", .taken = 0 };
+reg RSP = { .name = "rsp", .taken = 0 };
+reg RBP = { .name = "rbp", .taken = 0 };
+reg RSI = { .name = "rsi", .taken = 0 };
+reg RDI = { .name = "rdi", .taken = 0 };
+reg R8 = { .name = "r8", .taken = 0 };
+reg R9 = { .name = "r9", .taken = 0 };
+reg R10 = { .name = "r10", .taken = 0 };
+reg R11 = { .name = "r11", .taken = 0 };
+reg R12 = { .name = "r12", .taken = 0 };
+reg R13 = { .name = "r13", .taken = 0 };
+reg R14 = { .name = "r14", .taken = 0 };
+reg R15 = { .name = "r15", .taken = 0 };
 
-reg *reg_args[] = {&RDI, &RSI, &RDX, &RCX, &R8, &R9};
+reg *reg_args[MAX_ARGS] = {&RDI, &RSI, &RDX, &RCX, &R8, &R9};
 /*
 const reg *reg_caller[] = {&RAX, &RCX, &RDX, &RSI, &RDI, &R8, &R9, &R10, &R11}; // TODO: not sure if r10 can be used
 const reg *reg_callee[] = {&RBX, &R12, &R13, &R14, &R15}; // TODO: rbp (and rsp) is missing
@@ -74,6 +73,13 @@ int _num_digits(int n) {
     return cnt;
 }
 
+char *reg_to_str(char reg) {
+    if (reg < 0 || reg >= MAX_ARGS) {
+        return NULL;
+    }
+    return reg_args[reg]->name;
+}
+
 char *next_label() {
     char *label = malloc(LABEL_PREFIX_LEN + _num_digits(label_count + 1));
     if (label == NULL) {
@@ -85,40 +91,35 @@ char *next_label() {
     return label;
 }
 
-char *get_argument_register(int position) {
-    if (position < 0 || position >= MAX_ARGS) {
-        return NULL;
+char get_arg_reg(char pos) {
+    if (pos < 0 || pos >= MAX_ARGS) {
+        return -1;
     }
-    reg_args[position]->taken = 1;
-    return reg_args[position]->name;
+    return pos;
 }
 
-char *next_reg() {
-    for (int i = 0; i < MAX_ARGS; i++) {
-        reg *current = reg_args[i];
-        if (current->taken == 0) {
-            current->taken = 1;
-            return current->name;
+char next_reg() {
+    for (char i = 0; i < MAX_ARGS; i++) {
+        if (reg_args[i]->taken == 0) {
+            reg_args[i]->taken = 1;
+            return i;
         }
     }
-    return NULL;
+    return -1;
 }
 
-reg *get_reg(char *name) {
-    for (int i = 0; i < MAX_ARGS; i++) {
-        reg *current = reg_args[i];
-        if (strcmp(current->name, name) == 0) {
-            return current;
-        }
+void mark_taken(char reg) {
+    if (reg < 0 || reg >= MAX_ARGS) {
+        return;
     }
-    return NULL;
+    reg_args[reg]->taken = 1;
 }
 
-void free_reg(char *name) {
-    reg *found = get_reg(name);
-    if (found != NULL) {
-        found->taken = 0;
+void free_reg(char reg) {
+    if (reg < 0 || reg >= MAX_ARGS) {
+        return;
     }
+    reg_args[reg]->taken = 0;
 }
 
 void free_arg_regs() {
@@ -148,77 +149,77 @@ void function_end(char *name) {
     // printf("\t.size\t%s, .-%s\n", name, name);
 }
 
-void cmp_leq(char *lsrc, char *rsrc, char *dst) {
-    _cmp_cc("le", rsrc, lsrc, dst);
+void cmp_leq(char lsrc, char rsrc, char dst) {
+    _cmp_cc("le", reg_to_str(rsrc), reg_to_str(lsrc), reg_to_str(dst));
 }
-void cmp_leq_i(long long val, char *src, char *dst) {
-    _cmp_cc_i("ge", val, src, dst);
-}
-
-void cmp_geq_i(long long val, char *src, char *dst) {
-    _cmp_cc_i("le", val, src, dst);
+void cmp_leq_i(long long val, char src, char dst) {
+    _cmp_cc_i("ge", val, reg_to_str(src), reg_to_str(dst));
 }
 
-void cmp_dif(char *lsrc, char *rsrc, char *dst) {
-    _cmp_cc("ne", lsrc, rsrc, dst);
+void cmp_geq_i(long long val, char src, char dst) {
+    _cmp_cc_i("le", val, reg_to_str(src), reg_to_str(dst));
 }
-void cmp_dif_i(long long val, char *src, char *dst) {
-    _cmp_cc_i("ne", val, src, dst);
+
+void cmp_dif(char lsrc, char rsrc, char dst) {
+    _cmp_cc("ne", reg_to_str(lsrc), reg_to_str(rsrc), reg_to_str(dst));
+}
+void cmp_dif_i(long long val, char src, char dst) {
+    _cmp_cc_i("ne", val, reg_to_str(src), reg_to_str(dst));
 }
 
 
-void mov(char *src, char *dst) {
-    _mov(src, dst);
+void mov(char src, char dst) {
+    _mov(reg_to_str(src), reg_to_str(dst));
 }
-void mov_i(long long val, char *dst) {
-    _mov_i(val, dst);
-}
-
-void and(char *src, char *src_dst) {
-    _and(src, src_dst);
-}
-void and_i(long long val, char *src_dst) {
-    _and_i(val, src_dst);
+void mov_i(long long val, char dst) {
+    _mov_i(val, reg_to_str(dst));
 }
 
-void mul(char *src, char *src_dst) {
-    _mul(src, src_dst);
+void and(char src, char src_dst) {
+    _and(reg_to_str(src), reg_to_str(src_dst));
 }
-void mul_i(long long val, char *src_dst) {
-    _mul_i(val, src_dst);
-}
-
-void add(char *src, char *src_dst) {
-    _add(src, src_dst);
-}
-void add_i(long long val, char *src_dst) {
-    _add_i(val, src_dst);
+void and_i(long long val, char src_dst) {
+    _and_i(val, reg_to_str(src_dst));
 }
 
-void lea(char *lsrc, char *rsrc, char *dst) {
-    _lea(lsrc, rsrc, dst);
+void mul(char src, char src_dst) {
+    _mul(reg_to_str(src), reg_to_str(src_dst));
 }
-void lea_i(long long val, char *src, char *dst) {
-    _lea_i(val, src, dst);
-}
-
-void not(char *src_dst) {
-    _not(src_dst);
+void mul_i(long long val, char src_dst) {
+    _mul_i(val, reg_to_str(src_dst));
 }
 
-void neg(char *src_dst) {
-    _neg(src_dst);
+void add(char src, char src_dst) {
+    _add(reg_to_str(src), reg_to_str(src_dst));
+}
+void add_i(long long val, char src_dst) {
+    _add_i(val, reg_to_str(src_dst));
 }
 
-void drf(char *src, char *dst) {
-    _drf(src, dst);
+void lea(char lsrc, char rsrc, char dst) {
+    _lea(reg_to_str(lsrc), reg_to_str(rsrc), reg_to_str(dst));
 }
-void drf_i(long long val, char *dst) {
-    _drf_i(val, dst);
+void lea_i(long long val, char src, char dst) {
+    _lea_i(val, reg_to_str(src), reg_to_str(dst));
 }
 
-void ret(char *src) {
-    _mov(src, "rax");
+void not(char src_dst) {
+    _not(reg_to_str(src_dst));
+}
+
+void neg(char src_dst) {
+    _neg(reg_to_str(src_dst));
+}
+
+void drf(char src, char dst) {
+    _drf(reg_to_str(src), reg_to_str(dst));
+}
+void drf_i(long long val, char dst) {
+    _drf_i(val, reg_to_str(dst));
+}
+
+void ret(char src) {
+    _mov(reg_to_str(src), "rax");
 }
 void ret_i(long long val) {
     _mov_i(val, "rax");
