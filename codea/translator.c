@@ -141,10 +141,11 @@ void function_start(char *name) {
 
 void function_end(char *name) {
     free_arg_regs();
+    function_count++;
+    _ret();
     // printf("\tpopq\t%%%s\n", RBP); // TODO: might be moved to ret
     // printf(".LFE%d:\n", function_count);
     // printf("\t.size\t%s, .-%s\n", name, name);
-    function_count++;
 }
 
 void cmp_leq(char *lsrc, char *rsrc, char *dst) {
@@ -165,31 +166,33 @@ void cmp_dif_i(long long val, char *src, char *dst) {
     _cmp_cc_i("ne", val, src, dst);
 }
 
-void and(char *lsrc, char *rsrc, char *dst) {
-    _mov(lsrc, dst);
-    _and(rsrc, dst);
+
+void mov(char *src, char *dst) {
+    _mov(src, dst);
 }
-void and_i(long long val, char *src, char *dst) {
+void mov_i(long long val, char *dst) {
     _mov_i(val, dst);
-    _and(src, dst);
 }
 
-void mul(char *lsrc, char *rsrc, char *dst) {
-    _mov(lsrc, dst);
-    _mul(rsrc, dst);
+void and(char *src, char *src_dst) {
+    _and(src, src_dst);
 }
-void mul_i(long long val, char *src, char *dst) {
-    _mov_i(val, dst);
-    _mul(src, dst);
+void and_i(long long val, char *src_dst) {
+    _and_i(val, src_dst);
 }
 
-void add(char *lsrc, char *rsrc, char *dst) {
-    _mov(lsrc, dst);
-    _add(rsrc, dst);
+void mul(char *src, char *src_dst) {
+    _mul(src, src_dst);
 }
-void add_i(long long val, char *src, char *dst) {
-    _mov_i(val, dst);
-    _add(src, dst);
+void mul_i(long long val, char *src_dst) {
+    _mul_i(val, src_dst);
+}
+
+void add(char *src, char *src_dst) {
+    _add(src, src_dst);
+}
+void add_i(long long val, char *src_dst) {
+    _add_i(val, src_dst);
 }
 
 void lea(char *lsrc, char *rsrc, char *dst) {
@@ -199,14 +202,12 @@ void lea_i(long long val, char *src, char *dst) {
     _lea_i(val, src, dst);
 }
 
-void not(char *src, char *dst) {
-    _mov(src, dst);
-    _not(dst);
+void not(char *src_dst) {
+    _not(src_dst);
 }
 
-void neg(char *src, char *dst) {
-    _mov(src, dst);
-    _neg(dst);
+void neg(char *src_dst) {
+    _neg(src_dst);
 }
 
 void drf(char *src, char *dst) {
@@ -218,16 +219,13 @@ void drf_i(long long val, char *dst) {
 
 void ret(char *src) {
     _mov(src, "rax");
-    _ret();
 }
 void ret_i(long long val) {
     _mov_i(val, "rax");
-    _ret();
 }
 
 
 void _mov(char *src, char *dst) {
-    // TODO: check for reduntant move
     printf("\tmovq\t%%%s, %%%s\n", src, dst);
 }
 
@@ -281,6 +279,7 @@ void _neg(char *src_dst) {
 void _drf(char *src, char *dst) {
     printf("\tmovq\t(%%%s), %%%s\n", src, dst);
 }
+// TODO: this looks very wrong
 void _drf_i(long long val, char *dst) {
     printf("\tmovq\t($%lld), %%%s\n", val, dst);
 }

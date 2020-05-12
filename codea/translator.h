@@ -3,39 +3,42 @@
 
 #define MAX_ARGS 6
 
-void function_start(char *);
-void function_end(char *);
+void function_start(char *name);
+void function_end(char *name);
 
-char *get_argument_register(int);
+char *get_argument_register(int num);
 char *next_reg();
-void free_reg(char *);
+void free_reg(char *reg);
 
-void not(char *, char *);
+void not(char *src_dst);
 
-void neg(char *, char *);
+void neg(char *src_dst);
 
-void ret(char *);
-void ret_i(long long);
+void ret(char *src);
+void ret_i(long long val);
 
-void and(char *, char*, char*);
-void and_i(long long, char*, char*);
+void mov(char *src, char *dst);
+void mov_i(long long val, char *dst);
 
-void mul(char *, char *, char *);
-void mul_i(long long, char *, char *);
+void and(char *src, char *src_dst);
+void and_i(long long val, char *src_dst);
 
-void add(char *, char *, char *);
-void add_i(long long, char *, char *);
+void mul(char *src, char *src_dst);
+void mul_i(long long val, char *src_dst);
 
-void lea(char *, char *, char *);
-void lea_i(long long, char *, char *);
+void add(char *src, char *src_dst);
+void add_i(long long val, char *src_dst);
 
-void drf(char *, char *);
-void drf_i(long long, char *);
+void drf(char *src, char *dst);
+void drf_i(long long val, char *dst);
 
-void cmp_leq(char *, char *, char *);
-void cmp_leq_i(long long, char *, char *);
-void cmp_geq_i(long long, char *, char *);
-void cmp_dif(char *, char *, char *);
-void cmp_dif_i(long long, char *, char *);
+void lea(char *lsrc, char *rsrc, char *dst);
+void lea_i(long long val, char *src, char *dst);
+
+void cmp_leq(char *lsrc, char *rsrc, char *dst);
+void cmp_leq_i(long long val, char *src, char *dst);
+void cmp_geq_i(long long val, char *src, char *dst);
+void cmp_dif(char *lsrc, char *rsrc, char *dst);
+void cmp_dif_i(long long val, char *src, char *dst);
 
 #endif /* _TRANSLATOR_H_*/
