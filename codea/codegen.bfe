@@ -78,8 +78,12 @@ reg:        OP_ADD(reg, num)    # 1 # bnode->reg = kids[0]->reg; add_i(kids[1]->
 reg:        OP_ADD(num, reg)    # 1 # bnode->reg = kids[1]->reg; add_i(kids[0]->val, bnode->reg);
 num:        OP_ADD(num, num)    # 0 # bnode->val = kids[0]->val + kids[1]->val;
 
-reg:        OP_NOT(id)          # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); not(bnode->reg);
-reg:        OP_NOT(reg)         # 1 # bnode->reg = kids[0]->reg; not(bnode->reg);
+reg:        not_id              # 2 # bnode->reg = next_reg(); mov(kids[0]->kids[0]->reg, bnode->reg); not(bnode->reg);
+id:         OP_NOT(not_id)      # 0 # bnode->reg = kids[0]->reg;
+not_id:     OP_NOT(id)          # 0 # bnode->reg = kids[0]->reg;
+reg:        not_reg             # 1 # bnode->reg = kids[0]->reg; not(bnode->reg);
+reg:        OP_NOT(not_reg)     # 0 # bnode->reg = kids[0]->reg;
+not_reg:    OP_NOT(reg)         # 0 # bnode->reg = kids[0]->reg;
 num:        OP_NOT(num)         # 0 # bnode->val = ~kids[0]->val;
 
 reg:        neg_id              # 2 # bnode->reg = next_reg(); mov(kids[0]->kids[0]->reg, bnode->reg); neg(bnode->reg);
