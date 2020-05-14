@@ -33,7 +33,7 @@ void add_i(long long val, char src_dst);
 void drf(char src, char dst);
 void drf_i(long long val, char dst);
 
-void lea(char lsrc, char rsrc, char dst);
+void lea(long long val, char lsrc, char rsrc, char dst);
 void lea_i(long long val, char src, char dst);
 
 void cmp_leq(char lsrc, char rsrc, char dst);

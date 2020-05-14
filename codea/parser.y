@@ -101,7 +101,7 @@ extern void invoke_burm(NODEPTR_TYPE root);
 } term expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel
 
 @traversal idcheck
-@traversal @postorder codegen
+@traversal @lefttoright @postorder codegen
 
 %start program
 

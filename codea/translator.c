@@ -50,7 +50,7 @@ void _mul(char *, char *);
 void _mul_i(long long, char *);
 void _add(char *, char *);
 void _add_i(long long, char *);
-void _lea(char *, char *, char *);
+void _lea(long long, char *, char *, char *);
 void _lea_i(long long, char *, char *);
 void _not(char *);
 void _neg(char *);
@@ -196,8 +196,8 @@ void add_i(long long val, char src_dst) {
     _add_i(val, reg_to_str(src_dst));
 }
 
-void lea(char lsrc, char rsrc, char dst) {
-    _lea(reg_to_str(lsrc), reg_to_str(rsrc), reg_to_str(dst));
+void lea(long long val, char lsrc, char rsrc, char dst) {
+    _lea(val, reg_to_str(lsrc), reg_to_str(rsrc), reg_to_str(dst));
 }
 void lea_i(long long val, char src, char dst) {
     _lea_i(val, reg_to_str(src), reg_to_str(dst));
@@ -262,8 +262,8 @@ void _add_i(long long val, char *dst) {
     printf("\taddq\t$%lld, %%%s\n", val, dst);
 }
 
-void _lea(char *lsrc, char *rsrc, char *dst) {
-    printf("\tleaq\t(%%%s, %%%s), %%%s\n", lsrc, rsrc, dst);
+void _lea(long long val, char *lsrc, char *rsrc, char *dst) {
+    printf("\tleaq\t%lld(%%%s, %%%s), %%%s\n", val, lsrc, rsrc, dst);
 }
 void _lea_i(long long val, char *src, char *dst) {
     printf("\tleaq\t%lld(%%%s), %%%s\n", val, src, dst);
