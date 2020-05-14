@@ -82,8 +82,12 @@ reg:    OP_NOT(id)          # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bno
 reg:    OP_NOT(reg)         # 1 # bnode->reg = kids[0]->reg; not(bnode->reg);
 num:    OP_NOT(num)         # 0 # bnode->val = ~kids[0]->val;
 
-reg:    OP_NEG(id)          # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); neg(bnode->reg);
-reg:    OP_NEG(reg)         # 1 # bnode->reg = kids[0]->reg; neg(bnode->reg);
+reg:    neg_id              # 2 # bnode->reg = next_reg(); mov(kids[0]->kids[0]->reg, bnode->reg); neg(bnode->reg);
+id: OP_NEG(neg_id)          # 0 # bnode->reg = kids[0]->reg;
+neg_id: OP_NEG(id)          # 0 # bnode->reg = kids[0]->reg;
+reg:    neg_reg             # 1 # bnode->reg = kids[0]->reg; neg(bnode->reg);
+reg: OP_NEG(neg_reg)        # 0 # bnode->reg = kids[0]->reg;
+neg_reg: OP_NEG(reg)        # 0 # bnode->reg = kids[0]->reg;
 num:    OP_NEG(num)         # 0 # bnode->val = -kids[0]->val;
 
 reg:    OP_DRF(id)          # 1 # bnode->reg = next_reg(); drf(kids[0]->reg, bnode->reg);
