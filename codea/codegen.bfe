@@ -8,8 +8,11 @@
 #include "treenode.h"
 #include "translator.h"
 
- // TODO: add test for optimizations
- // TODO: extend grammmar for optimizations
+ // TODO: optimize and test mov elimination before return
+ // TODO: optimize and test * 2^n
+ // TODO: optimize and test + 0
+ // TODO: optimize and test * 1
+ // TODO: optimize and test constant folding
  // TODO: add tests of more complex return statements
  // TODO: add xin tests
  // TODO: add lex and parse error tests
