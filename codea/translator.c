@@ -6,6 +6,8 @@
 #define T_VAL -1
 #define F_VAL 0
 
+#define RET_REG_IDX -2
+
 #define LABEL_PREFIX ".L"
 #define LABEL_PREFIX_LEN 2
 
@@ -98,6 +100,10 @@ char get_arg_reg(char pos) {
     return pos;
 }
 
+char ret_reg() {
+    return RET_REG_IDX;
+}
+
 char next_reg() {
     for (char i = 0; i < MAX_ARGS; i++) {
         if (reg_args[i]->taken == 0) {
@@ -149,30 +155,37 @@ void function_end(char *name) {
     // printf("\t.size\t%s, .-%s\n", name, name);
 }
 
-void cmp_leq(char lsrc, char rsrc, char dst) {
+char cmp_leq(char lsrc, char rsrc, char dst) {
     _cmp_cc("le", reg_to_str(rsrc), reg_to_str(lsrc), reg_to_str(dst));
+    return dst;
 }
-void cmp_leq_i(long long val, char src, char dst) {
+char cmp_leq_i(long long val, char src, char dst) {
     _cmp_cc_i("ge", val, reg_to_str(src), reg_to_str(dst));
+    return dst;
 }
 
-void cmp_geq_i(long long val, char src, char dst) {
+char cmp_geq_i(long long val, char src, char dst) {
     _cmp_cc_i("le", val, reg_to_str(src), reg_to_str(dst));
+    return dst;
 }
 
-void cmp_dif(char lsrc, char rsrc, char dst) {
+char cmp_dif(char lsrc, char rsrc, char dst) {
     _cmp_cc("ne", reg_to_str(lsrc), reg_to_str(rsrc), reg_to_str(dst));
+    return dst;
 }
-void cmp_dif_i(long long val, char src, char dst) {
+char cmp_dif_i(long long val, char src, char dst) {
     _cmp_cc_i("ne", val, reg_to_str(src), reg_to_str(dst));
+    return dst;
 }
 
 
-void mov(char src, char dst) {
+char mov(char src, char dst) {
     _mov(reg_to_str(src), reg_to_str(dst));
+    return dst;
 }
-void mov_i(long long val, char dst) {
+char mov_i(long long val, char dst) {
     _mov_i(val, reg_to_str(dst));
+    return dst;
 }
 
 void and(char src, char src_dst) {
@@ -196,11 +209,13 @@ void add_i(long long val, char src_dst) {
     _add_i(val, reg_to_str(src_dst));
 }
 
-void lea(long long val, char lsrc, char rsrc, char dst) {
+char lea(long long val, char lsrc, char rsrc, char dst) {
     _lea(val, reg_to_str(lsrc), reg_to_str(rsrc), reg_to_str(dst));
+    return dst;
 }
-void lea_i(long long val, char src, char dst) {
+char lea_i(long long val, char src, char dst) {
     _lea_i(val, reg_to_str(src), reg_to_str(dst));
+    return dst;
 }
 
 void not(char src_dst) {
@@ -211,13 +226,16 @@ void neg(char src_dst) {
     _neg(reg_to_str(src_dst));
 }
 
-void drf(char src, char dst) {
+char drf(char src, char dst) {
     _drf(reg_to_str(src), reg_to_str(dst));
+    return dst;
 }
-void drf_i(long long val, char dst) {
+char drf_i(long long val, char dst) {
     _drf_i(val, reg_to_str(dst));
+    return dst;
 }
 
+// TODO: what to return here?
 void ret(char src) {
     _mov(reg_to_str(src), "rax");
 }
