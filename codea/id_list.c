@@ -16,7 +16,7 @@ id_list *add_id(id_list *list, char *lexeme, id_type type, int position) {
     head->type = type;
     head->lexeme = strdup(lexeme);
     head->next = list;
-    head->par_pos = position;
+    head->pos = position;
 
     return head;
 }

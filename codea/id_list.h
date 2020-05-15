@@ -9,7 +9,7 @@ typedef enum {
 typedef struct id_list {
     id_type type;
     char *lexeme;
-    char par_pos;
+    char pos;
     struct id_list *next;
 } id_list;
 

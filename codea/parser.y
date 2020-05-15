@@ -335,7 +335,7 @@ term:
     | ID                                /* name bestehend */
       @{
         @idcheck check_name(@term.i_ids@, @ID.lexeme@);
-        @i @term.s_n@ = new_variable_node(@ID.lexeme@, get_par_pos(@term.i_ids@, @ID.lexeme@));
+        @i @term.s_n@ = new_variable_node(@ID.lexeme@, get_var_pos(@term.i_ids@, @ID.lexeme@));
       @}
     | ID LPAREN expr_list RPAREN        /* funktion beliebig */
       @{
@@ -345,9 +345,9 @@ term:
 
 %%
 
-char get_par_pos(id_list *list, char *name) {
+char get_var_pos(id_list *list, char *name) {
     id_list *needle = get_name(list, name);
-    return needle != NULL ? needle->par_pos : -1;
+    return needle != NULL ? needle->pos : -1;
 }
 
 id_list *check_name(id_list *list, char *lexeme) {

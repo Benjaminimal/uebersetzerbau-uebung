@@ -17,7 +17,7 @@ treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     new_node->kids[1] = right;
     new_node->reg = -1;
     new_node->id = NULL;
-    new_node->par_pos = -1;
+    new_node->pos = -1;
     new_node->val = 0;
 
     return new_node;
@@ -31,10 +31,10 @@ treenode *new_unary_operator_node(int op, treenode *kid) {
     return _new_operator_node(op, kid, NULL);
 }
 
-treenode *new_variable_node(char *id, char par_pos) {
+treenode *new_variable_node(char *id, char pos) {
     treenode *new_node = _new_operator_node(OP_VAR, NULL, NULL);
     new_node->id = id;
-    new_node->par_pos = par_pos;
+    new_node->pos = pos;
     return new_node;
 }
 

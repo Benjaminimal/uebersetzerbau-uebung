@@ -108,7 +108,7 @@ ret:        OP_RET(con)         # 1 # ret_i(kids[0]->val);
 ret:        OP_RET(nop)         # 0
 
 con:        OP_CON              # 0 
-var:        OP_VAR              # 0 # bnode->reg = get_arg_reg(bnode->par_pos); mark_taken(bnode->reg);
+var:        OP_VAR              # 0 # bnode->reg = get_arg_reg(bnode->pos); mark_taken(bnode->reg);
 nop:        OP_NOP              # 0
 
 %%

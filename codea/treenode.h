@@ -27,7 +27,7 @@ typedef struct s_node {
     /* user defined data fields follow here */
     char            reg;
     char            *id;
-    char            par_pos;
+    char            pos;
     long long       val;
 } treenode;
 
