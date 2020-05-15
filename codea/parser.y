@@ -335,7 +335,7 @@ term:
     | ID                                /* name bestehend */
       @{
         @idcheck check_name(@term.i_ids@, @ID.lexeme@);
-        @i @term.s_n@ = new_id_node(@ID.lexeme@, get_par_pos(@term.i_ids@, @ID.lexeme@));
+        @i @term.s_n@ = new_variable_node(@ID.lexeme@, get_par_pos(@term.i_ids@, @ID.lexeme@));
       @}
     | ID LPAREN expr_list RPAREN        /* funktion beliebig */
       @{

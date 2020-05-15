@@ -31,8 +31,8 @@ treenode *new_unary_operator_node(int op, treenode *kid) {
     return _new_operator_node(op, kid, NULL);
 }
 
-treenode *new_id_node(char *id, char par_pos) {
-    treenode *new_node = _new_operator_node(OP_ID, NULL, NULL);
+treenode *new_variable_node(char *id, char par_pos) {
+    treenode *new_node = _new_operator_node(OP_VAR, NULL, NULL);
     new_node->id = id;
     new_node->par_pos = par_pos;
     return new_node;
@@ -50,8 +50,8 @@ treenode *new_nop_node() {
 
 char *op_to_str(int op) {
     switch (op) {
-        case OP_ID:
-            return "ID";
+        case OP_VAR:
+            return "VAR";
         case OP_CON:
             return "CON";
         case OP_LEQ:

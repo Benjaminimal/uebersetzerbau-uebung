@@ -1,7 +1,7 @@
 #ifndef _TREENODE_H_
 #define _TREENODE_H_
 
-#define OP_ID 1
+#define OP_VAR 1
 #define OP_CON 2
 #define OP_LEQ 3
 #define OP_DIF 4
@@ -42,7 +42,7 @@ typedef treenode *treenodep;
 
 treenode *new_binary_operator_node(int, treenode*, treenode*);
 treenode *new_unary_operator_node(int, treenode*);
-treenode *new_id_node(char*, char);
+treenode *new_variable_node(char*, char);
 treenode *new_constant_node(long long);
 treenode *new_nop_node();
 void print_tree(treenode *);

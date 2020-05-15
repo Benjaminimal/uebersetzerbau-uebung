@@ -24,97 +24,97 @@
 %}
 
 %start stat
-%term OP_ID=1 OP_CON=2 OP_LEQ=3 OP_DIF=4 OP_AND=5 OP_MUL=6 OP_ADD=7 OP_NOT=8 OP_NEG=9 OP_DRF=10 OP_RET=11 OP_NOP=12
+%term OP_VAR=1 OP_CON=2 OP_LEQ=3 OP_DIF=4 OP_AND=5 OP_MUL=6 OP_ADD=7 OP_NOT=8 OP_NEG=9 OP_DRF=10 OP_RET=11 OP_NOP=12
 
 %%
 
 stat:       ret                 # 0
 stat:       nop                 # 0
 
-reg:        OP_LEQ(id, id)      # 3 # bnode->reg = next_reg(); cmp_leq(kids[0]->reg, kids[1]->reg, bnode->reg);
-reg:        OP_LEQ(id, reg)     # 3 # bnode->reg = kids[1]->reg; cmp_leq(kids[0]->reg, kids[1]->reg, bnode->reg);
-reg:        OP_LEQ(reg, id)     # 3 # bnode->reg = kids[0]->reg; cmp_leq(kids[0]->reg, kids[1]->reg, bnode->reg);
-reg:        OP_LEQ(id, con)     # 3 # bnode->reg = next_reg(); cmp_geq_i(kids[1]->val, kids[0]->reg, bnode->reg);
-reg:        OP_LEQ(con, id)     # 3 # bnode->reg = next_reg(); cmp_leq_i(kids[0]->val, kids[1]->reg, bnode->reg);
+reg:        OP_LEQ(var, var)    # 3 # bnode->reg = next_reg(); cmp_leq(kids[0]->reg, kids[1]->reg, bnode->reg);
+reg:        OP_LEQ(var, reg)    # 3 # bnode->reg = kids[1]->reg; cmp_leq(kids[0]->reg, kids[1]->reg, bnode->reg);
+reg:        OP_LEQ(reg, var)    # 3 # bnode->reg = kids[0]->reg; cmp_leq(kids[0]->reg, kids[1]->reg, bnode->reg);
+reg:        OP_LEQ(var, con)    # 3 # bnode->reg = next_reg(); cmp_geq_i(kids[1]->val, kids[0]->reg, bnode->reg);
+reg:        OP_LEQ(con, var)    # 3 # bnode->reg = next_reg(); cmp_leq_i(kids[0]->val, kids[1]->reg, bnode->reg);
 
 reg:        OP_LEQ(reg, reg)    # 3 # bnode->reg = next_reg(); cmp_leq(kids[0]->reg, kids[1]->reg, bnode->reg);
 reg:        OP_LEQ(reg, con)    # 3 # bnode->reg = kids[0]->reg; cmp_geq_i(kids[1]->val, kids[0]->reg, bnode->reg);
 reg:        OP_LEQ(con, reg)    # 3 # bnode->reg = kids[1]->reg; cmp_leq_i(kids[0]->val, kids[1]->reg, bnode->reg);
 con:        OP_LEQ(con, con)    # 0 # bnode->val = kids[0]->val <= kids[1]->val ? -1 : 0;
 
-reg:        OP_DIF(id, id)      # 3 # bnode->reg = next_reg(); cmp_dif(kids[0]->reg, kids[1]->reg, bnode->reg);
-reg:        OP_DIF(id, reg)     # 3 # bnode->reg = kids[1]->reg; cmp_dif(kids[0]->reg, kids[1]->reg, bnode->reg);
-reg:        OP_DIF(reg, id)     # 3 # bnode->reg = kids[0]->reg; cmp_dif(kids[0]->reg, kids[1]->reg, bnode->reg);
-reg:        OP_DIF(id, con)     # 3 # bnode->reg = next_reg(); cmp_dif_i(kids[1]->val, kids[0]->reg, bnode->reg);
-reg:        OP_DIF(con, id)     # 3 # bnode->reg = next_reg(); cmp_dif_i(kids[0]->val, kids[1]->reg, bnode->reg);
+reg:        OP_DIF(var, var)    # 3 # bnode->reg = next_reg(); cmp_dif(kids[0]->reg, kids[1]->reg, bnode->reg);
+reg:        OP_DIF(var, reg)    # 3 # bnode->reg = kids[1]->reg; cmp_dif(kids[0]->reg, kids[1]->reg, bnode->reg);
+reg:        OP_DIF(reg, var)    # 3 # bnode->reg = kids[0]->reg; cmp_dif(kids[0]->reg, kids[1]->reg, bnode->reg);
+reg:        OP_DIF(var, con)    # 3 # bnode->reg = next_reg(); cmp_dif_i(kids[1]->val, kids[0]->reg, bnode->reg);
+reg:        OP_DIF(con, var)    # 3 # bnode->reg = next_reg(); cmp_dif_i(kids[0]->val, kids[1]->reg, bnode->reg);
 reg:        OP_DIF(reg, reg)    # 3 # bnode->reg = next_reg(); cmp_dif(kids[0]->reg, kids[1]->reg, bnode->reg);
 reg:        OP_DIF(reg, con)    # 3 # bnode->reg = kids[0]->reg; cmp_dif_i(kids[1]->val, kids[0]->reg, bnode->reg);
 reg:        OP_DIF(con, reg)    # 3 # bnode->reg = kids[1]->reg; cmp_dif_i(kids[0]->val, kids[1]->reg, bnode->reg);
 con:        OP_DIF(con, con)    # 0 # bnode->val = kids[0]->val != kids[1]->val ? -1 : 0;
 
-reg:        OP_AND(id, id)      # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); and(kids[1]->reg, bnode->reg);
-reg:        OP_AND(id, reg)     # 1 # bnode->reg = kids[1]->reg; and(kids[0]->reg, bnode->reg);
-reg:        OP_AND(reg, id)     # 1 # bnode->reg = kids[0]->reg; and(kids[1]->reg, bnode->reg);
-reg:        OP_AND(id, con)     # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); and_i(kids[1]->val, bnode->reg);
-reg:        OP_AND(con, id)     # 2 # bnode->reg = next_reg(); mov(kids[1]->reg, bnode->reg); and_i(kids[0]->val, bnode->reg);
+reg:        OP_AND(var, var)    # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); and(kids[1]->reg, bnode->reg);
+reg:        OP_AND(var, reg)    # 1 # bnode->reg = kids[1]->reg; and(kids[0]->reg, bnode->reg);
+reg:        OP_AND(reg, var)    # 1 # bnode->reg = kids[0]->reg; and(kids[1]->reg, bnode->reg);
+reg:        OP_AND(var, con)    # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); and_i(kids[1]->val, bnode->reg);
+reg:        OP_AND(con, var)    # 2 # bnode->reg = next_reg(); mov(kids[1]->reg, bnode->reg); and_i(kids[0]->val, bnode->reg);
 reg:        OP_AND(reg, reg)    # 1 # free_reg(kids[1]->reg); bnode->reg = kids[0]->reg; and(kids[1]->reg, bnode->reg);
 reg:        OP_AND(reg, con)    # 1 # bnode->reg = kids[0]->reg; and_i(kids[1]->val, bnode->reg);
 reg:        OP_AND(con, reg)    # 1 # bnode->reg = kids[1]->reg; and_i(kids[0]->val, bnode->reg);
 con:        OP_AND(con, con)    # 0 # bnode->val = kids[0]->val & kids[1]->val;
 
-reg:        OP_MUL(id, id)      # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); mul(kids[1]->reg, bnode->reg);
-reg:        OP_MUL(id, reg)     # 1 # bnode->reg = kids[1]->reg; mul(kids[0]->reg, bnode->reg);
-reg:        OP_MUL(reg, id)     # 1 # bnode->reg = kids[0]->reg; mul(kids[1]->reg, bnode->reg);
-reg:        OP_MUL(id, con)     # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); mul_i(kids[1]->val, bnode->reg);
-reg:        OP_MUL(con, id)     # 2 # bnode->reg = next_reg(); mov(kids[1]->reg, bnode->reg); mul_i(kids[0]->val, bnode->reg);
+reg:        OP_MUL(var, var)    # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); mul(kids[1]->reg, bnode->reg);
+reg:        OP_MUL(var, reg)    # 1 # bnode->reg = kids[1]->reg; mul(kids[0]->reg, bnode->reg);
+reg:        OP_MUL(reg, var)    # 1 # bnode->reg = kids[0]->reg; mul(kids[1]->reg, bnode->reg);
+reg:        OP_MUL(var, con)    # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); mul_i(kids[1]->val, bnode->reg);
+reg:        OP_MUL(con, var)    # 2 # bnode->reg = next_reg(); mov(kids[1]->reg, bnode->reg); mul_i(kids[0]->val, bnode->reg);
 reg:        OP_MUL(reg, reg)    # 1 # free_reg(kids[1]->reg); bnode->reg = kids[0]->reg; mul(kids[1]->reg, bnode->reg);
 reg:        OP_MUL(reg, con)    # 1 # bnode->reg = kids[0]->reg; mul_i(kids[1]->val, bnode->reg);
 reg:        OP_MUL(con, reg)    # 1 # bnode->reg = kids[1]->reg; mul_i(kids[0]->val, bnode->reg);
 con:        OP_MUL(con, con)    # 0 # bnode->val = kids[0]->val * kids[1]->val;
 
-reg:        OP_ADD(id, id)      # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); add(kids[1]->reg, bnode->reg);
-reg:        OP_ADD(id, reg)     # 1 # bnode->reg = kids[1]->reg; add(kids[0]->reg, bnode->reg);
-reg:        OP_ADD(reg, id)     # 1 # bnode->reg = kids[0]->reg; add(kids[1]->reg, bnode->reg);
-reg:        OP_ADD(id, con)     # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); add_i(kids[1]->val, bnode->reg);
-reg:        OP_ADD(con, id)     # 2 # bnode->reg = next_reg(); mov(kids[1]->reg, bnode->reg); add_i(kids[0]->val, bnode->reg);
+reg:        OP_ADD(var, var)    # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); add(kids[1]->reg, bnode->reg);
+reg:        OP_ADD(var, reg)    # 1 # bnode->reg = kids[1]->reg; add(kids[0]->reg, bnode->reg);
+reg:        OP_ADD(reg, var)    # 1 # bnode->reg = kids[0]->reg; add(kids[1]->reg, bnode->reg);
+reg:        OP_ADD(var, con)    # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); add_i(kids[1]->val, bnode->reg);
+reg:        OP_ADD(con, var)    # 2 # bnode->reg = next_reg(); mov(kids[1]->reg, bnode->reg); add_i(kids[0]->val, bnode->reg);
 reg:        OP_ADD(reg, reg)    # 1 # free_reg(kids[1]->reg); bnode->reg = kids[0]->reg; add(kids[1]->reg, bnode->reg);
 reg:        OP_ADD(reg, con)    # 1 # bnode->reg = kids[0]->reg; add_i(kids[1]->val, bnode->reg);
 reg:        OP_ADD(con, reg)    # 1 # bnode->reg = kids[1]->reg; add_i(kids[0]->val, bnode->reg);
 con:        OP_ADD(con, con)    # 0 # bnode->val = kids[0]->val + kids[1]->val;
 
-reg:        not_id              # 2 # bnode->reg = next_reg(); mov(kids[0]->kids[0]->reg, bnode->reg); not(bnode->reg);
-id:         OP_NOT(not_id)      # 0 # bnode->reg = kids[0]->reg;
-not_id:     OP_NOT(id)          # 0 # bnode->reg = kids[0]->reg;
+reg:        not_var             # 2 # bnode->reg = next_reg(); mov(kids[0]->kids[0]->reg, bnode->reg); not(bnode->reg);
+var:        OP_NOT(not_var)     # 0 # bnode->reg = kids[0]->reg;
+not_var:    OP_NOT(var)         # 0 # bnode->reg = kids[0]->reg;
 reg:        not_reg             # 1 # bnode->reg = kids[0]->reg; not(bnode->reg);
 reg:        OP_NOT(not_reg)     # 0 # bnode->reg = kids[0]->reg;
 not_reg:    OP_NOT(reg)         # 0 # bnode->reg = kids[0]->reg;
 con:        OP_NOT(con)         # 0 # bnode->val = ~kids[0]->val;
 
-reg:        neg_id              # 2 # bnode->reg = next_reg(); mov(kids[0]->kids[0]->reg, bnode->reg); neg(bnode->reg);
-id:         OP_NEG(neg_id)      # 0 # bnode->reg = kids[0]->reg;
-neg_id:     OP_NEG(id)          # 0 # bnode->reg = kids[0]->reg;
+reg:        neg_var             # 2 # bnode->reg = next_reg(); mov(kids[0]->kids[0]->reg, bnode->reg); neg(bnode->reg);
+var:        OP_NEG(neg_var)     # 0 # bnode->reg = kids[0]->reg;
+neg_var:    OP_NEG(var)         # 0 # bnode->reg = kids[0]->reg;
 reg:        neg_reg             # 1 # bnode->reg = kids[0]->reg; neg(bnode->reg);
 reg:        OP_NEG(neg_reg)     # 0 # bnode->reg = kids[0]->reg;
 neg_reg:    OP_NEG(reg)         # 0 # bnode->reg = kids[0]->reg;
 con:        OP_NEG(con)         # 0 # bnode->val = -kids[0]->val;
 
-reg:        OP_DRF(id)          # 1 # bnode->reg = next_reg(); drf(kids[0]->reg, bnode->reg);
+reg:        OP_DRF(var)         # 1 # bnode->reg = next_reg(); drf(kids[0]->reg, bnode->reg);
 reg:        OP_DRF(reg)         # 1 # bnode->reg = kids[0]->reg; drf(kids[0]->reg, bnode->reg);
 con:        OP_DRF(con)         # 1 # bnode->reg = next_reg(); drf_i(kids[0]->val, bnode->reg);
 
-ret:        OP_RET(id)          # 1 # ret(kids[0]->reg);
+ret:        OP_RET(var)         # 1 # ret(kids[0]->reg);
 ret:        OP_RET(reg)         # 1 # ret(kids[0]->reg);
 ret:        OP_RET(con)         # 1 # ret_i(kids[0]->val);
 ret:        OP_RET(nop)         # 0
 
 con:        OP_CON              # 0 
-id:         OP_ID               # 0 # bnode->reg = get_arg_reg(bnode->par_pos); mark_taken(bnode->reg);
+var:        OP_VAR              # 0 # bnode->reg = get_arg_reg(bnode->par_pos); mark_taken(bnode->reg);
 nop:        OP_NOP              # 0
 
 %%
 
 extern treenode *root;
-extern int yyparse(void);
+extern int yyparse(int var);
 void burm_reduce(NODEPTR_TYPE bnode, int goalnt);
 
 void invoke_burm(NODEPTR_TYPE root) {
