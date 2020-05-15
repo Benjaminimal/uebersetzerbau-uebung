@@ -11,7 +11,7 @@
 %{
 #include "error.h"
 #include "parser.h"
-#include "id_list.h"
+#include "sym_tab.h"
 #include "treenode.h"
 
 int yycolumn = 1;

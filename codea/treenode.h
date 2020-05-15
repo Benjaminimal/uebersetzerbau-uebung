@@ -26,7 +26,7 @@ typedef struct s_node {
     STATEPTR_TYPE   state;
     /* user defined data fields follow here */
     char            reg;
-    char            *id;
+    char            *sym;
     char            pos;
     long long       val;
 } treenode;

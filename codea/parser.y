@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "error.h"
-#include "id_list.h"
+#include "sym_tab.h"
 #include "treenode.h"
 #include "translator.h"
 
@@ -50,29 +50,29 @@ extern void invoke_burm(NODEPTR_TYPE root);
 } NUM
 
 @attributes {
-    id_list *i_ids, *s_ids;
+    sym_tab *i_symtab, *s_symtab;
     int i_position;
 } pars
 
 @attributes {
     @autoinh
-    id_list *i_ids;
-    id_list *s_ids;
+    sym_tab *i_symtab;
+    sym_tab *s_symtab;
     treenode *s_n;
 } stat
 
 @attributes {
-    id_list *i_ids;
+    sym_tab *i_symtab;
 } stats
 
 @attributes {
     @autoinh
-    id_list *i_ids;
+    sym_tab *i_symtab;
 } lexpr expr_list else_stats
 
 @attributes {
     @autoinh
-    id_list *i_ids;
+    sym_tab *i_symtab;
     treenode *s_n;
 } term expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel
 
@@ -91,9 +91,9 @@ program:
 funcdef:
       ID LPAREN pars RPAREN stats END
       @{
-        @i @pars.i_ids@ = empty_id_list();
+        @i @pars.i_symtab@ = empty_sym_tab();
         @i @pars.i_position@ = 0;
-        @i @stats.i_ids@ = @pars.s_ids@;
+        @i @stats.i_symtab@ = @pars.s_symtab@;
         @codegen @revorder (1) function_start(@ID.lexeme@);
         @codegen function_end(@ID.lexeme@);
       @}
@@ -102,16 +102,16 @@ funcdef:
 pars:
       /* empty */
       @{
-        @i @pars.s_ids@ = @pars.i_ids@;
+        @i @pars.s_symtab@ = @pars.i_symtab@;
       @}
     | ID                                /* name neu */  /* sichtbarkeit gesamte funktion */
       @{
-        @i @pars.s_ids@ = add_parameter(@pars.i_ids@, @ID.lexeme@, @pars.i_position@);
+        @i @pars.s_symtab@ = add_parameter(@pars.i_symtab@, @ID.lexeme@, @pars.i_position@);
       @}
     | ID COMMA pars                       /* name neu */  /* sichtbarkeit gesamte funktion */
       @{
-        @i @pars.0.s_ids@ = @pars.1.s_ids@;
-        @i @pars.1.i_ids@ = add_parameter(@pars.0.i_ids@, @ID.lexeme@, @pars.0.i_position@);
+        @i @pars.0.s_symtab@ = @pars.1.s_symtab@;
+        @i @pars.1.i_symtab@ = add_parameter(@pars.0.i_symtab@, @ID.lexeme@, @pars.0.i_position@);
         @i @pars.1.i_position@ = @pars.0.i_position@ + 1;
       @}
     ;
@@ -120,7 +120,7 @@ stats:
       /* empty */
     | stat SEMICOLON stats
       @{
-        @i @stats.1.i_ids@ = @stat.0.s_ids@;
+        @i @stats.1.i_symtab@ = @stat.0.s_symtab@;
         @codegen invoke_burm(@stat.s_n@);
       @}
     ;
@@ -128,46 +128,46 @@ stats:
 stat:
       RETURN expr
       @{
-        @i @stat.s_ids@ = @stat.i_ids@;
+        @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_n@ = new_unary_operator_node(OP_RET, @expr.s_n@);
       @}
     | IF expr THEN stats else_stats END
       @{
-        @i @stats.i_ids@ = @stat.i_ids@;
-        @i @stat.s_ids@ = @stat.i_ids@;
+        @i @stats.i_symtab@ = @stat.i_symtab@;
+        @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_n@ = new_nop_node();
       @}
     | ID COLON LOOP stats END             /* label neu */ /* sichtbarkeit innerhalb der schleife */
       @{
-        @i @stats.i_ids@ = add_label(@stat.i_ids@, @ID.lexeme@);
-        @i @stat.s_ids@ = @stat.i_ids@;
+        @i @stats.i_symtab@ = add_label(@stat.i_symtab@, @ID.lexeme@);
+        @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_n@ = new_nop_node();
       @}
     | BREAK ID                          /* label bestehend */
       @{
-        @idcheck check_label(@stat.i_ids@, @ID.lexeme@);
-        @i @stat.s_ids@ = @stat.i_ids@;
+        @idcheck check_label(@stat.i_symtab@, @ID.lexeme@);
+        @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_n@ = new_nop_node();
       @}
     | CONT ID                           /* label bestehend */
       @{
-        @idcheck check_label(@stat.i_ids@, @ID.lexeme@);
-        @i @stat.s_ids@ = @stat.i_ids@;
+        @idcheck check_label(@stat.i_symtab@, @ID.lexeme@);
+        @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_n@ = new_nop_node();
       @}
     | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stat */
       @{
-        @i @stat.s_ids@ = add_name(@stat.i_ids@, @ID.lexeme@);
+        @i @stat.s_symtab@ = add_name(@stat.i_symtab@, @ID.lexeme@);
         @i @stat.s_n@ = new_nop_node();
       @}
     | lexpr ASSIGN expr
       @{
-        @i @stat.s_ids@ = @stat.i_ids@;
+        @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_n@ = new_nop_node();
       @}
     | expr
       @{
-        @i @stat.s_ids@ = @stat.i_ids@;
+        @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_n@ = new_nop_node();
       @}
     ;
@@ -176,14 +176,14 @@ else_stats:
       /* empty */
     | ELSE stats
       @{
-        @i @stats.i_ids@ = @else_stats.i_ids@;
+        @i @stats.i_symtab@ = @else_stats.i_symtab@;
       @}
     ;
 
 lexpr:
        ID                               /* name bestehend */
       @{
-        @idcheck check_name(@lexpr.i_ids@, @ID.lexeme@);
+        @idcheck check_name(@lexpr.i_symtab@, @ID.lexeme@);
       @}
      | ASTERISK term
      ;
@@ -310,8 +310,8 @@ term:
       @}
     | ID                                /* name bestehend */
       @{
-        @idcheck check_name(@term.i_ids@, @ID.lexeme@);
-        @i @term.s_n@ = new_variable_node(@ID.lexeme@, get_var_pos(@term.i_ids@, @ID.lexeme@));
+        @idcheck check_name(@term.i_symtab@, @ID.lexeme@);
+        @i @term.s_n@ = new_variable_node(@ID.lexeme@, get_var_pos(@term.i_symtab@, @ID.lexeme@));
       @}
     | ID LPAREN expr_list RPAREN        /* funktion beliebig */
       @{
@@ -321,60 +321,60 @@ term:
 
 %%
 
-char get_var_pos(id_list *list, char *name) {
-    id_list *needle = get_name(list, name);
+char get_var_pos(sym_tab *tab, char *name) {
+    sym_tab *needle = get_name(tab, name);
     return needle != NULL ? needle->pos : -1;
 }
 
-id_list *check_name(id_list *list, char *lexeme) {
-    if (contains_name(list, lexeme) == 0) {
+sym_tab *check_name(sym_tab *tab, char *lexeme) {
+    if (contains_name(tab, lexeme) == 0) {
         EXIT_ERR_UNDEFINED_ID(lexeme);
     }
 
-    return list;
+    return tab;
 }
 
-id_list *check_label(id_list *list, char *lexeme) {
-    if (contains_label(list, lexeme) == 0) {
+sym_tab *check_label(sym_tab *tab, char *lexeme) {
+    if (contains_label(tab, lexeme) == 0) {
         EXIT_ERR_UNDEFINED_ID(lexeme);
     }
 
-    return list;
+    return tab;
 }
 
-id_list *add_parameter(id_list *list, char *lexeme, int position) {
-    id_list *succ;
-    if (contains_id(list, lexeme) != 0) {
+sym_tab *add_parameter(sym_tab *tab, char *lexeme, int position) {
+    sym_tab *succ;
+    if (contains_id(tab, lexeme) != 0) {
         EXIT_ERR_DUPLICATE_ID(lexeme);
     }
 
-    if ((succ = add_id(list, lexeme, NAME, position)) == NULL) {
+    if ((succ = add_id(tab, lexeme, NAME, position)) == NULL) {
         EXIT_ERR_OOM();
     }
     
     return succ;
 }
 
-id_list *add_name(id_list *list, char *lexeme) {
-    id_list *succ;
-    if (contains_id(list, lexeme) != 0) {
+sym_tab *add_name(sym_tab *tab, char *lexeme) {
+    sym_tab *succ;
+    if (contains_id(tab, lexeme) != 0) {
         EXIT_ERR_DUPLICATE_ID(lexeme);
     }
 
-    if ((succ = add_id(list, lexeme, NAME, -1)) == NULL) {
+    if ((succ = add_id(tab, lexeme, NAME, -1)) == NULL) {
         EXIT_ERR_OOM();
     }
     
     return succ;
 }
 
-id_list *add_label(id_list *list, char *lexeme) {
-    id_list *succ;
-    if (contains_id(list, lexeme) != 0) {
+sym_tab *add_label(sym_tab *tab, char *lexeme) {
+    sym_tab *succ;
+    if (contains_id(tab, lexeme) != 0) {
         EXIT_ERR_DUPLICATE_ID(lexeme);
     }
 
-    if ((succ = add_id(list, lexeme, LABEL, -1)) == NULL) {
+    if ((succ = add_id(tab, lexeme, LABEL, -1)) == NULL) {
         EXIT_ERR_OOM();
     }
     
