@@ -38,7 +38,19 @@ treenode *new_variable_node(char *sym, char pos) {
 }
 
 treenode *new_constant_node(long long val) {
-    treenode *new_node = _new_operator_node(OP_CON, NULL, NULL);
+    int op;
+    switch (val) {
+        case 0:
+            op = OP_ZRO;
+            break;
+        case 1:
+            op = OP_ONE;
+            break;
+        default:
+            op = OP_CON;
+            break;
+    }
+    treenode *new_node = _new_operator_node(op, NULL, NULL);
     new_node->val = val;
     return new_node;
 }
@@ -53,6 +65,10 @@ char *op_to_str(int op) {
             return "VAR";
         case OP_CON:
             return "CON";
+        case OP_ZRO:
+            return "ZRO";
+        case OP_ONE:
+            return "ONE";
         case OP_LEQ:
             return "LEQ";
         case OP_DIF:

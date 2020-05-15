@@ -3,16 +3,18 @@
 
 #define OP_VAR 1
 #define OP_CON 2
-#define OP_LEQ 3
-#define OP_DIF 4
-#define OP_AND 5
-#define OP_MUL 6
-#define OP_ADD 7
-#define OP_NOT 8
-#define OP_NEG 9
-#define OP_DRF 10
-#define OP_RET 11
-#define OP_NOP 12
+#define OP_ZRO 3
+#define OP_ONE 4
+#define OP_LEQ 5
+#define OP_DIF 6
+#define OP_AND 7
+#define OP_MUL 8
+#define OP_ADD 9
+#define OP_NOT 10
+#define OP_NEG 11
+#define OP_DRF 12
+#define OP_RET 13
+#define OP_NOP 14
 
 #ifdef USE_IBURG
 typedef struct burm_state *STATEPTR_TYPE;

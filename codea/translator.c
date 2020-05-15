@@ -77,6 +77,9 @@ int _num_digits(int n) {
 }
 
 char *reg_to_str(char reg) {
+    if (reg == RET_REG_IDX) {
+        return RAX.name;
+    }
     if (reg < 0 || reg >= MAX_ARGS) {
         return NULL;
     }
@@ -237,10 +240,10 @@ char drf_i(long long val, char dst) {
 
 // TODO: what to return here?
 void ret(char src) {
-    _mov(reg_to_str(src), "rax");
+    _mov(reg_to_str(src), RAX.name);
 }
 void ret_i(long long val) {
-    _mov_i(val, "rax");
+    _mov_i(val, RAX.name);
 }
 
 

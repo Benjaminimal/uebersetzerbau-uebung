@@ -11,9 +11,6 @@
  // TODO: optimize and test mov elimination before return
  // TODO: optimize and test constant folding for +, *, and, dif, leq
  // TODO: optimize add to lea
- // TODO: optimize and test + 0
- // TODO: optimize and test * 1
- // TODO: optimize and test constant folding
  // TODO: add tests of more complex return statements
  // TODO: add xin tests
  // TODO: add lex error tests
@@ -23,8 +20,9 @@
  // TODO: add a scope attribute to the tree pointing to the symbol table
 %}
 
+%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_DIF=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_NOP=14 
+
 %start stat
-%term OP_VAR=1 OP_CON=2 OP_LEQ=3 OP_DIF=4 OP_AND=5 OP_MUL=6 OP_ADD=7 OP_NOT=8 OP_NEG=9 OP_DRF=10 OP_RET=11 OP_NOP=12
 
 %%
 
@@ -72,6 +70,19 @@ reg:        OP_MUL(reg, con)    # 1 # bnode->reg = kids[0]->reg; mul_i(kids[1]->
 reg:        OP_MUL(con, reg)    # 1 # bnode->reg = kids[1]->reg; mul_i(kids[0]->val, bnode->reg);
 con:        OP_MUL(con, con)    # 0 # bnode->val = kids[0]->val * kids[1]->val;
 
+zro:        OP_MUL(var, zro)    # 0 # bnode->val = 0;
+zro:        OP_MUL(zro, var)    # 0 # bnode->val = 0;
+zro:        OP_MUL(reg, zro)    # 0 # bnode->val = 0;
+zro:        OP_MUL(zro, reg)    # 0 # bnode->val = 0;
+
+var:        OP_MUL(var, one)    # 0 # bnode->reg = kids[0]->reg;
+var:        OP_MUL(one, var)    # 0 # bnode->reg = kids[1]->reg;
+reg:        OP_MUL(reg, one)    # 0 # bnode->reg = kids[0]->reg;
+reg:        OP_MUL(one, reg)    # 0 # bnode->reg = kids[1]->reg;
+zro:        OP_MUL(zro, one)    # 0 # bnode->val = 0;
+zro:        OP_MUL(one, zro)    # 0 # bnode->val = 0;
+one:        OP_MUL(one, one)    # 0 # bnode->val = 1;
+
 reg:        OP_ADD(var, var)    # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); add(kids[1]->reg, bnode->reg);
 reg:        OP_ADD(var, reg)    # 1 # bnode->reg = kids[1]->reg; add(kids[0]->reg, bnode->reg);
 reg:        OP_ADD(reg, var)    # 1 # bnode->reg = kids[0]->reg; add(kids[1]->reg, bnode->reg);
@@ -81,6 +92,14 @@ reg:        OP_ADD(reg, reg)    # 1 # free_reg(kids[1]->reg); bnode->reg = kids[
 reg:        OP_ADD(reg, con)    # 1 # bnode->reg = kids[0]->reg; add_i(kids[1]->val, bnode->reg);
 reg:        OP_ADD(con, reg)    # 1 # bnode->reg = kids[1]->reg; add_i(kids[0]->val, bnode->reg);
 con:        OP_ADD(con, con)    # 0 # bnode->val = kids[0]->val + kids[1]->val;
+
+var:        OP_ADD(var, zro)    # 0 # bnode->reg = kids[0]->reg;
+var:        OP_ADD(zro, var)    # 0 # bnode->reg = kids[1]->reg;
+reg:        OP_ADD(reg, zro)    # 0 # bnode->reg = kids[0]->reg;
+reg:        OP_ADD(zro, reg)    # 0 # bnode->reg = kids[1]->reg;
+one:        OP_ADD(one, zro)    # 0 # bnode->val = 1;
+one:        OP_ADD(zrp, one)    # 0 # bnode->val = 1;
+zro:        OP_ADD(zro, zro)    # 0 # bnode->val = 0;
 
 reg:        not_var             # 2 # bnode->reg = next_reg(); mov(kids[0]->kids[0]->reg, bnode->reg); not(bnode->reg);
 var:        OP_NOT(not_var)     # 0 # bnode->reg = kids[0]->reg;
@@ -107,8 +126,18 @@ ret:        OP_RET(reg)         # 1 # ret(kids[0]->reg);
 ret:        OP_RET(con)         # 1 # ret_i(kids[0]->val);
 ret:        OP_RET(nop)         # 0
 
+zro:        OP_ZRO              # 0
+
+one:        OP_ONE              # 0
+
 con:        OP_CON              # 0 
+con:        OP_ZRO              # 0
+con:        OP_ONE              # 0
+con:        zro                 # 0
+con:        one                 # 0
+
 var:        OP_VAR              # 0 # bnode->reg = get_arg_reg(bnode->pos); mark_taken(bnode->reg);
+
 nop:        OP_NOP              # 0
 
 %%
