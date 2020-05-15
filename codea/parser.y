@@ -330,7 +330,7 @@ term:
       @}
     | NUM
       @{
-        @i @term.s_n@ = new_number_node(@NUM.value@);
+        @i @term.s_n@ = new_constant_node(@NUM.value@);
       @}
     | ID                                /* name bestehend */
       @{

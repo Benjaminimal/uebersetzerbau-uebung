@@ -38,9 +38,9 @@ treenode *new_id_node(char *id, char par_pos) {
     return new_node;
 }
 
-treenode *new_number_node(long long num) {
-    treenode *new_node = _new_operator_node(OP_NUM, NULL, NULL);
-    new_node->val = num;
+treenode *new_constant_node(long long val) {
+    treenode *new_node = _new_operator_node(OP_CON, NULL, NULL);
+    new_node->val = val;
     return new_node;
 }
 
@@ -52,8 +52,8 @@ char *op_to_str(int op) {
     switch (op) {
         case OP_ID:
             return "ID";
-        case OP_NUM:
-            return "NUM";
+        case OP_CON:
+            return "CON";
         case OP_LEQ:
             return "LEQ";
         case OP_DIF:
