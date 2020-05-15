@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "error.h"
 #include "treenode.h"
 
 
@@ -7,9 +8,7 @@ treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     treenode *new_node = malloc(sizeof(treenode));
 
     if (new_node == NULL) {
-        // TODO: rephrase
-        fprintf(stderr, "Out of memory.\n");
-        exit(4);
+        EXIT_ERR_OOM();
     }
 
     new_node->op = op;

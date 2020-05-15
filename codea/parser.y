@@ -2,36 +2,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "error.h"
 #include "id_list.h"
 #include "treenode.h"
 #include "translator.h"
 
 #define YYERROR_VERBOSE 1
-
-#define EXIT_DUPLICATE_ID_ERR(lexeme) \
-    fprintf( \
-        stderr, \
-        "%d: scope error, %s already defined\n", \
-        yylineno, \
-        lexeme \
-    ); \
-    exit(3);
-
-#define EXIT_UNDEFINED_ID_ERR(lexeme) \
-    fprintf( \
-        stderr, \
-        "%d: scope error, %s undefined\n", \
-        yylineno, \
-        lexeme \
-    ); \
-    exit(3);
-
-#define EXIT_OOM_ERR() \
-    fprintf( \
-        stderr, \
-        "out of memory\n" \
-    ); \
-    exit(4);
 
 void yyerror(char const *msg);
 extern int yylex();
@@ -352,7 +328,7 @@ char get_var_pos(id_list *list, char *name) {
 
 id_list *check_name(id_list *list, char *lexeme) {
     if (contains_name(list, lexeme) == 0) {
-        EXIT_UNDEFINED_ID_ERR(lexeme);
+        EXIT_ERR_UNDEFINED_ID(lexeme);
     }
 
     return list;
@@ -360,7 +336,7 @@ id_list *check_name(id_list *list, char *lexeme) {
 
 id_list *check_label(id_list *list, char *lexeme) {
     if (contains_label(list, lexeme) == 0) {
-        EXIT_UNDEFINED_ID_ERR(lexeme);
+        EXIT_ERR_UNDEFINED_ID(lexeme);
     }
 
     return list;
@@ -369,11 +345,11 @@ id_list *check_label(id_list *list, char *lexeme) {
 id_list *add_parameter(id_list *list, char *lexeme, int position) {
     id_list *succ;
     if (contains_id(list, lexeme) != 0) {
-        EXIT_DUPLICATE_ID_ERR(lexeme);
+        EXIT_ERR_DUPLICATE_ID(lexeme);
     }
 
     if ((succ = add_id(list, lexeme, NAME, position)) == NULL) {
-        EXIT_OOM_ERR();
+        EXIT_ERR_OOM();
     }
     
     return succ;
@@ -382,11 +358,11 @@ id_list *add_parameter(id_list *list, char *lexeme, int position) {
 id_list *add_name(id_list *list, char *lexeme) {
     id_list *succ;
     if (contains_id(list, lexeme) != 0) {
-        EXIT_DUPLICATE_ID_ERR(lexeme);
+        EXIT_ERR_DUPLICATE_ID(lexeme);
     }
 
     if ((succ = add_id(list, lexeme, NAME, -1)) == NULL) {
-        EXIT_OOM_ERR();
+        EXIT_ERR_OOM();
     }
     
     return succ;
@@ -395,24 +371,18 @@ id_list *add_name(id_list *list, char *lexeme) {
 id_list *add_label(id_list *list, char *lexeme) {
     id_list *succ;
     if (contains_id(list, lexeme) != 0) {
-        EXIT_DUPLICATE_ID_ERR(lexeme);
+        EXIT_ERR_DUPLICATE_ID(lexeme);
     }
 
     if ((succ = add_id(list, lexeme, LABEL, -1)) == NULL) {
-        EXIT_OOM_ERR();
+        EXIT_ERR_OOM();
     }
     
     return succ;
 }
 
 void yyerror(char const *msg) {
-    (void) fprintf(
-        stderr,
-        "%d: %s\n",
-        yylineno,
-        msg
-    );
-    exit(2);
+    EXIT_ERR_PARSE(msg);
 }
 
 int main(int argc, char *argv[]) {

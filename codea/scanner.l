@@ -9,20 +9,12 @@
 %option yylineno
 
 %{
+#include "error.h"
 #include "parser.h"
 #include "id_list.h"
 #include "treenode.h"
 
 int yycolumn = 1;
-
-#define EXIT_LEX_ERR() \
-    fprintf( \
-        stderr, \
-        "%d: lexical error: unexpected character '%s'\n", \
-        yylineno, \
-        yytext \
-    ); \
-    exit(1);
 %}
 
  /* Name Definitions */
@@ -62,4 +54,4 @@ WHITESPACE      [ \n\t]+
 {DECNUM}        return NUM; @{ @NUM.value@ = strtoull(yytext, NULL, 10); @}
 {WHITESPACE}    ;
 {COMMENT}       ;
-.               EXIT_LEX_ERR();
+.               EXIT_ERR_LEX();

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "error.h"
 #include "translator.h"
 
 #define T_VAL -1
@@ -85,8 +86,7 @@ char *reg_to_str(char reg) {
 char *next_label() {
     char *label = malloc(LABEL_PREFIX_LEN + _num_digits(label_count + 1));
     if (label == NULL) {
-        fprintf(stderr, "out of memory\n");
-        exit(4);
+        EXIT_ERR_OOM();
     }
     sprintf(label, "%s%d", LABEL_PREFIX, label_count);
     label_count++;
