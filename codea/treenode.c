@@ -104,5 +104,6 @@ void _print_tree(treenode *node, int indent) {
 }
 
 void print_tree(treenode *node) {
+    printf("\n\n");
     _print_tree(node, 0);
 }

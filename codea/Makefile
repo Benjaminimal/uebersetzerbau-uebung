@@ -33,7 +33,7 @@ $(OXOUT).y $(OXOUT).l: $(PARSER).y $(SCANNER).l
 	$(AGG) $^
 
 $(GENERATOR).c: $(GENERATOR).bfe
-	bfe < $< | iburg > $@
+	bfe < $< | iburg -I > $@
 
 # TODO: this is broken here but should work if copied to the shell
 check: all
