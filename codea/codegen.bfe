@@ -10,7 +10,6 @@
 
  // TODO: optimize boolean short circuits
  // TODO: optimize and test constant folding for *, and, dif, leq
- // TODO: optimize add to lea
  // TODO: add tests of more complex return statements
  // TODO: add xin tests
  // TODO: add lex error tests
@@ -111,14 +110,14 @@ rpc:        OP_ADD(rpc, con)    # 0 # bnode->reg = kids[0]->reg; bnode->val = ki
 rpc:        OP_ADD(con, rpc)    # 0 # bnode->reg = kids[1]->reg; bnode->val = kids[0]->val + kids[1]->val;
 rpc:        reg                 # 0 # bnode->val = 0;
 
-ret:        OP_ADD(var, var)    # 1 # bnode->reg = ret_reg(); mov(kids[0]->reg, bnode->reg); add(kids[1]->reg, bnode->reg);
-reg:        OP_ADD(var, var)    # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); add(kids[1]->reg, bnode->reg);
+ret:        OP_ADD(var, var)    # 0 # bnode->reg = lea(bnode->val, kids[0]->reg, kids[1]->reg, ret_reg());
+reg:        OP_ADD(var, var)    # 1 # bnode->reg = lea(bnode->val, kids[0]->reg, kids[1]->reg, next_reg());
 reg:        OP_ADD(var, reg)    # 1 # bnode->reg = kids[1]->reg; add(kids[0]->reg, bnode->reg);
 reg:        OP_ADD(reg, var)    # 1 # bnode->reg = kids[0]->reg; add(kids[1]->reg, bnode->reg);
-ret:        OP_ADD(var, con)    # 1 # bnode->reg = ret_reg(); mov(kids[0]->reg, bnode->reg); add_i(kids[1]->val, bnode->reg);
-reg:        OP_ADD(var, con)    # 2 # bnode->reg = next_reg(); mov(kids[0]->reg, bnode->reg); add_i(kids[1]->val, bnode->reg);
-ret:        OP_ADD(con, var)    # 1 # bnode->reg = ret_reg(); mov(kids[1]->reg, bnode->reg); add_i(kids[0]->val, bnode->reg);
-reg:        OP_ADD(con, var)    # 2 # bnode->reg = next_reg(); mov(kids[1]->reg, bnode->reg); add_i(kids[0]->val, bnode->reg);
+ret:        OP_ADD(var, con)    # 0 # bnode->reg = lea_i(kids[1]->val, kids[0]->reg, ret_reg());
+reg:        OP_ADD(var, con)    # 1 # bnode->reg = lea_i(kids[1]->val, kids[0]->reg, next_reg());
+ret:        OP_ADD(con, var)    # 0 # bnode->reg = lea_i(kids[0]->val, kids[1]->reg, ret_reg());
+reg:        OP_ADD(con, var)    # 1 # bnode->reg = lea_i(kids[0]->val, kids[1]->reg, next_reg());
 reg:        OP_ADD(reg, reg)    # 1 # free_reg(kids[1]->reg); bnode->reg = kids[0]->reg; add(kids[1]->reg, bnode->reg);
 reg:        OP_ADD(reg, con)    # 1 # bnode->reg = kids[0]->reg; add_i(kids[1]->val, bnode->reg);
 reg:        OP_ADD(con, reg)    # 1 # bnode->reg = kids[1]->reg; add_i(kids[0]->val, bnode->reg);
