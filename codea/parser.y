@@ -46,7 +46,7 @@ extern void invoke_burm(NODEPTR_TYPE root);
 } ID
 
 @attributes {
-    long long value;
+    long value;
 } NUM
 
 @attributes {

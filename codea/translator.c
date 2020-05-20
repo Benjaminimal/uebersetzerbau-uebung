@@ -44,27 +44,27 @@ const reg *reg_callee[] = {&RBX, &R12, &R13, &R14, &R15}; // TODO: rbp (and rsp)
 */
 
 void _mov(char *, char *);
-void _mov_i(long long, char *);
+void _mov_i(long, char *);
 void _cmp(char *, char *);
-void _cmp_i(long long, char *);
+void _cmp_i(long, char *);
 void _and(char *, char *);
-void _and_i(long long , char *);
+void _and_i(long , char *);
 void _mul(char *, char *);
-void _mul_i(long long, char *);
+void _mul_i(long, char *);
 void _add(char *, char *);
-void _add_i(long long, char *);
-void _lea(long long, char *, char *, char *);
-void _lea_i(long long, char *, char *);
+void _add_i(long, char *);
+void _lea(long, char *, char *, char *);
+void _lea_i(long, char *, char *);
 void _not(char *);
 void _neg(char *);
 void _drf(char *, char *);
-void _drf_i(long long, char *);
+void _drf_i(long, char *);
 void _ret();
 void _jmp(char *);
 void _jcc(char *, char *);
 void _lbl(char *);
 void _cmp_cc(char *, char *, char *, char *);
-void _cmp_cc_i(char *, long long, char *, char *);
+void _cmp_cc_i(char *, long, char *, char *);
 
 
 int _num_digits(int n) {
@@ -162,12 +162,12 @@ char cmp_leq(char lsrc, char rsrc, char dst) {
     _cmp_cc("le", reg_to_str(rsrc), reg_to_str(lsrc), reg_to_str(dst));
     return dst;
 }
-char cmp_leq_i(long long val, char src, char dst) {
+char cmp_leq_i(long val, char src, char dst) {
     _cmp_cc_i("ge", val, reg_to_str(src), reg_to_str(dst));
     return dst;
 }
 
-char cmp_geq_i(long long val, char src, char dst) {
+char cmp_geq_i(long val, char src, char dst) {
     _cmp_cc_i("le", val, reg_to_str(src), reg_to_str(dst));
     return dst;
 }
@@ -176,7 +176,7 @@ char cmp_dif(char lsrc, char rsrc, char dst) {
     _cmp_cc("ne", reg_to_str(lsrc), reg_to_str(rsrc), reg_to_str(dst));
     return dst;
 }
-char cmp_dif_i(long long val, char src, char dst) {
+char cmp_dif_i(long val, char src, char dst) {
     _cmp_cc_i("ne", val, reg_to_str(src), reg_to_str(dst));
     return dst;
 }
@@ -186,7 +186,7 @@ char mov(char src, char dst) {
     _mov(reg_to_str(src), reg_to_str(dst));
     return dst;
 }
-char mov_i(long long val, char dst) {
+char mov_i(long val, char dst) {
     _mov_i(val, reg_to_str(dst));
     return dst;
 }
@@ -194,29 +194,29 @@ char mov_i(long long val, char dst) {
 void and(char src, char src_dst) {
     _and(reg_to_str(src), reg_to_str(src_dst));
 }
-void and_i(long long val, char src_dst) {
+void and_i(long val, char src_dst) {
     _and_i(val, reg_to_str(src_dst));
 }
 
 void mul(char src, char src_dst) {
     _mul(reg_to_str(src), reg_to_str(src_dst));
 }
-void mul_i(long long val, char src_dst) {
+void mul_i(long val, char src_dst) {
     _mul_i(val, reg_to_str(src_dst));
 }
 
 void add(char src, char src_dst) {
     _add(reg_to_str(src), reg_to_str(src_dst));
 }
-void add_i(long long val, char src_dst) {
+void add_i(long val, char src_dst) {
     _add_i(val, reg_to_str(src_dst));
 }
 
-char lea(long long val, char lsrc, char rsrc, char dst) {
+char lea(long val, char lsrc, char rsrc, char dst) {
     _lea(val, reg_to_str(lsrc), reg_to_str(rsrc), reg_to_str(dst));
     return dst;
 }
-char lea_i(long long val, char src, char dst) {
+char lea_i(long val, char src, char dst) {
     _lea_i(val, reg_to_str(src), reg_to_str(dst));
     return dst;
 }
@@ -233,7 +233,7 @@ char drf(char src, char dst) {
     _drf(reg_to_str(src), reg_to_str(dst));
     return dst;
 }
-char drf_i(long long val, char dst) {
+char drf_i(long val, char dst) {
     _drf_i(val, reg_to_str(dst));
     return dst;
 }
@@ -242,7 +242,7 @@ char drf_i(long long val, char dst) {
 void ret(char src) {
     _mov(reg_to_str(src), RAX.name);
 }
-void ret_i(long long val) {
+void ret_i(long val) {
     _mov_i(val, RAX.name);
 }
 
@@ -251,42 +251,42 @@ void _mov(char *src, char *dst) {
     printf("\tmovq\t%%%s, %%%s\n", src, dst);
 }
 
-void _mov_i(long long val, char *dst) {
+void _mov_i(long val, char *dst) {
     printf("\tmovq\t$%lld, %%%s\n", val, dst);
 }
 
 void _cmp(char *left, char *right) {
     printf("\tcmpq\t%%%s, %%%s\n", left, right);
 }
-void _cmp_i(long long val, char *dst) {
+void _cmp_i(long val, char *dst) {
     printf("\tcmpq\t$%lld, %%%s\n", val, dst);
 }
 
 void _and(char *src, char *dst) {
     printf("\tandq\t%%%s, %%%s\n", src, dst);
 }
-void _and_i(long long val, char *dst) {
+void _and_i(long val, char *dst) {
     printf("\tandq\t$%lld, %%%s\n", val, dst);
 }
 
 void _mul(char *src, char *dst) {
     printf("\timulq\t%%%s, %%%s\n", src, dst);
 }
-void _mul_i(long long val, char *dst) {
+void _mul_i(long val, char *dst) {
     printf("\timulq\t$%lld, %%%s\n", val, dst);
 }
 
 void _add(char *src, char *dst) {
     printf("\taddq\t%%%s, %%%s\n", src, dst);
 }
-void _add_i(long long val, char *dst) {
+void _add_i(long val, char *dst) {
     printf("\taddq\t$%lld, %%%s\n", val, dst);
 }
 
-void _lea(long long val, char *lsrc, char *rsrc, char *dst) {
+void _lea(long val, char *lsrc, char *rsrc, char *dst) {
     printf("\tleaq\t%lld(%%%s, %%%s), %%%s\n", val, lsrc, rsrc, dst);
 }
-void _lea_i(long long val, char *src, char *dst) {
+void _lea_i(long val, char *src, char *dst) {
     printf("\tleaq\t%lld(%%%s), %%%s\n", val, src, dst);
 }
 
@@ -302,7 +302,7 @@ void _drf(char *src, char *dst) {
     printf("\tmovq\t(%%%s), %%%s\n", src, dst);
 }
 // TODO: this looks very wrong
-void _drf_i(long long val, char *dst) {
+void _drf_i(long val, char *dst) {
     printf("\tmovq\t($%lld), %%%s\n", val, dst);
 }
 
@@ -338,7 +338,7 @@ void _cmp_cc(char *cond, char *lsrc, char *rsrc, char *dst) {
     free(label_end);
 }
 
-void _cmp_cc_i(char *cond, long long val, char *src, char *dst) {
+void _cmp_cc_i(char *cond, long val, char *src, char *dst) {
     char *label_true = next_label();
     char *label_end = next_label();
 

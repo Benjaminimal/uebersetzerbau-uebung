@@ -37,7 +37,7 @@ treenode *new_variable_node(char *sym, char pos) {
     return new_node;
 }
 
-treenode *new_constant_node(long long val) {
+treenode *new_constant_node(long val) {
     int op;
     switch (val) {
         case 0:

@@ -30,7 +30,7 @@ typedef struct s_node {
     char            reg;
     char            *sym;
     char            pos;
-    long long       val;
+    long       val;
 } treenode;
 
 typedef treenode *treenodep;
@@ -45,7 +45,7 @@ typedef treenode *treenodep;
 treenode *new_binary_operator_node(int, treenode*, treenode*);
 treenode *new_unary_operator_node(int, treenode*);
 treenode *new_variable_node(char*, char);
-treenode *new_constant_node(long long);
+treenode *new_constant_node(long);
 treenode *new_nop_node();
 void print_tree(treenode *);
 
