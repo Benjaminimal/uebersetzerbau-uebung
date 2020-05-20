@@ -66,6 +66,11 @@ void _lbl(char *);
 void _cmp_cc(char *, char *, char *, char *);
 void _cmp_cc_i(char *, long, char *, char *);
 
+void print_regs() {
+    for (int i = 0; i < MAX_ARGS; i++) {
+        printf("%s: %d\n", reg_args[i]->name, reg_args[i]->taken);
+    }
+}
 
 int _num_digits(int n) {
     int cnt = 0;
@@ -108,7 +113,7 @@ char ret_reg() {
 }
 
 char next_reg() {
-    for (char i = 0; i < MAX_ARGS; i++) {
+    for (char i = MAX_ARGS - 1; i >= 0; i--) {
         if (reg_args[i]->taken == 0) {
             reg_args[i]->taken = 1;
             return i;

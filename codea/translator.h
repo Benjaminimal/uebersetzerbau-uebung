@@ -3,6 +3,8 @@
 
 #define MAX_ARGS 6
 
+void print_regs();
+
 void function_start(char *name);
 void function_end(char *name);
 

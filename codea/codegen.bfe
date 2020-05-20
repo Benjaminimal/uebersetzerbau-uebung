@@ -76,6 +76,7 @@ zro:        OP_MUL(zro, vtc)    # 0 # bnode->val = 0;
 
 ret:        vtc                 # 1 # bnode->reg = mov(bnode->reg, ret_reg()); mul_i(bnode->val, bnode->reg);
 reg:        vtc                 # 2 # bnode->reg = mov(bnode->reg, next_reg()); mul_i(bnode->val, bnode->reg);
+ret:        OP_MUL(vtc, vtc)    # 2 # bnode->reg = mov(kids[0]->reg, ret_reg()); bnode->val = kids[0]->val * kids[1]->val; mul(kids[1]->reg, bnode->reg); mul_i(bnode->val, bnode->reg);
 rtc:        OP_MUL(vtc, vtc)    # 2 # bnode->reg = mov(kids[0]->reg, next_reg()); bnode->val = kids[0]->val * kids[1]->val; mul(kids[1]->reg, bnode->reg);
 vtc:        OP_MUL(vtc, con)    # 0 # bnode->reg = kids[0]->reg; bnode->val = kids[0]->val * kids[1]->val;
 vtc:        OP_MUL(con, vtc)    # 0 # bnode->reg = kids[1]->reg; bnode->val = kids[0]->val * kids[1]->val;
