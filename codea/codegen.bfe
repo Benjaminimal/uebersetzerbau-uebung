@@ -242,6 +242,7 @@ con:        OP_NEG(con)         # 0 # bnode->val = -kids[0]->val;
 
 ret:        OP_DRF(var)         # 0 # bnode->reg = ret_reg(); drf(kids[0]->reg, bnode->reg);
 reg:        OP_DRF(var)         # 1 # bnode->reg = next_reg(); drf(kids[0]->reg, bnode->reg);
+ret:        OP_DRF(ret)         # 1 # bnode->reg = kids[0]->reg; drf(kids[0]->reg, bnode->reg);
 reg:        OP_DRF(reg)         # 1 # bnode->reg = kids[0]->reg; drf(kids[0]->reg, bnode->reg);
 con:        OP_DRF(con)         # 1 # bnode->reg = next_reg(); drf_i(kids[0]->val, bnode->reg); // TODO: this should not be a con if val is not set, if this realy keeps using next_reg() you neet to introduce a ret: derivation for it
 
