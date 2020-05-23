@@ -60,10 +60,14 @@ extern void invoke_burm(NODEPTR_TYPE root);
     sym_tab *i_symtab;
     sym_tab *s_symtab;
     treenode *s_node;
+    int i_position;
+    int s_position;
 } stat
 
 @attributes {
     sym_tab *i_symtab;
+    int i_position;
+    int s_position;
 } stats else_stats
 
 @attributes {
@@ -95,6 +99,7 @@ funcdef:
         @i @pars.i_symtab@ = empty_sym_tab();
         @i @pars.i_position@ = 0;
         @i @stats.i_symtab@ = @pars.s_symtab@;
+        @i @stats.i_position@ = @pars.s_position@;
         @codegen @revorder (1) function_start(@ID.lexeme@);
         @codegen function_end(@ID.lexeme@);
       @}
@@ -122,9 +127,15 @@ pars:
 
 stats:
       /* empty */
+      @{
+        @i @stats.s_position@ = @stats.i_position@;
+      @}
     | stat SEMICOLON stats
       @{
         @i @stats.1.i_symtab@ = @stat.0.s_symtab@;
+        @i @stat.i_position@ = @stats.0.i_position@;
+        @i @stats.1.i_position@ = @stat.s_position@;
+        @i @stats.0.s_position@ = @stats.1.s_position@;
         @codegen invoke_burm(@stat.s_node@);
       @}
     ;
@@ -133,18 +144,24 @@ stat:
       RETURN expr
       @{
         @i @stat.s_symtab@ = @stat.i_symtab@;
+        @i @stat.s_position@ = @stat.i_position@;
         @i @stat.s_node@ = new_unary_operator_node(OP_RET, @expr.s_node@);
       @}
     | IF expr THEN stats else_stats END
       @{
         @i @stats.i_symtab@ = @stat.i_symtab@;
         @i @else_stats.i_symtab@ = @stat.i_symtab@;
-        @i @stat.s_symtab@ = @stat.i_symtab@;
+        @i @stats.i_position@ = @stat.i_position@;
+        @i @else_stats.i_position@ = @stats.s_position@;
+        @i @stat.s_position@ = @else_stats.s_position@;
+        @i @stat.s_symtab@ = @stat.i_symtab@; // TODO: what if there is a variable definition in else_stats?
         @i @stat.s_node@ = new_nop_node();
       @}
     | ID COLON LOOP stats END             /* label neu */ /* sichtbarkeit innerhalb der schleife */
       @{
         @i @stats.i_symtab@ = add_label(@stat.i_symtab@, @ID.lexeme@);
+        @i @stats.i_position@ = @stat.i_position@;
+        @i @stat.s_position@ = @stats.s_position@;
         @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_node@ = new_nop_node();
       @}
@@ -152,36 +169,46 @@ stat:
       @{
         @idcheck check_label(@stat.i_symtab@, @ID.lexeme@);
         @i @stat.s_symtab@ = @stat.i_symtab@;
+        @i @stat.s_position@ = @stat.i_position@;
         @i @stat.s_node@ = new_nop_node();
       @}
     | CONT ID                           /* label bestehend */
       @{
         @idcheck check_label(@stat.i_symtab@, @ID.lexeme@);
         @i @stat.s_symtab@ = @stat.i_symtab@;
+        @i @stat.s_position@ = @stat.i_position@;
         @i @stat.s_node@ = new_nop_node();
       @}
     | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stat */
       @{
-        @i @stat.s_symtab@ = add_name(@stat.i_symtab@, @ID.lexeme@, -1); // TODO: add position
+        @i @stat.s_symtab@ = add_name(@stat.i_symtab@, @ID.lexeme@, @stat.i_position@);
+        @i @stat.s_position@ = @stat.i_position@ + 1;
         @i @stat.s_node@ = new_nop_node();
       @}
     | lexpr ASSIGN expr
       @{
         @i @stat.s_symtab@ = @stat.i_symtab@;
+        @i @stat.s_position@ = @stat.i_position@;
         @i @stat.s_node@ = new_nop_node();
       @}
     | expr
       @{
         @i @stat.s_symtab@ = @stat.i_symtab@;
+        @i @stat.s_position@ = @stat.i_position@;
         @i @stat.s_node@ = new_nop_node();
       @}
     ;
 
 else_stats:
       /* empty */
+      @{
+        @i @else_stats.s_position@ = @else_stats.i_position@;
+      @}
     | ELSE stats
       @{
         @i @stats.i_symtab@ = @else_stats.i_symtab@;
+        @i @stats.i_position@ = @else_stats.i_position@;
+        @i @else_stats.s_position@ = @stats.s_position@;
       @}
     ;
 
