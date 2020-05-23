@@ -17,7 +17,7 @@
  // TODO: add a scope attribute to the tree pointing to the symbol table
 %}
 
-%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_DIF=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_NOP=14 
+%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_DIF=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_INI=14 OP_NOP=15
 
 %start stat
 
@@ -25,6 +25,11 @@
 
 stat:       ret                 # 0
 stat:       nop                 # 0
+stat:       ini                 # 0
+
+ini:        OP_INI(var, var)    # 1 # mov(kids[1]->reg, kids[0]->reg);
+ini:        OP_INI(var, reg)    # 1 # free_reg(kids[1]->reg); mov(kids[1]->reg, kids[0]->reg);
+ini:        OP_INI(var, con)    # 1 # mov_i(kids[1]->val, kids[0]->reg);
 
 ret:        OP_LEQ(var, var)    # 2 # bnode->reg = ret_reg(); cmp_leq(kids[0]->reg, kids[1]->reg, bnode->reg);
 reg:        OP_LEQ(var, var)    # 3 # bnode->reg = next_reg(); cmp_leq(kids[0]->reg, kids[1]->reg, bnode->reg);
@@ -282,9 +287,9 @@ extern int yyparse(int var);
 void burm_reduce(NODEPTR_TYPE bnode, int goalnt);
 
 void invoke_burm(NODEPTR_TYPE root) {
-        burm_label(root);
-        burm_reduce(root, 1);
 #ifdef DEBUG
         print_tree(root);
 #endif /* DBG */
+        burm_label(root);
+        burm_reduce(root, 1);
 }

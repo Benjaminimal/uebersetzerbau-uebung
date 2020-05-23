@@ -14,7 +14,8 @@
 #define OP_NEG 11
 #define OP_DRF 12
 #define OP_RET 13
-#define OP_NOP 14
+#define OP_INI 14
+#define OP_NOP 15
 
 #ifdef USE_IBURG
 typedef struct burm_state *STATEPTR_TYPE;
@@ -42,6 +43,10 @@ typedef treenode *treenodep;
 #define STATE_LABEL(p)  ((p)->state)
 #define PANIC           printf
 
+/* codeb */
+treenode *new_init_node(treenode*, treenode*);
+
+/* codea */
 treenode *new_binary_operator_node(int, treenode*, treenode*);
 treenode *new_unary_operator_node(int, treenode*);
 treenode *new_variable_node(char*, char);

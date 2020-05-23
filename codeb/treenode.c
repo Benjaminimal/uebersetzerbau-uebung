@@ -22,6 +22,10 @@ treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     return new_node;
 }
 
+treenode *new_init_node(treenode* left, treenode* right) {
+    return _new_operator_node(OP_INI, left, right);
+}
+
 treenode *new_binary_operator_node(int op, treenode *left, treenode *right) {
     return _new_operator_node(op, left, right);
 }
@@ -87,6 +91,8 @@ char *op_to_str(int op) {
             return "DRF";
         case OP_RET:
             return "RET";
+        case OP_INI:
+            return "INI";
         case OP_NOP:
             return "NOP";
     }
@@ -104,6 +110,7 @@ void _print_tree(treenode *node, int indent) {
 }
 
 void print_tree(treenode *node) {
-    printf("\n\n");
+    printf("\n");
     _print_tree(node, 0);
+    printf("\n");
 }

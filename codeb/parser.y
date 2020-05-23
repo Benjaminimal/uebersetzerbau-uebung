@@ -183,7 +183,7 @@ stat:
       @{
         @i @stat.s_symtab@ = add_name(@stat.i_symtab@, @ID.lexeme@, @stat.i_position@);
         @i @stat.s_position@ = @stat.i_position@ + 1;
-        @i @stat.s_node@ = new_nop_node();
+        @i @stat.s_node@ = new_init_node(new_variable_node(@ID.lexeme@, @stat.i_position@), @expr.s_node@);
       @}
     | lexpr ASSIGN expr
       @{
@@ -359,9 +359,9 @@ char get_var_pos(sym_tab *tab, char *name) {
 }
 
 sym_tab *check_name(sym_tab *tab, char *lexeme) {
-    #if DEBUG
+#if DEBUG
     print_sym_tab(tab);
-    #endif
+#endif
     if (contains_name(tab, lexeme) == 0) {
         EXIT_ERR_UNDEFINED_ID(lexeme);
     }
@@ -370,9 +370,9 @@ sym_tab *check_name(sym_tab *tab, char *lexeme) {
 }
 
 sym_tab *check_label(sym_tab *tab, char *lexeme) {
-    #if DEBUG
+#if DEBUG
     print_sym_tab(tab);
-    #endif
+#endif
     if (contains_label(tab, lexeme) == 0) {
         EXIT_ERR_UNDEFINED_ID(lexeme);
     }
