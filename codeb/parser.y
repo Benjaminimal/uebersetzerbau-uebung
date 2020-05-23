@@ -52,6 +52,7 @@ extern void invoke_burm(NODEPTR_TYPE root);
 @attributes {
     sym_tab *i_symtab, *s_symtab;
     int i_position;
+    int s_position;
 } pars
 
 @attributes {
@@ -103,16 +104,19 @@ pars:
       /* empty */
       @{
         @i @pars.s_symtab@ = @pars.i_symtab@;
+        @i @pars.s_position@ = @pars.i_position@;
       @}
     | ID                                /* name neu */  /* sichtbarkeit gesamte funktion */
       @{
         @i @pars.s_symtab@ = add_parameter(@pars.i_symtab@, @ID.lexeme@, @pars.i_position@);
+        @i @pars.s_position@ = @pars.i_position@;
       @}
     | ID COMMA pars                       /* name neu */  /* sichtbarkeit gesamte funktion */
       @{
         @i @pars.0.s_symtab@ = @pars.1.s_symtab@;
         @i @pars.1.i_symtab@ = add_parameter(@pars.0.i_symtab@, @ID.lexeme@, @pars.0.i_position@);
         @i @pars.1.i_position@ = @pars.0.i_position@ + 1;
+        @i @pars.0.s_position@ = @pars.1.i_position@;
       @}
     ;
 
@@ -157,7 +161,7 @@ stat:
       @}
     | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stat */
       @{
-        @i @stat.s_symtab@ = add_name(@stat.i_symtab@, @ID.lexeme@);
+        @i @stat.s_symtab@ = add_name(@stat.i_symtab@, @ID.lexeme@, -1); // TODO: add position
         @i @stat.s_node@ = new_nop_node();
       @}
     | lexpr ASSIGN expr
@@ -361,13 +365,13 @@ sym_tab *add_parameter(sym_tab *tab, char *lexeme, int position) {
     return succ;
 }
 
-sym_tab *add_name(sym_tab *tab, char *lexeme) {
+sym_tab *add_name(sym_tab *tab, char *lexeme, int position) {
     sym_tab *succ;
     if (contains_id(tab, lexeme) != 0) {
         EXIT_ERR_DUPLICATE_ID(lexeme);
     }
 
-    if ((succ = add_id(tab, lexeme, NAME, -1)) == NULL) {
+    if ((succ = add_id(tab, lexeme, NAME, position)) == NULL) {
         EXIT_ERR_OOM();
     }
     

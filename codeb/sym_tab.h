@@ -9,7 +9,7 @@ typedef enum {
 typedef struct sym_tab {
     sym_type type;
     char *lexeme;
-    char pos;
+    int pos;
     struct sym_tab *next;
 } sym_tab;
 
