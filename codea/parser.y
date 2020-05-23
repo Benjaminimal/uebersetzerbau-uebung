@@ -77,7 +77,7 @@ extern void invoke_burm(NODEPTR_TYPE root);
 } term expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel
 
 @traversal idcheck
-@traversal @lefttoright @postorder codegen
+@traversal @lefttoright @preorder codegen
 
 %start program
 
@@ -94,8 +94,8 @@ funcdef:
         @i @pars.i_symtab@ = empty_sym_tab();
         @i @pars.i_position@ = 0;
         @i @stats.i_symtab@ = @pars.s_symtab@;
-        @codegen @revorder (1) function_start(@ID.lexeme@);
-        @codegen function_end(@ID.lexeme@);
+        @codegen function_start(@ID.lexeme@);
+        @codegen @revorder (1) function_end(@ID.lexeme@);
       @}
     ;
 
