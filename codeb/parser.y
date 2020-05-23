@@ -64,12 +64,12 @@ extern void invoke_burm(NODEPTR_TYPE root);
 
 @attributes {
     sym_tab *i_symtab;
-} stats
+} stats else_stats
 
 @attributes {
     @autoinh
     sym_tab *i_symtab;
-} lexpr expr_list else_stats
+} lexpr expr_list
 
 @attributes {
     @autoinh
@@ -138,6 +138,7 @@ stat:
     | IF expr THEN stats else_stats END
       @{
         @i @stats.i_symtab@ = @stat.i_symtab@;
+        @i @else_stats.i_symtab@ = @stat.i_symtab@;
         @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_node@ = new_nop_node();
       @}
