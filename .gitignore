@@ -29,3 +29,7 @@ codegen.c
 codea
 test.out
 !codea/
+
+# codeb
+codeb
+!codeb/
