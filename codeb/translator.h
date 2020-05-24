@@ -2,6 +2,7 @@
 #define _TRANSLATOR_H_
 
 #define MAX_ARGS 6
+#define MAX_REGS 6
 
 void print_regs();
 
@@ -25,6 +26,8 @@ void neg(char src_dst);
 void ret(char src);
 void ret_i(long val);
 void ret_e();
+
+void test(char reg, char *label);
 
 char mov(char src, char dst);
 char mov_i(long val, char dst);

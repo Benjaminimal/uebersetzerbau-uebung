@@ -25,6 +25,20 @@ treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     return new_node;
 }
 
+treenode *new_if_node(treenode *expr, treenode *branch_true, treenode *branch_false, char *label_false, char *label_end) {
+    treenode *true_node = _new_operator_node(OP_TRU, branch_true, NULL);
+    true_node->labels[0] = label_end;
+    true_node->labels[1] = label_false;
+    treenode *false_node = _new_operator_node(OP_FAL, branch_false, NULL);
+    treenode *alternative_node = _new_operator_node(OP_ALT, true_node, false_node);
+    treenode *test_node = _new_operator_node(OP_TST, expr, NULL);
+    test_node->labels[0] = label_false;
+    treenode *if_node = _new_operator_node(OP_IF, test_node, alternative_node);
+    if_node->labels[0] = label_end;
+    if_node->labels[1] = label_false;
+    return if_node;
+}
+
 treenode *new_cont_node(sym_tab *tab) {
     treenode *new_node = _new_operator_node(OP_JMP, NULL, NULL);
     new_node->labels[0] = tab->labels[0];
@@ -131,6 +145,18 @@ char *op_to_str(int op) {
             return "LOP";
         case OP_LBL:
             return "LBL";
+        case OP_JMP:
+            return "OP_JMP";
+        case OP_IF:
+            return "OP_IF";
+        case OP_TST:
+            return "OP_TST";
+        case OP_ALT:
+            return "OP_ALT";
+        case OP_TRU:
+            return "OP_TRU";
+        case OP_FAL:
+            return "OP_FAL";
         case OP_NOP:
             return "NOP";
     }
@@ -140,8 +166,8 @@ void _print_tree(treenode *node, int indent) {
     if (node == NULL) return;
     for (int i = 0; i < indent; i++) printf("\t");
     printf("op: %s", op_to_str(node->op));
-    if (node->sym != NULL) printf(" id: %s", node->sym);
-    printf(" val: %lld", node->val);
+    if (node->sym != NULL) printf(" id: %s pos: %d", node->sym, node->pos);
+    if (node->op == OP_CON) printf(" val: %lld", node->val);
     printf("\n");
     _print_tree(node->kids[0], indent + 1);
     _print_tree(node->kids[1], indent + 1);

@@ -115,14 +115,14 @@ pars:
     | ID                                /* name neu */  /* sichtbarkeit gesamte funktion */
       @{
         @i @pars.s_symtab@ = add_parameter(@pars.i_symtab@, @ID.lexeme@, @pars.i_position@);
-        @i @pars.s_position@ = @pars.i_position@;
+        @i @pars.s_position@ = @pars.i_position@ + 1;
       @}
     | ID COMMA pars                       /* name neu */  /* sichtbarkeit gesamte funktion */
       @{
         @i @pars.0.s_symtab@ = @pars.1.s_symtab@;
         @i @pars.1.i_symtab@ = add_parameter(@pars.0.i_symtab@, @ID.lexeme@, @pars.0.i_position@);
         @i @pars.1.i_position@ = @pars.0.i_position@ + 1;
-        @i @pars.0.s_position@ = @pars.1.i_position@;
+        @i @pars.0.s_position@ = @pars.1.s_position@;
       @}
     ;
 
@@ -157,7 +157,8 @@ stat:
         @i @else_stats.i_position@ = @stats.s_position@;
         @i @stat.s_position@ = @else_stats.s_position@;
         @i @stat.s_symtab@ = @stat.i_symtab@; // TODO: what if there is a variable definition in else_stats?
-        @i @stat.s_node@ = new_nop_node();
+
+        @i @stat.s_node@ = new_if_node(@expr.s_node@, @stats.s_node@, @else_stats.s_node@, next_label(), next_label());
       @}
     | ID COLON LOOP stats END             /* label neu */ /* sichtbarkeit innerhalb der schleife */
       @{

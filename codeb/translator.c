@@ -45,6 +45,7 @@ const reg *reg_callee[] = {&RBX, &R12, &R13, &R14, &R15}; // TODO: rbp (and rsp)
 
 // TODO: get rid of all the $lld 
 
+void _test_i(long, char *);
 void _mov(char *, char *);
 void _mov_i(long, char *);
 void _mov_d(char *, char *);
@@ -168,6 +169,11 @@ void function_end(char *name) {
     // printf("\t.size\t%s, .-%s\n", name, name);
 }
 
+
+void test(char reg, char *label) {
+    _test_i(1, reg_to_str(reg));
+    _jcc("z", label);
+}
 
 void lbl(char *label) {
     _lbl(label);
@@ -360,7 +366,11 @@ void _jmp(char *loc) {
 }
 
 void _jcc(char *cond, char *loc) {
-    printf("\tj%s\t%s\n", cond, loc);
+    printf("\tj%s\t\t%s\n", cond, loc);
+}
+
+void _test_i(long val, char *reg) {
+    printf("\ttest\t$%d,%%%s\n", val, reg);
 }
 
 void _lbl(char *label) {

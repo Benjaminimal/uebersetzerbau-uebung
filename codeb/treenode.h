@@ -22,7 +22,12 @@
 #define OP_LOP 17
 #define OP_LBL 18
 #define OP_JMP 19
-#define OP_NOP 20
+#define OP_IF  20
+#define OP_TST 21
+#define OP_ALT 22
+#define OP_TRU 23
+#define OP_FAL 24
+#define OP_NOP 25
 
 #ifdef USE_IBURG
 typedef struct burm_state *STATEPTR_TYPE;
@@ -57,6 +62,7 @@ treenode *new_sequence_node(treenode *, treenode *);
 treenode *new_loop_node(sym_tab *, treenode *);
 treenode *new_cont_node(sym_tab *);
 treenode *new_break_node(sym_tab *);
+treenode *new_if_node(treenode *, treenode *, treenode *, char *, char *);
 
 /* codea */
 treenode *new_binary_operator_node(int, treenode *, treenode *);

@@ -17,7 +17,7 @@
  // TODO: add a scope attribute to the tree pointing to the symbol table
 %}
 
-%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_DIF=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_INI=14 OP_ASN=15 OP_SEQ=16 OP_LOP=17 OP_LBL=18 OP_JMP=19 OP_NOP=20
+%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_DIF=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_INI=14 OP_ASN=15 OP_SEQ=16 OP_LOP=17 OP_LBL=18 OP_JMP=19 OP_IF=20 OP_TST=21 OP_ALT=22 OP_TRU=23 OP_FAL=24 OP_NOP=25
 
 %start stats
 
@@ -34,6 +34,19 @@ stat:       ini                 # 0
 stat:       asn                 # 0
 stat:       loop                # 0
 stat:       jmp                 # 0
+stat:       cond                # 0
+
+cond:       OP_IF(test, alt)    # 0 # lbl(bnode->labels[0]);
+
+test:       OP_TST(reg)         # 2 # free_reg(kids[0]->reg); test(kids[0]->reg, bnode->labels[0]);
+test:       OP_TST(var)         # 2 # test(kids[0]->reg, bnode->labels[0]);
+test:       OP_TST(con)         # 1 # if ((kids[0]->val & 1) == 0) jmp(bnode->labels[0]);
+
+alt:        OP_ALT(btru, bfal)  # 0
+
+btru:       OP_TRU(seq)         # 1 # jmp(bnode->labels[0]); lbl(bnode->labels[1]);
+
+bfal:       OP_FAL(seq)         # 0
 
 jmp:        OP_JMP              # 1 # jmp(bnode->labels[0]);
 
