@@ -22,7 +22,11 @@ treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     return new_node;
 }
 
-treenode *new_init_node(treenode* left, treenode* right) {
+treenode *new_sequence_node(treenode *left, treenode *right) {
+    return _new_operator_node(OP_SEQ, left, right);
+}
+
+treenode *new_init_node(treenode *left, treenode *right) {
     return _new_operator_node(OP_INI, left, right);
 }
 
@@ -95,6 +99,8 @@ char *op_to_str(int op) {
             return "INI";
         case OP_ASN:
             return "ASN";
+        case OP_SEQ:
+            return "SEQ";
         case OP_NOP:
             return "NOP";
     }

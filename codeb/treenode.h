@@ -16,7 +16,8 @@
 #define OP_RET 13
 #define OP_INI 14
 #define OP_ASN 15
-#define OP_NOP 16
+#define OP_SEQ 16
+#define OP_NOP 17
 
 #ifdef USE_IBURG
 typedef struct burm_state *STATEPTR_TYPE;
@@ -46,6 +47,7 @@ typedef treenode *treenodep;
 
 /* codeb */
 treenode *new_init_node(treenode*, treenode*);
+treenode *new_sequence_node(treenode*, treenode*);
 
 /* codea */
 treenode *new_binary_operator_node(int, treenode*, treenode*);

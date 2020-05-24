@@ -68,6 +68,7 @@ extern void invoke_burm(NODEPTR_TYPE root);
     sym_tab *i_symtab;
     int i_position;
     int s_position;
+    treenode *s_node;
 } stats else_stats
 
 @attributes {
@@ -100,7 +101,7 @@ funcdef:
         @i @pars.i_position@ = 0;
         @i @stats.i_symtab@ = @pars.s_symtab@;
         @i @stats.i_position@ = @pars.s_position@;
-        @codegen function_start(@ID.lexeme@);
+        @codegen function_start(@ID.lexeme@); invoke_burm(@stats.s_node@);
         @codegen @revorder (1) function_end(@ID.lexeme@);
       @}
     ;
@@ -129,6 +130,7 @@ stats:
       /* empty */
       @{
         @i @stats.s_position@ = @stats.i_position@;
+        @i @stats.s_node@ = new_nop_node();
       @}
     | stat SEMICOLON stats
       @{
@@ -136,7 +138,7 @@ stats:
         @i @stat.i_position@ = @stats.0.i_position@;
         @i @stats.1.i_position@ = @stat.s_position@;
         @i @stats.0.s_position@ = @stats.1.s_position@;
-        @codegen invoke_burm(@stat.s_node@);
+        @i @stats.0.s_node@ = new_sequence_node(@stat.s_node@, @stats.1.s_node@);
       @}
     ;
 
@@ -203,12 +205,14 @@ else_stats:
       /* empty */
       @{
         @i @else_stats.s_position@ = @else_stats.i_position@;
+        @i @else_stats.s_node@ = new_nop_node();
       @}
     | ELSE stats
       @{
         @i @stats.i_symtab@ = @else_stats.i_symtab@;
         @i @stats.i_position@ = @else_stats.i_position@;
         @i @else_stats.s_position@ = @stats.s_position@;
+        @i @else_stats.s_node@ = @stats.s_node@;
       @}
     ;
 
