@@ -25,13 +25,13 @@ treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     return new_node;
 }
 
-treenode *new_if_node(treenode *expr, treenode *branch_true, treenode *branch_false, char *label_false, char *label_end) {
+treenode *new_if_node(treenode *expression, treenode *branch_true, treenode *branch_false, char *label_false, char *label_end) {
     treenode *true_node = _new_operator_node(OP_TRU, branch_true, NULL);
     true_node->labels[0] = label_end;
     true_node->labels[1] = label_false;
     treenode *false_node = _new_operator_node(OP_FAL, branch_false, NULL);
     treenode *alternative_node = _new_operator_node(OP_ALT, true_node, false_node);
-    treenode *test_node = _new_operator_node(OP_TST, expr, NULL);
+    treenode *test_node = _new_operator_node(OP_TST, expression, NULL);
     test_node->labels[0] = label_false;
     treenode *if_node = _new_operator_node(OP_IF, test_node, alternative_node);
     if_node->labels[0] = label_end;
@@ -66,8 +66,12 @@ treenode *new_sequence_node(treenode *left, treenode *right) {
     return _new_operator_node(OP_SEQ, left, right);
 }
 
-treenode *new_init_node(treenode *left, treenode *right) {
-    return _new_operator_node(OP_INI, left, right);
+treenode *new_assign_node(treenode *expression, treenode *lexpression) {
+    return _new_operator_node(OP_ASN, expression, lexpression);
+}
+
+treenode *new_init_node(treenode *expression, treenode *variable) {
+    return _new_operator_node(OP_INI, expression, variable);
 }
 
 treenode *new_binary_operator_node(int op, treenode *left, treenode *right) {

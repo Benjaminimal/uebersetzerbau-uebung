@@ -54,25 +54,25 @@ loop:       OP_LOP(lbl, seq)    # 1 # jmp(bnode->labels[0]); lbl(bnode->labels[1
 
 lbl:        OP_LBL              # 0 # lbl(bnode->labels[0]);
 
-asn:        OP_ASN(var, var)    # 1 # mov(kids[1]->reg, kids[0]->reg);
-asn:        OP_ASN(var, reg)    # 1 # free_reg(kids[1]->reg); mov(kids[1]->reg, kids[0]->reg);
-asn:        OP_ASN(var, con)    # 1 # mov_i(kids[1]->val, kids[0]->reg);
+asn:        OP_ASN(var, var)    # 1 # mov(kids[0]->reg, kids[1]->reg);
+asn:        OP_ASN(reg, var)    # 1 # free_reg(kids[0]->reg); mov(kids[0]->reg, kids[1]->reg);
+asn:        OP_ASN(con, var)    # 1 # mov_i(kids[0]->val, kids[1]->reg);
 
-asn:        OP_ASN(adr, var)    # 1 # free_reg(kids[0]->reg); mov_d(kids[1]->reg, kids[0]->reg);
-asn:        OP_ASN(adr, reg)    # 1 # free_reg(kids[0]->reg); free_reg(kids[1]->reg); mov_d(kids[1]->reg, kids[0]->reg);
-asn:        OP_ASN(adr, con)    # 1 # free_reg(kids[0]->reg); mov_i_d(kids[1]->val, kids[0]->reg);
+asn:        OP_ASN(var, adr)    # 1 # free_reg(kids[1]->reg); mov_d(kids[0]->reg, kids[1]->reg);
+asn:        OP_ASN(reg, adr)    # 1 # free_reg(kids[1]->reg); free_reg(kids[0]->reg); mov_d(kids[0]->reg, kids[1]->reg);
+asn:        OP_ASN(con, adr)    # 1 # free_reg(kids[1]->reg); mov_i_d(kids[0]->val, kids[1]->reg);
 
-asn:        OP_ASN(iadr, var)   # 1 # mov_r_di(kids[1]->reg, kids[0]->val);
-asn:        OP_ASN(iadr, reg)   # 1 # free_reg(kids[1]->reg); mov_r_di(kids[1]->reg, kids[0]->val);
-asn:        OP_ASN(iadr, con)   # 1 # mov_i_di(kids[1]->val, kids[0]->val);
+asn:        OP_ASN(var, iadr)   # 1 # mov_r_di(kids[0]->reg, kids[1]->val);
+asn:        OP_ASN(reg, iadr)   # 1 # free_reg(kids[0]->reg); mov_r_di(kids[0]->reg, kids[1]->val);
+asn:        OP_ASN(con, iadr)   # 1 # mov_i_di(kids[0]->val, kids[1]->val);
 
 adr:        OP_DRF(var)         # 0 # bnode->reg = kids[0]->reg;
 adr:        OP_DRF(reg)         # 0 # bnode->reg = kids[0]->reg;
 iadr:       OP_DRF(con)         # 0 # bnode->val = kids[0]->val;
 
-ini:        OP_INI(var, var)    # 1 # mov(kids[1]->reg, kids[0]->reg);
-ini:        OP_INI(var, reg)    # 1 # free_reg(kids[1]->reg); mov(kids[1]->reg, kids[0]->reg);
-ini:        OP_INI(var, con)    # 1 # mov_i(kids[1]->val, kids[0]->reg);
+ini:        OP_INI(var, var)    # 1 # mov(kids[0]->reg, kids[1]->reg);
+ini:        OP_INI(reg, var)    # 1 # free_reg(kids[0]->reg); mov(kids[0]->reg, kids[1]->reg);
+ini:        OP_INI(con, var)    # 1 # mov_i(kids[0]->val, kids[1]->reg);
 
 ret:        OP_LEQ(var, var)    # 2 # bnode->reg = ret_reg(); cmp_leq(kids[0]->reg, kids[1]->reg, bnode->reg);
 reg:        OP_LEQ(var, var)    # 3 # bnode->reg = next_reg(); cmp_leq(kids[0]->reg, kids[1]->reg, bnode->reg);

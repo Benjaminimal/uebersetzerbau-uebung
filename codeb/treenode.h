@@ -58,6 +58,7 @@ typedef treenode *treenodep;
 
 /* codeb */
 treenode *new_init_node(treenode *, treenode *);
+treenode *new_assign_node(treenode *, treenode *);
 treenode *new_sequence_node(treenode *, treenode *);
 treenode *new_loop_node(sym_tab *, treenode *);
 treenode *new_cont_node(sym_tab *);

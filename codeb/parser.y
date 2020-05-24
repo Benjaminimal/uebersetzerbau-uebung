@@ -187,13 +187,13 @@ stat:
       @{
         @i @stat.s_symtab@ = add_name(@stat.i_symtab@, @ID.lexeme@, @stat.i_position@);
         @i @stat.s_position@ = @stat.i_position@ + 1;
-        @i @stat.s_node@ = new_init_node(new_variable_node(@ID.lexeme@, @stat.i_position@), @expr.s_node@);
+        @i @stat.s_node@ = new_init_node(@expr.s_node@, new_variable_node(@ID.lexeme@, @stat.i_position@));
       @}
     | lexpr ASSIGN expr
       @{
         @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_position@ = @stat.i_position@;
-        @i @stat.s_node@ = new_binary_operator_node(OP_ASN, @lexpr.s_node@, @expr.s_node@);
+        @i @stat.s_node@ = new_assign_node(@expr.s_node@, @lexpr.s_node@);
       @}
     | expr
       @{
