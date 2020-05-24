@@ -73,13 +73,13 @@ extern void invoke_burm(NODEPTR_TYPE root);
 @attributes {
     @autoinh
     sym_tab *i_symtab;
-} lexpr expr_list
+} expr_list
 
 @attributes {
     @autoinh
     sym_tab *i_symtab;
     treenode *s_node;
-} term expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel
+} lexpr term expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel
 
 @traversal idcheck
 @traversal @lefttoright @preorder codegen
@@ -189,7 +189,7 @@ stat:
       @{
         @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_position@ = @stat.i_position@;
-        @i @stat.s_node@ = new_nop_node();
+        @i @stat.s_node@ = new_binary_operator_node(OP_ASN, @lexpr.s_node@, @expr.s_node@);
       @}
     | expr
       @{
@@ -215,9 +215,13 @@ else_stats:
 lexpr:
        ID                               /* name bestehend */
       @{
+        @i @lexpr.s_node@ = new_variable_node(@ID.lexeme@, get_var_pos(@lexpr.i_symtab@, @ID.lexeme@));
         @idcheck check_name(@lexpr.i_symtab@, @ID.lexeme@);
       @}
      | ASTERISK term
+      @{
+        @i @lexpr.s_node@ = new_unary_operator_node(OP_DRF, @term.s_node@);
+      @}
      ;
 
 expr:

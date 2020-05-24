@@ -15,7 +15,8 @@
 #define OP_DRF 12
 #define OP_RET 13
 #define OP_INI 14
-#define OP_NOP 15
+#define OP_ASN 15
+#define OP_NOP 16
 
 #ifdef USE_IBURG
 typedef struct burm_state *STATEPTR_TYPE;

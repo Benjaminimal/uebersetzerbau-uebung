@@ -23,6 +23,10 @@ void ret_i(long val);
 
 char mov(char src, char dst);
 char mov_i(long val, char dst);
+void mov_d(char src, char dst);
+void mov_i_d(long val, char dst);
+void mov_r_di(char src, long addr);
+void mov_i_di(long val, long addr);
 
 void and(char src, char src_dst);
 void and_i(long val, char src_dst);

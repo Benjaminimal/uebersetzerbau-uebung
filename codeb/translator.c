@@ -43,8 +43,14 @@ const reg *reg_caller[] = {&RAX, &RCX, &RDX, &RSI, &RDI, &R8, &R9, &R10, &R11}; 
 const reg *reg_callee[] = {&RBX, &R12, &R13, &R14, &R15}; // TODO: rbp (and rsp) is missing
 */
 
+// TODO: get rid of all the $lld 
+
 void _mov(char *, char *);
 void _mov_i(long, char *);
+void _mov_d(char *, char *);
+void _mov_i_d(long , char *);
+void _mov_r_di(char *, long);
+void _mov_i_di(long, long);
 void _cmp(char *, char *);
 void _cmp_i(long, char *);
 void _and(char *, char *);
@@ -195,6 +201,18 @@ char mov_i(long val, char dst) {
     _mov_i(val, reg_to_str(dst));
     return dst;
 }
+void mov_d(char src, char dst) {
+    _mov_d(reg_to_str(src), reg_to_str(dst));
+}
+void mov_i_d(long val, char dst) {
+    _mov_i_d(val, reg_to_str(dst));
+}
+void mov_r_di(char src, long addr) {
+    _mov_r_di(reg_to_str(src), addr);
+}
+void mov_i_di(long val, long addr) {
+    _mov_i_di(val, addr);
+}
 
 void and(char src, char src_dst) {
     _and(reg_to_str(src), reg_to_str(src_dst));
@@ -250,14 +268,30 @@ void ret(char src) {
 void ret_i(long val) {
     _mov_i(val, RAX.name);
 }
-
-
+void _mov_d(char *src, char *dst) {
+    printf("\tmovq\t%%%s, (%%%s)\n", src, dst);
+}
+void _mov_i_d(long val, char *dst) {
+    printf("\tmovq\t$%lld, (%%%s)\n", val, dst);
+}
+void _mov_r_di(char *src, long addr) {
+    printf("\tmovq\t%%%s, (%ld)\n", src, addr);
+}
+void _mov_i_di(long val, long addr) {
+    printf("\tmovq\t$%ld, (%ld)\n", val, addr);
+}
 void _mov(char *src, char *dst) {
     printf("\tmovq\t%%%s, %%%s\n", src, dst);
 }
-
 void _mov_i(long val, char *dst) {
     printf("\tmovq\t$%lld, %%%s\n", val, dst);
+}
+
+void _drf(char *src, char *dst) {
+    printf("\tmovq\t(%%%s), %%%s\n", src, dst);
+}
+void _drf_i(long val, char *dst) {
+    printf("\tmovq\t(%lld), %%%s\n", val, dst);
 }
 
 void _cmp(char *left, char *right) {
@@ -301,14 +335,6 @@ void _not(char *src_dst) {
 
 void _neg(char *src_dst) {
     printf("\tnegq\t%%%s\n", src_dst);
-}
-
-void _drf(char *src, char *dst) {
-    printf("\tmovq\t(%%%s), %%%s\n", src, dst);
-}
-// TODO: this looks very wrong
-void _drf_i(long val, char *dst) {
-    printf("\tmovq\t($%lld), %%%s\n", val, dst);
 }
 
 void _ret() {

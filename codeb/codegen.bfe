@@ -17,7 +17,7 @@
  // TODO: add a scope attribute to the tree pointing to the symbol table
 %}
 
-%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_DIF=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_INI=14 OP_NOP=15
+%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_DIF=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_INI=14 OP_ASN=15 OP_NOP=16
 
 %start stat
 
@@ -26,6 +26,23 @@
 stat:       ret                 # 0
 stat:       nop                 # 0
 stat:       ini                 # 0
+stat:       asn                 # 0
+
+asn:        OP_ASN(var, var)    # 1 # mov(kids[1]->reg, kids[0]->reg);
+asn:        OP_ASN(var, reg)    # 1 # free_reg(kids[1]->reg); mov(kids[1]->reg, kids[0]->reg);
+asn:        OP_ASN(var, con)    # 1 # mov_i(kids[1]->val, kids[0]->reg);
+
+asn:        OP_ASN(adr, var)    # 1 # free_reg(kids[0]->reg); mov_d(kids[1]->reg, kids[0]->reg);
+asn:        OP_ASN(adr, reg)    # 1 # free_reg(kids[0]->reg); free_reg(kids[1]->reg); mov_d(kids[1]->reg, kids[0]->reg);
+asn:        OP_ASN(adr, con)    # 1 # free_reg(kids[0]->reg); mov_i_d(kids[1]->val, kids[0]->reg);
+
+asn:        OP_ASN(iadr, var)   # 1 # mov_r_di(kids[1]->reg, kids[0]->val);
+asn:        OP_ASN(iadr, reg)   # 1 # free_reg(kids[1]->reg); mov_r_di(kids[1]->reg, kids[0]->val);
+asn:        OP_ASN(iadr, con)   # 1 # mov_i_di(kids[1]->val, kids[0]->val);
+
+adr:        OP_DRF(var)         # 0 # bnode->reg = kids[0]->reg;
+adr:        OP_DRF(reg)         # 0 # bnode->reg = kids[0]->reg;
+iadr:       OP_DRF(con)         # 0 # bnode->val = kids[0]->val;
 
 ini:        OP_INI(var, var)    # 1 # mov(kids[1]->reg, kids[0]->reg);
 ini:        OP_INI(var, reg)    # 1 # free_reg(kids[1]->reg); mov(kids[1]->reg, kids[0]->reg);
@@ -258,7 +275,8 @@ ret:        OP_DRF(var)         # 0 # bnode->reg = ret_reg(); drf(kids[0]->reg, 
 reg:        OP_DRF(var)         # 1 # bnode->reg = next_reg(); drf(kids[0]->reg, bnode->reg);
 ret:        OP_DRF(ret)         # 1 # bnode->reg = kids[0]->reg; drf(kids[0]->reg, bnode->reg);
 reg:        OP_DRF(reg)         # 1 # bnode->reg = kids[0]->reg; drf(kids[0]->reg, bnode->reg);
-con:        OP_DRF(con)         # 1 # bnode->reg = next_reg(); drf_i(kids[0]->val, bnode->reg); // TODO: this should not be a con if val is not set, if this realy keeps using next_reg() you neet to introduce a ret: derivation for it
+ret:        OP_DRF(con)         # 1 # bnode->reg = ret_reg(); drf_i(kids[0]->val, bnode->reg);
+reg:        OP_DRF(con)         # 1 # bnode->reg = next_reg(); drf_i(kids[0]->val, bnode->reg);
 
 ret:        OP_RET(var)         # 1 # ret(kids[0]->reg);
 ret:        OP_RET(reg)         # 1 # ret(kids[0]->reg);

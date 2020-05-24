@@ -93,6 +93,8 @@ char *op_to_str(int op) {
             return "RET";
         case OP_INI:
             return "INI";
+        case OP_ASN:
+            return "ASN";
         case OP_NOP:
             return "NOP";
     }
