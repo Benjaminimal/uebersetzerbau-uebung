@@ -54,7 +54,7 @@ char lea_i(long val, char src, char dst);
 char cmp_leq(char lsrc, char rsrc, char dst);
 char cmp_leq_i(long val, char src, char dst);
 char cmp_geq_i(long val, char src, char dst);
-char cmp_dif(char lsrc, char rsrc, char dst);
-char cmp_dif_i(long val, char src, char dst);
+char cmp_neq(char lsrc, char rsrc, char dst);
+char cmp_neq_i(long val, char src, char dst);
 
 #endif /* _TRANSLATOR_H_*/

@@ -8,7 +8,7 @@
 #define OP_ZRO 3
 #define OP_ONE 4
 #define OP_LEQ 5
-#define OP_DIF 6
+#define OP_NEQ 6
 #define OP_AND 7
 #define OP_MUL 8
 #define OP_ADD 9
@@ -70,7 +70,7 @@ treenode *new_add_node(treenode *, treenode *);
 treenode *new_multiply_node(treenode *, treenode *);
 treenode *new_and_node(treenode *, treenode *);
 treenode *new_compare_less_or_equal_node(treenode *, treenode *);
-treenode *new_compare_different_node(treenode *, treenode *);
+treenode *new_compare_not_equal_node(treenode *, treenode *);
 treenode *new_return_node(treenode *);
 treenode *new_dereference_node(treenode *);
 treenode *new_not_node(treenode *);

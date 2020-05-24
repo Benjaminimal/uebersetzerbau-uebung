@@ -331,7 +331,7 @@ expr_rel:
       @}
     | term POUND term
       @{
-        @i @expr_rel.s_node@ = new_compare_different_node(@term.0.s_node@, @term.1.s_node@);
+        @i @expr_rel.s_node@ = new_compare_not_equal_node(@term.0.s_node@, @term.1.s_node@);
       @}
     ;
 

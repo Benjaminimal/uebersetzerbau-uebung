@@ -197,11 +197,11 @@ char cmp_geq_i(long val, char src, char dst) {
     return dst;
 }
 
-char cmp_dif(char lsrc, char rsrc, char dst) {
+char cmp_neq(char lsrc, char rsrc, char dst) {
     _cmp_cc("ne", reg_to_str(lsrc), reg_to_str(rsrc), reg_to_str(dst));
     return dst;
 }
-char cmp_dif_i(long val, char src, char dst) {
+char cmp_neq_i(long val, char src, char dst) {
     _cmp_cc_i("ne", val, reg_to_str(src), reg_to_str(dst));
     return dst;
 }

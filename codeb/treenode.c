@@ -91,8 +91,8 @@ treenode *new_compare_less_or_equal_node(treenode *left, treenode *right) {
     return _new_operator_node(OP_LEQ, left, right);
 }
 
-treenode *new_compare_different_node(treenode *left, treenode *right) {
-    return _new_operator_node(OP_DIF, left, right);
+treenode *new_compare_not_equal_node(treenode *left, treenode *right) {
+    return _new_operator_node(OP_NEQ, left, right);
 }
 
 treenode *new_return_node(treenode *expression) {
@@ -152,8 +152,8 @@ char *op_to_str(int op) {
             return "ONE";
         case OP_LEQ:
             return "LEQ";
-        case OP_DIF:
-            return "DIF";
+        case OP_NEQ:
+            return "NEQ";
         case OP_AND:
             return "AND";
         case OP_MUL:
