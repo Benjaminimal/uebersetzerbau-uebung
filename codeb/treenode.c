@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "error.h"
+#include "sym_tab.h"
 #include "treenode.h"
 
 
@@ -17,9 +18,34 @@ treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     new_node->reg = -1;
     new_node->sym = NULL;
     new_node->pos = -1;
+    new_node->labels[0] = NULL;
+    new_node->labels[1] = NULL;
     new_node->val = 0;
 
     return new_node;
+}
+
+treenode *new_cont_node(sym_tab *tab) {
+    treenode *new_node = _new_operator_node(OP_JMP, NULL, NULL);
+    new_node->labels[0] = tab->labels[0];
+}
+
+treenode *new_break_node(sym_tab *tab) {
+    treenode *new_node = _new_operator_node(OP_JMP, NULL, NULL);
+    new_node->labels[0] = tab->labels[1];
+}
+
+treenode *new_label_node(char *label) {
+    treenode *new_node = _new_operator_node(OP_LBL, NULL, NULL);
+    new_node->labels[0] = label;
+}
+
+treenode *new_loop_node(sym_tab *tab, treenode *sequence) {
+    treenode *label_node = new_label_node(tab->labels[0]);
+    treenode *loop_node = _new_operator_node(OP_LOP, label_node, sequence);
+    loop_node->labels[0] = tab->labels[0];
+    loop_node->labels[1] = tab->labels[1];
+    return loop_node;
 }
 
 treenode *new_sequence_node(treenode *left, treenode *right) {
@@ -101,6 +127,10 @@ char *op_to_str(int op) {
             return "ASN";
         case OP_SEQ:
             return "SEQ";
+        case OP_LOP:
+            return "LOP";
+        case OP_LBL:
+            return "LBL";
         case OP_NOP:
             return "NOP";
     }

@@ -17,7 +17,7 @@
  // TODO: add a scope attribute to the tree pointing to the symbol table
 %}
 
-%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_DIF=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_INI=14 OP_ASN=15 OP_SEQ=16 OP_NOP=17
+%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_DIF=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_INI=14 OP_ASN=15 OP_SEQ=16 OP_LOP=17 OP_LBL=18 OP_JMP=19 OP_NOP=20
 
 %start stats
 
@@ -32,6 +32,14 @@ stat:       ret                 # 0
 stat:       nop                 # 0
 stat:       ini                 # 0
 stat:       asn                 # 0
+stat:       loop                # 0
+stat:       jmp                 # 0
+
+jmp:        OP_JMP              # 1 # jmp(bnode->labels[0]);
+
+loop:       OP_LOP(lbl, seq)    # 1 # jmp(bnode->labels[0]); lbl(bnode->labels[1]);
+
+lbl:        OP_LBL              # 0 # lbl(bnode->labels[0]);
 
 asn:        OP_ASN(var, var)    # 1 # mov(kids[1]->reg, kids[0]->reg);
 asn:        OP_ASN(var, reg)    # 1 # free_reg(kids[1]->reg); mov(kids[1]->reg, kids[0]->reg);
@@ -286,8 +294,8 @@ reg:        OP_DRF(con)         # 1 # bnode->reg = next_reg(); drf_i(kids[0]->va
 ret:        OP_RET(var)         # 1 # ret(kids[0]->reg);
 ret:        OP_RET(reg)         # 1 # ret(kids[0]->reg);
 ret:        OP_RET(con)         # 1 # ret_i(kids[0]->val);
-ret:        OP_RET(ret)         # 0
-ret:        OP_RET(nop)         # 0
+ret:        OP_RET(ret)         # 0 # ret_e();
+ret:        OP_RET(nop)         # 0 # ret_e();
 
 zro:        OP_ZRO              # 0
 

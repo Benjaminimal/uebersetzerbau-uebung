@@ -161,25 +161,26 @@ stat:
       @}
     | ID COLON LOOP stats END             /* label neu */ /* sichtbarkeit innerhalb der schleife */
       @{
-        @i @stats.i_symtab@ = add_label(@stat.i_symtab@, @ID.lexeme@);
+        @i @stats.i_symtab@ = add_label(@stat.i_symtab@, @ID.lexeme@, next_label(), next_label());
         @i @stats.i_position@ = @stat.i_position@;
         @i @stat.s_position@ = @stats.s_position@;
         @i @stat.s_symtab@ = @stat.i_symtab@;
-        @i @stat.s_node@ = new_nop_node();
+        @i @stat.s_node@ = new_loop_node(get_label(@stats.i_symtab@, @ID.lexeme@), @stats.s_node@);
       @}
     | BREAK ID                          /* label bestehend */
       @{
         @idcheck check_label(@stat.i_symtab@, @ID.lexeme@);
         @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_position@ = @stat.i_position@;
-        @i @stat.s_node@ = new_nop_node();
+        @i @stat.s_node@ = new_break_node(get_label(@stat.i_symtab@, @ID.lexeme@));
       @}
     | CONT ID                           /* label bestehend */
       @{
         @idcheck check_label(@stat.i_symtab@, @ID.lexeme@);
         @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_position@ = @stat.i_position@;
-        @i @stat.s_node@ = new_nop_node();
+
+        @i @stat.s_node@ = new_cont_node(get_label(@stat.i_symtab@, @ID.lexeme@));
       @}
     | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stat */
       @{
@@ -414,7 +415,7 @@ sym_tab *add_name(sym_tab *tab, char *lexeme, int position) {
     return succ;
 }
 
-sym_tab *add_label(sym_tab *tab, char *lexeme) {
+sym_tab *add_label(sym_tab *tab, char *lexeme, char *start, char *end) {
     sym_tab *succ;
     if (contains_id(tab, lexeme) != 0) {
         EXIT_ERR_DUPLICATE_ID(lexeme);
@@ -423,6 +424,8 @@ sym_tab *add_label(sym_tab *tab, char *lexeme) {
     if ((succ = add_id(tab, lexeme, LABEL, -1)) == NULL) {
         EXIT_ERR_OOM();
     }
+    succ->labels[0] = start;
+    succ->labels[1] = end;
     
     return succ;
 }

@@ -43,6 +43,8 @@ sym_tab *add_id(sym_tab *tab, char *lexeme, sym_type type, int position) {
     head->lexeme = strdup(lexeme);
     head->next = tab;
     head->pos = position;
+    head->labels[0] = NULL;
+    head->labels[1] = NULL;
 
     return head;
 }

@@ -1,6 +1,8 @@
 #ifndef _TREENODE_H_
 #define _TREENODE_H_
 
+#include "sym_tab.h"
+
 #define OP_VAR 1
 #define OP_CON 2
 #define OP_ZRO 3
@@ -17,7 +19,10 @@
 #define OP_INI 14
 #define OP_ASN 15
 #define OP_SEQ 16
-#define OP_NOP 17
+#define OP_LOP 17
+#define OP_LBL 18
+#define OP_JMP 19
+#define OP_NOP 20
 
 #ifdef USE_IBURG
 typedef struct burm_state *STATEPTR_TYPE;
@@ -33,7 +38,8 @@ typedef struct s_node {
     char            reg;
     char            *sym;
     char            pos;
-    long       val;
+    char            *labels[2];
+    long            val;
 } treenode;
 
 typedef treenode *treenodep;
@@ -46,13 +52,16 @@ typedef treenode *treenodep;
 #define PANIC           printf
 
 /* codeb */
-treenode *new_init_node(treenode*, treenode*);
-treenode *new_sequence_node(treenode*, treenode*);
+treenode *new_init_node(treenode *, treenode *);
+treenode *new_sequence_node(treenode *, treenode *);
+treenode *new_loop_node(sym_tab *, treenode *);
+treenode *new_cont_node(sym_tab *);
+treenode *new_break_node(sym_tab *);
 
 /* codea */
-treenode *new_binary_operator_node(int, treenode*, treenode*);
-treenode *new_unary_operator_node(int, treenode*);
-treenode *new_variable_node(char*, char);
+treenode *new_binary_operator_node(int, treenode *, treenode *);
+treenode *new_unary_operator_node(int, treenode *);
+treenode *new_variable_node(char *, char);
 treenode *new_constant_node(long);
 treenode *new_nop_node();
 void print_tree(treenode *);

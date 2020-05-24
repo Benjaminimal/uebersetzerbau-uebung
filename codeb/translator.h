@@ -11,8 +11,12 @@ void function_end(char *name);
 char get_arg_reg(char num);
 char next_reg();
 char ret_reg();
+char *next_label();
 void mark_taken(char reg);
 void free_reg(char reg);
+
+void lbl(char *label);
+void jmp(char *label);
 
 void not(char src_dst);
 
@@ -20,6 +24,7 @@ void neg(char src_dst);
 
 void ret(char src);
 void ret_i(long val);
+void ret_e();
 
 char mov(char src, char dst);
 char mov_i(long val, char dst);

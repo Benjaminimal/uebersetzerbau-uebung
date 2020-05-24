@@ -10,6 +10,7 @@ typedef struct sym_tab {
     sym_type type;
     char *lexeme;
     int pos;
+    char *labels[2];
     struct sym_tab *next;
 } sym_tab;
 

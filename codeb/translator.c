@@ -98,7 +98,7 @@ char *reg_to_str(char reg) {
 }
 
 char *next_label() {
-    char *label = malloc(LABEL_PREFIX_LEN + _num_digits(label_count + 1));
+    char *label = malloc(LABEL_PREFIX_LEN + _num_digits(label_count) + 1);
     if (label == NULL) {
         EXIT_ERR_OOM();
     }
@@ -163,10 +163,18 @@ void function_start(char *name) {
 void function_end(char *name) {
     free_arg_regs();
     function_count++;
-    _ret();
     // printf("\tpopq\t%%%s\n", RBP); // TODO: might be moved to ret
     // printf(".LFE%d:\n", function_count);
     // printf("\t.size\t%s, .-%s\n", name, name);
+}
+
+
+void lbl(char *label) {
+    _lbl(label);
+}
+
+void jmp(char *label) {
+    _jmp(label);
 }
 
 char cmp_leq(char lsrc, char rsrc, char dst) {
@@ -264,10 +272,16 @@ char drf_i(long val, char dst) {
 // TODO: what to return here?
 void ret(char src) {
     _mov(reg_to_str(src), RAX.name);
+    _ret();
 }
 void ret_i(long val) {
     _mov_i(val, RAX.name);
+    _ret();
 }
+void ret_e() {
+    _ret();
+}
+
 void _mov_d(char *src, char *dst) {
     printf("\tmovq\t%%%s, (%%%s)\n", src, dst);
 }
@@ -342,7 +356,7 @@ void _ret() {
 }
 
 void _jmp(char *loc) {
-    printf("\tjmp\t%s\n", loc);
+    printf("\tjmp\t\t%s\n", loc);
 }
 
 void _jcc(char *cond, char *loc) {
