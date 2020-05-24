@@ -147,7 +147,7 @@ stat:
       @{
         @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_position@ = @stat.i_position@;
-        @i @stat.s_node@ = new_unary_operator_node(OP_RET, @expr.s_node@);
+        @i @stat.s_node@ = new_return_node(@expr.s_node@);
       @}
     | IF expr THEN stats else_stats END
       @{
@@ -187,7 +187,7 @@ stat:
       @{
         @i @stat.s_symtab@ = add_name(@stat.i_symtab@, @ID.lexeme@, @stat.i_position@);
         @i @stat.s_position@ = @stat.i_position@ + 1;
-        @i @stat.s_node@ = new_init_node(@expr.s_node@, new_variable_node(@ID.lexeme@, @stat.i_position@));
+        @i @stat.s_node@ = new_init_node(get_name(@stat.s_symtab@, @ID.lexeme@), @expr.s_node@);
       @}
     | lexpr ASSIGN expr
       @{
@@ -221,12 +221,12 @@ else_stats:
 lexpr:
        ID                               /* name bestehend */
       @{
-        @i @lexpr.s_node@ = new_variable_node(@ID.lexeme@, get_var_pos(@lexpr.i_symtab@, @ID.lexeme@));
+        @i @lexpr.s_node@ = new_variable_node(get_name(@lexpr.i_symtab@, @ID.lexeme@));
         @idcheck check_name(@lexpr.i_symtab@, @ID.lexeme@);
       @}
      | ASTERISK term
       @{
-        @i @lexpr.s_node@ = new_unary_operator_node(OP_DRF, @term.s_node@);
+        @i @lexpr.s_node@ = new_dereference_node(@term.s_node@);
       @}
      ;
 
@@ -248,27 +248,27 @@ expr:
 expr_unary:
       NOT expr_unary
       @{
-        @i @expr_unary.0.s_node@ = new_unary_operator_node(OP_NOT, @expr_unary.1.s_node@);
+        @i @expr_unary.0.s_node@ = new_not_node(@expr_unary.1.s_node@);
       @}
     | HYPHEN expr_unary
       @{
-        @i @expr_unary.0.s_node@ = new_unary_operator_node(OP_NEG, @expr_unary.1.s_node@);
+        @i @expr_unary.0.s_node@ = new_negate_node(@expr_unary.1.s_node@);
       @}
     | ASTERISK expr_unary
       @{
-        @i @expr_unary.0.s_node@ = new_unary_operator_node(OP_DRF, @expr_unary.1.s_node@);
+        @i @expr_unary.0.s_node@ = new_dereference_node(@expr_unary.1.s_node@);
       @}
     | NOT term
       @{
-        @i @expr_unary.s_node@ = new_unary_operator_node(OP_NOT, @term.s_node@);
+        @i @expr_unary.s_node@ = new_not_node(@term.s_node@);
       @}
     | HYPHEN term
       @{
-        @i @expr_unary.s_node@ = new_unary_operator_node(OP_NEG, @term.s_node@);
+        @i @expr_unary.s_node@ = new_negate_node(@term.s_node@);
       @}
     | ASTERISK term
       @{
-        @i @expr_unary.s_node@ = new_unary_operator_node(OP_DRF, @term.s_node@);
+        @i @expr_unary.s_node@ = new_dereference_node(@term.s_node@);
       @}
     ;
 
@@ -294,44 +294,44 @@ expr_binary:
 expr_add:
       expr_add PLUS term
       @{
-        @i @expr_add.0.s_node@ = new_binary_operator_node(OP_ADD, @expr_add.1.s_node@, @term.s_node@);
+        @i @expr_add.0.s_node@ = new_add_node(@expr_add.1.s_node@, @term.s_node@);
       @}
     | term PLUS term
       @{
-        @i @expr_add.s_node@ = new_binary_operator_node(OP_ADD, @term.0.s_node@, @term.1.s_node@);
+        @i @expr_add.s_node@ = new_add_node(@term.0.s_node@, @term.1.s_node@);
       @}
     ;
 
 expr_mul:
       expr_mul ASTERISK term
       @{
-        @i @expr_mul.0.s_node@ = new_binary_operator_node(OP_MUL, @expr_mul.1.s_node@, @term.s_node@);
+        @i @expr_mul.0.s_node@ = new_multiply_node(@expr_mul.1.s_node@, @term.s_node@);
       @}
     | term ASTERISK term
       @{
-        @i @expr_mul.s_node@ = new_binary_operator_node(OP_MUL, @term.0.s_node@, @term.1.s_node@);
+        @i @expr_mul.s_node@ = new_multiply_node(@term.0.s_node@, @term.1.s_node@);
       @}
     ;
 
 expr_and:
       expr_and AND term
       @{
-        @i @expr_and.0.s_node@ = new_binary_operator_node(OP_AND, @expr_and.1.s_node@, @term.s_node@);
+        @i @expr_and.0.s_node@ = new_and_node(@expr_and.1.s_node@, @term.s_node@);
       @}
     | term AND term
       @{
-        @i @expr_and.s_node@ = new_binary_operator_node(OP_AND, @term.0.s_node@, @term.1.s_node@);
+        @i @expr_and.s_node@ = new_and_node(@term.0.s_node@, @term.1.s_node@);
       @}
     ;
 
 expr_rel:
       term LEQ term
       @{
-        @i @expr_rel.s_node@ = new_binary_operator_node(OP_LEQ, @term.0.s_node@, @term.1.s_node@);
+        @i @expr_rel.s_node@ = new_compare_less_or_equal_node(@term.0.s_node@, @term.1.s_node@);
       @}
     | term POUND term
       @{
-        @i @expr_rel.s_node@ = new_binary_operator_node(OP_DIF, @term.0.s_node@, @term.1.s_node@);
+        @i @expr_rel.s_node@ = new_compare_different_node(@term.0.s_node@, @term.1.s_node@);
       @}
     ;
 
@@ -353,7 +353,7 @@ term:
     | ID                                /* name bestehend */
       @{
         @idcheck check_name(@term.i_symtab@, @ID.lexeme@);
-        @i @term.s_node@ = new_variable_node(@ID.lexeme@, get_var_pos(@term.i_symtab@, @ID.lexeme@));
+        @i @term.s_node@ = new_variable_node(get_name(@term.i_symtab@, @ID.lexeme@));
       @}
     | ID LPAREN expr_list RPAREN        /* funktion beliebig */
       @{
@@ -362,11 +362,6 @@ term:
     ;
 
 %%
-
-char get_var_pos(sym_tab *tab, char *name) {
-    sym_tab *needle = get_name(tab, name);
-    return needle != NULL ? needle->pos : -1;
-}
 
 sym_tab *check_name(sym_tab *tab, char *lexeme) {
 #if DEBUG

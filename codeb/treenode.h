@@ -57,7 +57,7 @@ typedef treenode *treenodep;
 #define PANIC           printf
 
 /* codeb */
-treenode *new_init_node(treenode *, treenode *);
+treenode *new_init_node(sym_tab *, treenode *);
 treenode *new_assign_node(treenode *, treenode *);
 treenode *new_sequence_node(treenode *, treenode *);
 treenode *new_loop_node(sym_tab *, treenode *);
@@ -66,9 +66,16 @@ treenode *new_break_node(sym_tab *);
 treenode *new_if_node(treenode *, treenode *, treenode *, char *, char *);
 
 /* codea */
-treenode *new_binary_operator_node(int, treenode *, treenode *);
-treenode *new_unary_operator_node(int, treenode *);
-treenode *new_variable_node(char *, char);
+treenode *new_add_node(treenode *, treenode *);
+treenode *new_multiply_node(treenode *, treenode *);
+treenode *new_and_node(treenode *, treenode *);
+treenode *new_compare_less_or_equal_node(treenode *, treenode *);
+treenode *new_compare_different_node(treenode *, treenode *);
+treenode *new_return_node(treenode *);
+treenode *new_dereference_node(treenode *);
+treenode *new_not_node(treenode *);
+treenode *new_negate_node(treenode *);
+treenode *new_variable_node(sym_tab *);
 treenode *new_constant_node(long);
 treenode *new_nop_node();
 void print_tree(treenode *);

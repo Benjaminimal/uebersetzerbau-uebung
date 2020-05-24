@@ -70,22 +70,51 @@ treenode *new_assign_node(treenode *expression, treenode *lexpression) {
     return _new_operator_node(OP_ASN, expression, lexpression);
 }
 
-treenode *new_init_node(treenode *expression, treenode *variable) {
-    return _new_operator_node(OP_INI, expression, variable);
+treenode *new_init_node(sym_tab *tab, treenode *expression) {
+    treenode *new_variable = new_variable_node(tab);
+    return _new_operator_node(OP_INI, expression, new_variable);
 }
 
-treenode *new_binary_operator_node(int op, treenode *left, treenode *right) {
-    return _new_operator_node(op, left, right);
+treenode *new_add_node(treenode *left, treenode *right) {
+    return _new_operator_node(OP_ADD, left, right);
 }
 
-treenode *new_unary_operator_node(int op, treenode *kid) {
-    return _new_operator_node(op, kid, NULL);
+treenode *new_multiply_node(treenode *left, treenode *right) {
+    return _new_operator_node(OP_MUL, left, right);
 }
 
-treenode *new_variable_node(char *sym, char pos) {
+treenode *new_and_node(treenode *left, treenode *right) {
+    return _new_operator_node(OP_AND, left, right);
+}
+
+treenode *new_compare_less_or_equal_node(treenode *left, treenode *right) {
+    return _new_operator_node(OP_LEQ, left, right);
+}
+
+treenode *new_compare_different_node(treenode *left, treenode *right) {
+    return _new_operator_node(OP_DIF, left, right);
+}
+
+treenode *new_return_node(treenode *expression) {
+    return _new_operator_node(OP_RET, expression, NULL);
+}
+
+treenode *new_dereference_node(treenode *node) {
+    return _new_operator_node(OP_DRF, node, NULL);
+}
+
+treenode *new_not_node(treenode *node) {
+    return _new_operator_node(OP_NOT, node, NULL);
+}
+
+treenode *new_negate_node(treenode *node) {
+    return _new_operator_node(OP_NEG, node, NULL);
+}
+
+treenode *new_variable_node(sym_tab *tab) {
     treenode *new_node = _new_operator_node(OP_VAR, NULL, NULL);
-    new_node->sym = sym;
-    new_node->pos = pos;
+    new_node->sym = tab->lexeme;
+    new_node->pos = tab->pos;
     return new_node;
 }
 
