@@ -287,7 +287,6 @@ char drf_i(long val, char dst) {
     return dst;
 }
 
-// TODO: what to return here?
 void ret(char src) {
     _mov(reg_to_str(src), RAX.name);
     _ret();

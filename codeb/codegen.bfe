@@ -8,13 +8,7 @@
 #include "treenode.h"
 #include "translator.h"
 
- // TODO: optimize boolean short circuits
- // TODO: optimize and test constant folding for neq, leq
- // TODO: add xin tests
- // TODO: figure out how to test drf operator
  // TODO: test the empty program
- // TODO: extend the symbol table with values and registers
- // TODO: add a scope attribute to the tree pointing to the symbol table
 %}
 
 %term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_NEQ=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_INI=14 OP_ASN=15 OP_SEQ=16 OP_LOP=17 OP_LBL=18 OP_JMP=19 OP_IF=20 OP_TST=21 OP_ALT=22 OP_BRA=23 OP_JCC=24 OP_NOP=25
@@ -258,7 +252,7 @@ vpc:        OP_ADD(con, vpc)    # 0 # bnode->reg = kids[1]->reg; bnode->val = ki
 vpc:        var                 # 0 # bnode->val = 0;
 
 reg:        rpc                 # 2 # bnode->reg = kids[0]->reg; add_i(bnode->val, bnode->reg);
-reg:        OP_ADD(rpc, rpc)    # 1 # free_reg(kids[1]->reg); bnode->reg = kids[0]->reg; bnode->val = kids[0]->val + kids[1]->val; lea(bnode->val, kids[0]->reg, kids[1]->reg, bnode->reg); // TODO: check if this should produce an rpc
+reg:        OP_ADD(rpc, rpc)    # 1 # free_reg(kids[1]->reg); bnode->reg = kids[0]->reg; bnode->val = kids[0]->val + kids[1]->val; lea(bnode->val, kids[0]->reg, kids[1]->reg, bnode->reg);
 rpc:        OP_ADD(rpc, con)    # 0 # bnode->reg = kids[0]->reg; bnode->val = kids[0]->val + kids[1]->val;
 rpc:        OP_ADD(con, rpc)    # 0 # bnode->reg = kids[1]->reg; bnode->val = kids[0]->val + kids[1]->val;
 rpc:        reg                 # 0 # bnode->val = 0;
