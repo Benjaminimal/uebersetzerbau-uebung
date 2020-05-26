@@ -211,7 +211,7 @@ void _print_tree(treenode *node, int indent) {
     for (int i = 0; i < indent; i++) printf("\t");
     printf("op: %s", op_to_str(node->op));
     if (node->sym != NULL) printf(" id: %s pos: %d", node->sym, node->pos);
-    if (node->op == OP_CON) printf(" val: %lld", node->val);
+    if (node->op == OP_CON) printf(" val: %ld", node->val);
     printf("\n");
     _print_tree(node->kids[0], indent + 1);
     _print_tree(node->kids[1], indent + 1);

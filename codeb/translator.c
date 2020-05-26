@@ -43,8 +43,6 @@ const reg *reg_caller[] = {&RAX, &RCX, &RDX, &RSI, &RDI, &R8, &R9, &R10, &R11}; 
 const reg *reg_callee[] = {&RBX, &R12, &R13, &R14, &R15}; // TODO: rbp (and rsp) is missing
 */
 
-// TODO: get rid of all the $lld 
-
 void _test_i(long, char *);
 void _test_ii(long, long);
 void _mov(char *, char *);
@@ -306,7 +304,7 @@ void _mov_d(char *src, char *dst) {
     printf("\tmovq\t%%%s, (%%%s)\n", src, dst);
 }
 void _mov_i_d(long val, char *dst) {
-    printf("\tmovq\t$%lld, (%%%s)\n", val, dst);
+    printf("\tmovq\t$%ld, (%%%s)\n", val, dst);
 }
 void _mov_r_di(char *src, long addr) {
     printf("\tmovq\t%%%s, (%ld)\n", src, addr);
@@ -318,52 +316,52 @@ void _mov(char *src, char *dst) {
     printf("\tmovq\t%%%s, %%%s\n", src, dst);
 }
 void _mov_i(long val, char *dst) {
-    printf("\tmovq\t$%lld, %%%s\n", val, dst);
+    printf("\tmovq\t$%ld, %%%s\n", val, dst);
 }
 
 void _drf(char *src, char *dst) {
     printf("\tmovq\t(%%%s), %%%s\n", src, dst);
 }
 void _drf_i(long val, char *dst) {
-    printf("\tmovq\t(%lld), %%%s\n", val, dst);
+    printf("\tmovq\t(%ld), %%%s\n", val, dst);
 }
 
 void _cmp(char *left, char *right) {
     printf("\tcmpq\t%%%s, %%%s\n", left, right);
 }
 void _cmp_i(long val, char *dst) {
-    printf("\tcmpq\t$%lld, %%%s\n", val, dst);
+    printf("\tcmpq\t$%ld, %%%s\n", val, dst);
 }
 
 void _and(char *src, char *dst) {
     printf("\tandq\t%%%s, %%%s\n", src, dst);
 }
 void _and_i(long val, char *dst) {
-    printf("\tandq\t$%lld, %%%s\n", val, dst);
+    printf("\tandq\t$%ld, %%%s\n", val, dst);
 }
 
 void _mul(char *src, char *dst) {
     printf("\timulq\t%%%s, %%%s\n", src, dst);
 }
 void _mul_i(long val, char *dst) {
-    printf("\timulq\t$%lld, %%%s\n", val, dst);
+    printf("\timulq\t$%ld, %%%s\n", val, dst);
 }
 void _mul_i_r(long val, char *src, char *dst) {
-    printf("\timulq\t$%lld, %%%s, %%%s\n", val, src, dst);
+    printf("\timulq\t$%ld, %%%s, %%%s\n", val, src, dst);
 }
 
 void _add(char *src, char *dst) {
     printf("\taddq\t%%%s, %%%s\n", src, dst);
 }
 void _add_i(long val, char *dst) {
-    printf("\taddq\t$%lld, %%%s\n", val, dst);
+    printf("\taddq\t$%ld, %%%s\n", val, dst);
 }
 
 void _lea(long val, char *lsrc, char *rsrc, char *dst) {
-    printf("\tleaq\t%lld(%%%s, %%%s), %%%s\n", val, lsrc, rsrc, dst);
+    printf("\tleaq\t%ld(%%%s, %%%s), %%%s\n", val, lsrc, rsrc, dst);
 }
 void _lea_i(long val, char *src, char *dst) {
-    printf("\tleaq\t%lld(%%%s), %%%s\n", val, src, dst);
+    printf("\tleaq\t%ld(%%%s), %%%s\n", val, src, dst);
 }
 
 void _not(char *src_dst) {
