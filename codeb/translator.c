@@ -59,6 +59,7 @@ void _and(char *, char *);
 void _and_i(long , char *);
 void _mul(char *, char *);
 void _mul_i(long, char *);
+void _mul_i_r(long, char *, char *);
 void _add(char *, char *);
 void _add_i(long, char *);
 void _lea(long, char *, char *, char *);
@@ -250,6 +251,10 @@ void mul(char src, char src_dst) {
 void mul_i(long val, char src_dst) {
     _mul_i(val, reg_to_str(src_dst));
 }
+char mul_i_r(long val, char src, char dst) {
+    _mul_i_r(val, reg_to_str(src), reg_to_str(dst));
+    return dst;
+}
 
 void add(char src, char src_dst) {
     _add(reg_to_str(src), reg_to_str(src_dst));
@@ -342,6 +347,9 @@ void _mul(char *src, char *dst) {
 }
 void _mul_i(long val, char *dst) {
     printf("\timulq\t$%lld, %%%s\n", val, dst);
+}
+void _mul_i_r(long val, char *src, char *dst) {
+    printf("\timulq\t$%lld, %%%s, %%%s\n", val, src, dst);
 }
 
 void _add(char *src, char *dst) {

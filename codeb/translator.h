@@ -44,6 +44,7 @@ void and_i(long val, char src_dst);
 
 void mul(char src, char src_dst);
 void mul_i(long val, char src_dst);
+char mul_i_r(long val, char src, char dst);
 
 void add(char src, char src_dst);
 void add_i(long val, char src_dst);
