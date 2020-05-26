@@ -18,6 +18,8 @@ void free_reg(char reg);
 
 void lbl(char *label);
 void jmp(char *label);
+void jz(char *label);
+void jnz(char *label);
 
 void not(char src_dst);
 
@@ -27,7 +29,8 @@ void ret(char src);
 void ret_i(long val);
 void ret_e();
 
-void test(char reg, char *label);
+void test(char reg);
+void test_i(long val);
 
 char mov(char src, char dst);
 char mov_i(long val, char dst);

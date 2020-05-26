@@ -25,17 +25,28 @@ treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     return new_node;
 }
 
-treenode *new_if_node(treenode *expression, treenode *branch_true, treenode *branch_false, char *label_false, char *label_end) {
-    treenode *true_node = _new_operator_node(OP_TRU, branch_true, NULL);
-    true_node->labels[0] = label_end;
-    true_node->labels[1] = label_false;
-    treenode *false_node = _new_operator_node(OP_FAL, branch_false, NULL);
+treenode *new_if_node(treenode *expression, treenode *statements_true, treenode *statements_false, char *label_false, char *label_end) {
+
+    statements_true->labels[0] = label_false;
+    statements_true->labels[1] = label_end;
+    treenode *jump_end_node = _new_operator_node(OP_JCC, statements_true, NULL);
+    treenode *true_node = _new_operator_node(OP_BRA, jump_end_node, NULL);
+
+    statements_false->labels[0] = label_false;
+    statements_false->labels[1] = label_end;
+    treenode *jump_not_node = _new_operator_node(OP_JCC, statements_false, NULL);
+    treenode *false_node = _new_operator_node(OP_BRA, jump_not_node, NULL);
+
     treenode *alternative_node = _new_operator_node(OP_ALT, true_node, false_node);
+
     treenode *test_node = _new_operator_node(OP_TST, expression, NULL);
-    test_node->labels[0] = label_false;
-    treenode *if_node = _new_operator_node(OP_IF, test_node, alternative_node);
-    if_node->labels[0] = label_end;
-    if_node->labels[1] = label_false;
+
+    treenode *conditional_jump_node = _new_operator_node(OP_JCC, test_node, NULL);
+    conditional_jump_node->labels[0] = label_false;
+    conditional_jump_node->labels[1] = label_end;
+
+    treenode *if_node = _new_operator_node(OP_IF, conditional_jump_node, alternative_node);
+
     return if_node;
 }
 
@@ -186,10 +197,10 @@ char *op_to_str(int op) {
             return "OP_TST";
         case OP_ALT:
             return "OP_ALT";
-        case OP_TRU:
-            return "OP_TRU";
-        case OP_FAL:
-            return "OP_FAL";
+        case OP_BRA:
+            return "BRA";
+        case OP_JCC:
+            return "JCC";
         case OP_NOP:
             return "NOP";
     }

@@ -17,7 +17,7 @@
  // TODO: add a scope attribute to the tree pointing to the symbol table
 %}
 
-%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_NEQ=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_INI=14 OP_ASN=15 OP_SEQ=16 OP_LOP=17 OP_LBL=18 OP_JMP=19 OP_IF=20 OP_TST=21 OP_ALT=22 OP_TRU=23 OP_FAL=24 OP_NOP=25
+%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_NEQ=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_INI=14 OP_ASN=15 OP_SEQ=16 OP_LOP=17 OP_LBL=18 OP_JMP=19 OP_IF=20 OP_TST=21 OP_ALT=22 OP_BRA=23 OP_JCC=24 OP_NOP=25
 
 %start stats
 
@@ -36,17 +36,36 @@ stat:       loop                # 0
 stat:       jmp                 # 0
 stat:       cond                # 0
 
-cond:       OP_IF(test, alt)    # 0 # lbl(bnode->labels[0]);
+cond:       OP_IF(jtf, alt)     # 0
+cond:       OP_IF(jte, talt)    # 0
+cond:       OP_IF(jfe, falt)    # 0
+cond:       OP_IF(nop, nop)     # 0
 
-test:       OP_TST(reg)         # 2 # free_reg(kids[0]->reg); test(kids[0]->reg, bnode->labels[0]);
-test:       OP_TST(var)         # 2 # test(kids[0]->reg, bnode->labels[0]);
-test:       OP_TST(con)         # 1 # if ((kids[0]->val & 1) == 0) jmp(bnode->labels[0]);
+jtf:        OP_JCC(test)        # 1 # jz(bnode->labels[0]);
+jte:        OP_JCC(test)        # 1 # jz(bnode->labels[1]);
+jfe:        OP_JCC(test)        # 1 # jnz(bnode->labels[1]);
 
-alt:        OP_ALT(btru, bfal)  # 0
+test:       OP_TST(var)         # 1 # test(kids[0]->reg);
+test:       OP_TST(reg)         # 1 # free_reg(kids[0]->reg); test(kids[0]->reg);
+test:       OP_TST(con)         # 1 # test_i(kids[0]->val); // TODO: optimize this
+nop:        OP_TST(var)         # 0
+nop:        OP_TST(reg)         # 0
+nop:        OP_TST(con)         # 0
 
-btru:       OP_TRU(seq)         # 1 # jmp(bnode->labels[0]); lbl(bnode->labels[1]);
+alt:        OP_ALT(tbra, fbra)  # 1 # lbl(kids[0]->labels[1]);
+talt:       OP_ALT(obra, nop)   # 1 # lbl(kids[0]->labels[1]);
+falt:       OP_ALT(nop, obra)   # 1 # lbl(kids[1]->labels[1]);
+nop:        OP_ALT(nop, nop)    # 0
 
-bfal:       OP_FAL(seq)         # 0
+tbra:       OP_BRA(jmpe)        # 1 # bnode->labels[0] = kids[0]->labels[0]; bnode->labels[1] = kids[0]->labels[1]; lbl(bnode->labels[0]);
+fbra:       OP_BRA(jnop)        # 0 # bnode->labels[0] = kids[0]->labels[0]; bnode->labels[1] = kids[0]->labels[1];
+obra:       OP_BRA(jnop)        # 1 # bnode->labels[0] = kids[0]->labels[0]; bnode->labels[1] = kids[0]->labels[1];
+nop:        OP_BRA(nop)         # 0
+
+jmpe:       OP_JCC(seq)         # 0 # bnode->labels[0] = kids[0]->labels[0]; bnode->labels[1] = kids[0]->labels[1]; jmp(bnode->labels[1]);
+jnop:       OP_JCC(seq)         # 0 # bnode->labels[0] = kids[0]->labels[0]; bnode->labels[1] = kids[0]->labels[1];
+nop:        OP_JCC(nop)         # 0
+
 
 jmp:        OP_JMP              # 1 # jmp(bnode->labels[0]);
 

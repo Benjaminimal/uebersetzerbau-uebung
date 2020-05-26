@@ -25,8 +25,8 @@
 #define OP_IF  20
 #define OP_TST 21
 #define OP_ALT 22
-#define OP_TRU 23
-#define OP_FAL 24
+#define OP_BRA 23
+#define OP_JCC 24
 #define OP_NOP 25
 
 #ifdef USE_IBURG
