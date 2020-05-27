@@ -8,6 +8,7 @@
 #include "treenode.h"
 #include "translator.h"
 
+ // TODO: fix constant folding not working with ret (seems like the costs are wrong, it's working for and but nor for add and mul)
  // TODO: test the empty program
 %}
 
@@ -56,8 +57,8 @@ fbra:       OP_BRA(jnop)        # 0 # bnode->labels[0] = kids[0]->labels[0]; bno
 obra:       OP_BRA(jnop)        # 1 # bnode->labels[0] = kids[0]->labels[0]; bnode->labels[1] = kids[0]->labels[1];
 nop:        OP_BRA(nop)         # 0
 
-jmpe:       OP_JCC(seq)         # 0 # bnode->labels[0] = kids[0]->labels[0]; bnode->labels[1] = kids[0]->labels[1]; jmp(bnode->labels[1]);
-jnop:       OP_JCC(seq)         # 0 # bnode->labels[0] = kids[0]->labels[0]; bnode->labels[1] = kids[0]->labels[1];
+jmpe:       OP_JCC(seq)         # 1 # jmp(bnode->labels[1]);
+jnop:       OP_JCC(seq)         # 0
 nop:        OP_JCC(nop)         # 0
 
 

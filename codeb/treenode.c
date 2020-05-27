@@ -4,6 +4,7 @@
 #include "sym_tab.h"
 #include "treenode.h"
 
+// TODO: rename this to ast or something similar
 
 treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     treenode *new_node = malloc(sizeof(treenode));
@@ -27,25 +28,27 @@ treenode *_new_operator_node(int op, treenode *left, treenode *right) {
 
 treenode *new_if_node(treenode *expression, treenode *statements_true, treenode *statements_false, char *label_false, char *label_end) {
 
-    statements_true->labels[0] = label_false;
-    statements_true->labels[1] = label_end;
-    treenode *jump_end_node = _new_operator_node(OP_JCC, statements_true, NULL);
-    treenode *true_node = _new_operator_node(OP_BRA, jump_end_node, NULL);
+    treenode *jump_cc_true_node = _new_operator_node(OP_JCC, statements_true, NULL);
+    jump_cc_true_node->labels[0] = label_false;
+    jump_cc_true_node->labels[1] = label_end;
 
-    statements_false->labels[0] = label_false;
-    statements_false->labels[1] = label_end;
-    treenode *jump_not_node = _new_operator_node(OP_JCC, statements_false, NULL);
-    treenode *false_node = _new_operator_node(OP_BRA, jump_not_node, NULL);
+    treenode *true_node = _new_operator_node(OP_BRA, jump_cc_true_node, NULL);
+
+    treenode *jump_cc_false_node = _new_operator_node(OP_JCC, statements_false, NULL);
+    jump_cc_false_node->labels[0] = label_false;
+    jump_cc_false_node->labels[1] = label_end;
+
+    treenode *false_node = _new_operator_node(OP_BRA, jump_cc_false_node, NULL);
 
     treenode *alternative_node = _new_operator_node(OP_ALT, true_node, false_node);
 
     treenode *test_node = _new_operator_node(OP_TST, expression, NULL);
 
-    treenode *conditional_jump_node = _new_operator_node(OP_JCC, test_node, NULL);
-    conditional_jump_node->labels[0] = label_false;
-    conditional_jump_node->labels[1] = label_end;
+    treenode *jump_cc_node = _new_operator_node(OP_JCC, test_node, NULL);
+    jump_cc_node->labels[0] = label_false;
+    jump_cc_node->labels[1] = label_end;
 
-    treenode *if_node = _new_operator_node(OP_IF, conditional_jump_node, alternative_node);
+    treenode *if_node = _new_operator_node(OP_IF, jump_cc_node, alternative_node);
 
     return if_node;
 }
