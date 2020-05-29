@@ -54,25 +54,34 @@ treenode *new_if_node(treenode *expression, treenode *statements_true, treenode 
 }
 
 treenode *new_cont_node(sym_tab *tab) {
-    treenode *new_node = _new_operator_node(OP_JMP, NULL, NULL);
-    new_node->labels[0] = tab->labels[0];
+    treenode *cont_node = _new_operator_node(OP_JMP, NULL, NULL);
+    if (tab != NULL) {
+        cont_node->labels[0] = tab->labels[0];
+    }
+    return cont_node;
 }
 
 treenode *new_break_node(sym_tab *tab) {
-    treenode *new_node = _new_operator_node(OP_JMP, NULL, NULL);
-    new_node->labels[0] = tab->labels[1];
+    treenode *break_node = _new_operator_node(OP_JMP, NULL, NULL);
+    if (tab != NULL) {
+        break_node->labels[0] = tab->labels[1];
+    }
+    return break_node;
 }
 
 treenode *new_label_node(char *label) {
-    treenode *new_node = _new_operator_node(OP_LBL, NULL, NULL);
-    new_node->labels[0] = label;
+    treenode *label_node = _new_operator_node(OP_LBL, NULL, NULL);
+    label_node->labels[0] = label;
+    return label_node;
 }
 
 treenode *new_loop_node(sym_tab *tab, treenode *sequence) {
     treenode *label_node = new_label_node(tab->labels[0]);
     treenode *loop_node = _new_operator_node(OP_LOP, label_node, sequence);
-    loop_node->labels[0] = tab->labels[0];
-    loop_node->labels[1] = tab->labels[1];
+    if (tab != NULL) {
+        loop_node->labels[0] = tab->labels[0];
+        loop_node->labels[1] = tab->labels[1];
+    }
     return loop_node;
 }
 
@@ -127,8 +136,10 @@ treenode *new_negate_node(treenode *node) {
 
 treenode *new_variable_node(sym_tab *tab) {
     treenode *new_node = _new_operator_node(OP_VAR, NULL, NULL);
-    new_node->sym = tab->lexeme;
-    new_node->pos = tab->pos;
+    if (tab != NULL) {
+        new_node->sym = tab->lexeme;
+        new_node->pos = tab->pos;
+    }
     return new_node;
 }
 
@@ -193,13 +204,13 @@ char *op_to_str(int op) {
         case OP_LBL:
             return "LBL";
         case OP_JMP:
-            return "OP_JMP";
+            return "JMP";
         case OP_IF:
-            return "OP_IF";
+            return "IF";
         case OP_TST:
-            return "OP_TST";
+            return "TST";
         case OP_ALT:
-            return "OP_ALT";
+            return "ALT";
         case OP_BRA:
             return "BRA";
         case OP_JCC:
@@ -214,6 +225,11 @@ void _print_tree(treenode *node, int indent) {
     for (int i = 0; i < indent; i++) printf("\t");
     printf("op: %s", op_to_str(node->op));
     if (node->sym != NULL) printf(" id: %s pos: %d", node->sym, node->pos);
+    for (int i = 0; i < 2; i++) {
+        if (node->labels[i] != NULL) {
+            printf(" labels[%d]: %s", i, node->labels[i]);
+        }
+    }
     if (node->op == OP_CON) printf(" val: %ld", node->val);
     printf("\n");
     _print_tree(node->kids[0], indent + 1);
