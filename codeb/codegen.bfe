@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "treenode.h"
+#include "ast.h"
 #include "translator.h"
 
  // TODO: fix constant folding not working with ret (seems like the costs are wrong, it's working for and but nor for add and mul)
@@ -340,7 +340,7 @@ nop:        OP_NOP              # 0
 
 %%
 
-extern treenode *root;
+extern astnode *root;
 extern int yyparse(int var);
 void burm_reduce(NODEPTR_TYPE bnode, int goalnt);
 

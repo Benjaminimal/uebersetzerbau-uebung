@@ -4,7 +4,7 @@
 #include <string.h>
 #include "error.h"
 #include "sym_tab.h"
-#include "treenode.h"
+#include "ast.h"
 #include "translator.h"
 
 #define YYERROR_VERBOSE 1
@@ -59,7 +59,7 @@ extern void invoke_burm(NODEPTR_TYPE root);
     @autoinh
     sym_tab *i_symtab;
     sym_tab *s_symtab;
-    treenode *s_node;
+    astnode *s_node;
     int i_position;
     int s_position;
 } stat
@@ -68,7 +68,7 @@ extern void invoke_burm(NODEPTR_TYPE root);
     sym_tab *i_symtab;
     int i_position;
     int s_position;
-    treenode *s_node;
+    astnode *s_node;
 } stats else_stats
 
 @attributes {
@@ -79,7 +79,7 @@ extern void invoke_burm(NODEPTR_TYPE root);
 @attributes {
     @autoinh
     sym_tab *i_symtab;
-    treenode *s_node;
+    astnode *s_node;
 } lexpr term expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel
 
 @traversal idcheck

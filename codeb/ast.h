@@ -45,11 +45,11 @@ typedef struct s_node {
     char            pos;
     char            *labels[2];
     long            val;
-} treenode;
+} astnode;
 
-typedef treenode *treenodep;
+typedef astnode *astnodep;
 
-#define NODEPTR_TYPE    treenodep
+#define NODEPTR_TYPE    astnodep
 #define OP_LABEL(p)     ((p)->op)
 #define LEFT_CHILD(p)   ((p)->kids[0])
 #define RIGHT_CHILD(p)  ((p)->kids[1])
@@ -57,27 +57,27 @@ typedef treenode *treenodep;
 #define PANIC           printf
 
 /* codeb */
-treenode *new_init_node(sym_tab *, treenode *);
-treenode *new_assign_node(treenode *, treenode *);
-treenode *new_sequence_node(treenode *, treenode *);
-treenode *new_loop_node(sym_tab *, treenode *);
-treenode *new_cont_node(sym_tab *);
-treenode *new_break_node(sym_tab *);
-treenode *new_if_node(treenode *, treenode *, treenode *, char *, char *);
+astnode *new_init_node(sym_tab *, astnode *);
+astnode *new_assign_node(astnode *, astnode *);
+astnode *new_sequence_node(astnode *, astnode *);
+astnode *new_loop_node(sym_tab *, astnode *);
+astnode *new_cont_node(sym_tab *);
+astnode *new_break_node(sym_tab *);
+astnode *new_if_node(astnode *, astnode *, astnode *, char *, char *);
 
 /* codea */
-treenode *new_add_node(treenode *, treenode *);
-treenode *new_multiply_node(treenode *, treenode *);
-treenode *new_and_node(treenode *, treenode *);
-treenode *new_compare_less_or_equal_node(treenode *, treenode *);
-treenode *new_compare_not_equal_node(treenode *, treenode *);
-treenode *new_return_node(treenode *);
-treenode *new_dereference_node(treenode *);
-treenode *new_not_node(treenode *);
-treenode *new_negate_node(treenode *);
-treenode *new_variable_node(sym_tab *);
-treenode *new_constant_node(long);
-treenode *new_nop_node();
-void print_tree(treenode *);
+astnode *new_add_node(astnode *, astnode *);
+astnode *new_multiply_node(astnode *, astnode *);
+astnode *new_and_node(astnode *, astnode *);
+astnode *new_compare_less_or_equal_node(astnode *, astnode *);
+astnode *new_compare_not_equal_node(astnode *, astnode *);
+astnode *new_return_node(astnode *);
+astnode *new_dereference_node(astnode *);
+astnode *new_not_node(astnode *);
+astnode *new_negate_node(astnode *);
+astnode *new_variable_node(sym_tab *);
+astnode *new_constant_node(long);
+astnode *new_nop_node();
+void print_tree(astnode *);
 
 #endif /* _TREENODE_H_ */

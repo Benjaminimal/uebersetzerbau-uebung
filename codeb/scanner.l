@@ -12,7 +12,7 @@
 #include "error.h"
 #include "parser.h"
 #include "sym_tab.h"
-#include "treenode.h"
+#include "ast.h"
 
 int yycolumn = 1;
 %}

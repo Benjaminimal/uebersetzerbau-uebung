@@ -2,12 +2,12 @@
 #include <stdio.h>
 #include "error.h"
 #include "sym_tab.h"
-#include "treenode.h"
+#include "ast.h"
 
 // TODO: rename this to ast or something similar
 
-treenode *_new_operator_node(int op, treenode *left, treenode *right) {
-    treenode *new_node = malloc(sizeof(treenode));
+astnode *_new_operator_node(int op, astnode *left, astnode *right) {
+    astnode *new_node = malloc(sizeof(astnode));
 
     if (new_node == NULL) {
         EXIT_ERR_OOM();
@@ -26,58 +26,58 @@ treenode *_new_operator_node(int op, treenode *left, treenode *right) {
     return new_node;
 }
 
-treenode *new_if_node(treenode *expression, treenode *statements_true, treenode *statements_false, char *label_false, char *label_end) {
+astnode *new_if_node(astnode *expression, astnode *statements_true, astnode *statements_false, char *label_false, char *label_end) {
 
-    treenode *jump_cc_true_node = _new_operator_node(OP_JCC, statements_true, NULL);
+    astnode *jump_cc_true_node = _new_operator_node(OP_JCC, statements_true, NULL);
     jump_cc_true_node->labels[0] = label_false;
     jump_cc_true_node->labels[1] = label_end;
 
-    treenode *true_node = _new_operator_node(OP_BRA, jump_cc_true_node, NULL);
+    astnode *true_node = _new_operator_node(OP_BRA, jump_cc_true_node, NULL);
 
-    treenode *jump_cc_false_node = _new_operator_node(OP_JCC, statements_false, NULL);
+    astnode *jump_cc_false_node = _new_operator_node(OP_JCC, statements_false, NULL);
     jump_cc_false_node->labels[0] = label_false;
     jump_cc_false_node->labels[1] = label_end;
 
-    treenode *false_node = _new_operator_node(OP_BRA, jump_cc_false_node, NULL);
+    astnode *false_node = _new_operator_node(OP_BRA, jump_cc_false_node, NULL);
 
-    treenode *alternative_node = _new_operator_node(OP_ALT, true_node, false_node);
+    astnode *alternative_node = _new_operator_node(OP_ALT, true_node, false_node);
 
-    treenode *test_node = _new_operator_node(OP_TST, expression, NULL);
+    astnode *test_node = _new_operator_node(OP_TST, expression, NULL);
 
-    treenode *jump_cc_node = _new_operator_node(OP_JCC, test_node, NULL);
+    astnode *jump_cc_node = _new_operator_node(OP_JCC, test_node, NULL);
     jump_cc_node->labels[0] = label_false;
     jump_cc_node->labels[1] = label_end;
 
-    treenode *if_node = _new_operator_node(OP_IF, jump_cc_node, alternative_node);
+    astnode *if_node = _new_operator_node(OP_IF, jump_cc_node, alternative_node);
 
     return if_node;
 }
 
-treenode *new_cont_node(sym_tab *tab) {
-    treenode *cont_node = _new_operator_node(OP_JMP, NULL, NULL);
+astnode *new_cont_node(sym_tab *tab) {
+    astnode *cont_node = _new_operator_node(OP_JMP, NULL, NULL);
     if (tab != NULL) {
         cont_node->labels[0] = tab->labels[0];
     }
     return cont_node;
 }
 
-treenode *new_break_node(sym_tab *tab) {
-    treenode *break_node = _new_operator_node(OP_JMP, NULL, NULL);
+astnode *new_break_node(sym_tab *tab) {
+    astnode *break_node = _new_operator_node(OP_JMP, NULL, NULL);
     if (tab != NULL) {
         break_node->labels[0] = tab->labels[1];
     }
     return break_node;
 }
 
-treenode *new_label_node(char *label) {
-    treenode *label_node = _new_operator_node(OP_LBL, NULL, NULL);
+astnode *new_label_node(char *label) {
+    astnode *label_node = _new_operator_node(OP_LBL, NULL, NULL);
     label_node->labels[0] = label;
     return label_node;
 }
 
-treenode *new_loop_node(sym_tab *tab, treenode *sequence) {
-    treenode *label_node = new_label_node(tab->labels[0]);
-    treenode *loop_node = _new_operator_node(OP_LOP, label_node, sequence);
+astnode *new_loop_node(sym_tab *tab, astnode *sequence) {
+    astnode *label_node = new_label_node(tab->labels[0]);
+    astnode *loop_node = _new_operator_node(OP_LOP, label_node, sequence);
     if (tab != NULL) {
         loop_node->labels[0] = tab->labels[0];
         loop_node->labels[1] = tab->labels[1];
@@ -85,57 +85,57 @@ treenode *new_loop_node(sym_tab *tab, treenode *sequence) {
     return loop_node;
 }
 
-treenode *new_sequence_node(treenode *left, treenode *right) {
+astnode *new_sequence_node(astnode *left, astnode *right) {
     return _new_operator_node(OP_SEQ, left, right);
 }
 
-treenode *new_assign_node(treenode *expression, treenode *lexpression) {
+astnode *new_assign_node(astnode *expression, astnode *lexpression) {
     return _new_operator_node(OP_ASN, expression, lexpression);
 }
 
-treenode *new_init_node(sym_tab *tab, treenode *expression) {
-    treenode *new_variable = new_variable_node(tab);
+astnode *new_init_node(sym_tab *tab, astnode *expression) {
+    astnode *new_variable = new_variable_node(tab);
     return _new_operator_node(OP_INI, expression, new_variable);
 }
 
-treenode *new_add_node(treenode *left, treenode *right) {
+astnode *new_add_node(astnode *left, astnode *right) {
     return _new_operator_node(OP_ADD, left, right);
 }
 
-treenode *new_multiply_node(treenode *left, treenode *right) {
+astnode *new_multiply_node(astnode *left, astnode *right) {
     return _new_operator_node(OP_MUL, left, right);
 }
 
-treenode *new_and_node(treenode *left, treenode *right) {
+astnode *new_and_node(astnode *left, astnode *right) {
     return _new_operator_node(OP_AND, left, right);
 }
 
-treenode *new_compare_less_or_equal_node(treenode *left, treenode *right) {
+astnode *new_compare_less_or_equal_node(astnode *left, astnode *right) {
     return _new_operator_node(OP_LEQ, left, right);
 }
 
-treenode *new_compare_not_equal_node(treenode *left, treenode *right) {
+astnode *new_compare_not_equal_node(astnode *left, astnode *right) {
     return _new_operator_node(OP_NEQ, left, right);
 }
 
-treenode *new_return_node(treenode *expression) {
+astnode *new_return_node(astnode *expression) {
     return _new_operator_node(OP_RET, expression, NULL);
 }
 
-treenode *new_dereference_node(treenode *node) {
+astnode *new_dereference_node(astnode *node) {
     return _new_operator_node(OP_DRF, node, NULL);
 }
 
-treenode *new_not_node(treenode *node) {
+astnode *new_not_node(astnode *node) {
     return _new_operator_node(OP_NOT, node, NULL);
 }
 
-treenode *new_negate_node(treenode *node) {
+astnode *new_negate_node(astnode *node) {
     return _new_operator_node(OP_NEG, node, NULL);
 }
 
-treenode *new_variable_node(sym_tab *tab) {
-    treenode *new_node = _new_operator_node(OP_VAR, NULL, NULL);
+astnode *new_variable_node(sym_tab *tab) {
+    astnode *new_node = _new_operator_node(OP_VAR, NULL, NULL);
     if (tab != NULL) {
         new_node->sym = tab->lexeme;
         new_node->pos = tab->pos;
@@ -143,7 +143,7 @@ treenode *new_variable_node(sym_tab *tab) {
     return new_node;
 }
 
-treenode *new_constant_node(long val) {
+astnode *new_constant_node(long val) {
     int op;
     switch (val) {
         case 0:
@@ -156,12 +156,12 @@ treenode *new_constant_node(long val) {
             op = OP_CON;
             break;
     }
-    treenode *new_node = _new_operator_node(op, NULL, NULL);
+    astnode *new_node = _new_operator_node(op, NULL, NULL);
     new_node->val = val;
     return new_node;
 }
 
-treenode *new_nop_node() {
+astnode *new_nop_node() {
     return _new_operator_node(OP_NOP, NULL, NULL);
 }
 
@@ -220,7 +220,7 @@ char *op_to_str(int op) {
     }
 }
 
-void _print_tree(treenode *node, int indent) {
+void _print_tree(astnode *node, int indent) {
     if (node == NULL) return;
     for (int i = 0; i < indent; i++) printf("\t");
     printf("op: %s", op_to_str(node->op));
@@ -236,7 +236,7 @@ void _print_tree(treenode *node, int indent) {
     _print_tree(node->kids[1], indent + 1);
 }
 
-void print_tree(treenode *node) {
+void print_tree(astnode *node) {
     printf("\n");
     _print_tree(node, 0);
     printf("\n");
