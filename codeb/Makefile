@@ -4,7 +4,7 @@ PARSER = parser
 SCANNER = scanner
 OXOUT = oxout
 
-LIBS = sym_tab.c ast.c translator.c
+LIBS = sym_tab.c ast.c x86.c
 
 AGG = ox
 

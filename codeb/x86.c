@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "error.h"
-#include "translator.h"
+#include "x86.h"
 
 #define T_VAL -1
 #define F_VAL 0

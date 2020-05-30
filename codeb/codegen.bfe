@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "ast.h"
-#include "translator.h"
+#include "x86.h"
 
  // TODO: fix constant folding not working with ret (seems like the costs are wrong, it's working for and but nor for add and mul)
  // TODO: test the empty program

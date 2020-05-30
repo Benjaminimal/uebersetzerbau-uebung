@@ -5,7 +5,7 @@
 #include "error.h"
 #include "sym_tab.h"
 #include "ast.h"
-#include "translator.h"
+#include "x86.h"
 
 #define YYERROR_VERBOSE 1
 
