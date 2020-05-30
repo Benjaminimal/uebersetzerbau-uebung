@@ -4,8 +4,6 @@
 #include "sym_tab.h"
 #include "ast.h"
 
-// TODO: rename this to ast or something similar
-
 astnode *_new_operator_node(int op, astnode *left, astnode *right) {
     astnode *new_node = malloc(sizeof(astnode));
 

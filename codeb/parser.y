@@ -156,7 +156,7 @@ stat:
         @i @stats.i_position@ = @stat.i_position@;
         @i @else_stats.i_position@ = @stats.s_position@;
         @i @stat.s_position@ = @else_stats.s_position@;
-        @i @stat.s_symtab@ = @stat.i_symtab@; // TODO: what if there is a variable definition in else_stats?
+        @i @stat.s_symtab@ = @stat.i_symtab@;
 
         @i @stat.s_node@ = new_if_node(@expr.s_node@, @stats.s_node@, @else_stats.s_node@, next_label(), next_label());
       @}
