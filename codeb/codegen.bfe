@@ -334,6 +334,7 @@ con:        OP_ONE              # 0
 con:        zro                 # 0
 con:        one                 # 0
 
+reg:        var                 # 1 # bnode->reg = mov(bnode->reg, next_reg());
 var:        OP_VAR              # 0 # bnode->reg = get_arg_reg(bnode->pos); mark_taken(bnode->reg);
 
 nop:        OP_NOP              # 0
