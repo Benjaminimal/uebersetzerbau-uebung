@@ -24,6 +24,24 @@ astnode *_new_operator_node(int op, astnode *left, astnode *right) {
     return new_node;
 }
 
+astnode *new_call_node(char *name, astnode *arguments) {
+    astnode *save_node = _new_operator_node(OP_SAV, NULL, NULL);
+
+    astnode *call_node = _new_operator_node(OP_CLL, save_node, arguments);
+    call_node->labels[0] = name;
+    return call_node;
+}
+
+astnode *new_arguments_node(astnode *expression, astnode *next) {
+    astnode *arguments_node = _new_operator_node(OP_ARG, expression, next);
+    return arguments_node;
+}
+
+astnode *new_expression_node(astnode *expression) {
+    astnode *expression_node = _new_operator_node(OP_EXP, expression, NULL);
+    return expression_node;
+}
+
 astnode *new_function_node(char *name, int varcount, astnode *parameters, astnode *sequence) {
     astnode *enter_node = _new_operator_node(OP_ENT, NULL, NULL);
     enter_node->labels[0] = name;
@@ -242,6 +260,14 @@ char *op_to_str(int op) {
             return "PRS";
         case OP_PAR:
             return "PAR";
+        case OP_CLL:
+            return "CLL";
+        case OP_ARG:
+            return "ARG";
+        case OP_EXP:
+            return "EXP";
+        case OP_SAV:
+            return "SAV";
         case OP_NOP:
             return "NOP";
     }

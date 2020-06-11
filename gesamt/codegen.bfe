@@ -12,7 +12,7 @@
  // TODO: test the empty program
 %}
 
-%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_NEQ=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_INI=14 OP_ASN=15 OP_SEQ=16 OP_LOP=17 OP_LBL=18 OP_JMP=19 OP_IF=20 OP_TST=21 OP_ALT=22 OP_BRA=23 OP_JCC=24 OP_FUN=25 OP_BGN=26 OP_ENT=27 OP_PRS=29 OP_PAR=30 OP_NOP=31 
+%term OP_VAR=1 OP_CON=2 OP_ZRO=3 OP_ONE=4 OP_LEQ=5 OP_NEQ=6 OP_AND=7 OP_MUL=8 OP_ADD=9 OP_NOT=10 OP_NEG=11 OP_DRF=12 OP_RET=13 OP_INI=14 OP_ASN=15 OP_SEQ=16 OP_LOP=17 OP_LBL=18 OP_JMP=19 OP_IF=20 OP_TST=21 OP_ALT=22 OP_BRA=23 OP_JCC=24 OP_FUN=25 OP_BGN=26 OP_ENT=27 OP_PRS=29 OP_PAR=30 OP_CLL=31 OP_ARG=32 OP_EXP=33 OP_SAV=34 OP_NOP=35
 
 %start func
 
@@ -26,7 +26,7 @@ ent:        OP_ENT              # 0 # function_start(bnode->labels[0], bnode->po
 prs:        OP_PRS(par, prs)    # 0
 prs:        nop                 # 0
 
-par:        OP_PAR              # 0 # mov_r_m(get_arg_reg(bnode->pos), bnode->pos);
+par:        OP_PAR              # 0 # mov_r_m(get_arg_reg(bnode->pos), bnode->pos); free_reg(get_arg_reg(bnode->pos));
 
 stats:      seq                 # 0
 
@@ -40,6 +40,21 @@ stat:       asn                 # 0
 stat:       loop                # 0
 stat:       jmp                 # 0
 stat:       cond                # 0
+stat:       expr                # 0
+
+expr:       OP_EXP(reg)         # 0 # free_reg(kids[0]->reg);
+expr:       OP_EXP(con)         # 0
+expr:       OP_EXP(call)        # 0
+
+call:       OP_CLL(save, args)  # 1 # call(bnode->labels[0]); free_arg_regs(); restore_regs(); bnode->reg = ret_reg();
+ret:        call                # 0 # bnode->reg = ret_reg();
+reg:        call                # 1 # bnode->reg = mov_r_r(bnode->reg, next_reg()); // TODO: move where it belongs
+
+save:       OP_SAV              # 1 # save_regs();
+
+args:       OP_ARG(reg, args)   # 0
+reg:        con                 # 1 # bnode->reg = mov_i_r(bnode->val, next_reg()); // TODO: move where it belongs
+args:       nop                 # 0
 
 cond:       OP_IF(jtf, alt)     # 0
 cond:       OP_IF(jte, talt)    # 0
@@ -315,7 +330,7 @@ con:        one                 # 0
 
 reg:        var                 # 1 # bnode->reg = mov_m_r(bnode->pos, ret_reg());
 reg:        var                 # 1 # bnode->reg = mov_m_r(bnode->pos, next_reg());
-var:        OP_VAR              # 0 # bnode->reg = get_arg_reg(bnode->pos); mark_taken(bnode->reg);
+var:        OP_VAR              # 0 # bnode->reg = get_arg_reg(bnode->pos);
 
 nop:        OP_NOP              # 0
 
@@ -328,7 +343,11 @@ void burm_reduce(NODEPTR_TYPE bnode, int goalnt);
 void invoke_burm(NODEPTR_TYPE root) {
 #ifdef DEBUG
         print_tree(root);
-#endif /* DBG */
+        print_regs();
+#endif /* DEBUG */
         burm_label(root);
         burm_reduce(root, 1);
+#ifdef DEBUG
+        print_regs();
+#endif /* DEBUG */
 }

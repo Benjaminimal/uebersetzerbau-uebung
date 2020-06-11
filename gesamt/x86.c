@@ -41,11 +41,12 @@ reg R15 = { .name = "r15", .taken = 0 };
 
 reg *reg_args[MAX_ARGS] = {&RDI, &RSI, &RDX, &RCX, &R8, &R9};
 /*
-const reg *reg_caller[] = {&RAX, &RCX, &RDX, &RSI, &RDI, &R8, &R9, &R10, &R11}; // TODO: not sure if r10 can be used
-const reg *reg_callee[] = {&RBX, &R12, &R13, &R14, &R15}; // TODO: rbp (and rsp) is missing
+const reg *reg_caller[] = {&RAX, &RCX, &RDX, &RSI, &RDI, &R8, &R9, &R10, &R11};
+const reg *reg_callee[] = {&RBX, &R12, &R13, &R14, &R15};
 */
 
 void _push(char *);
+void _pop(char *);
 void _test_i_r(long, char *);
 void _test_i_m(long, long);
 void _test_i_i(long, long);
@@ -73,7 +74,7 @@ void _mul_i_m_r(long, long, char *, char *);
 void _add_r_r(char *, char *);
 void _add_m_r(long, char *, char *);
 void _add_i_r(long, char *);
-void _sub_i(long, char *);
+void _sub_i_r(long, char *);
 void _lea_i_r_r_r(long, char *, char *, char *);
 void _lea_i_r_r(long, char *, char *);
 void _not_r(char *);
@@ -166,6 +167,36 @@ void free_arg_regs() {
     }
 }
 
+int saved_regs_ctx = -1;
+int saved_regs[6] = {0, 0, 0, 0, 0, 0}; // TODO: move me
+void save_regs() {
+    saved_regs_ctx++;
+    for (int i = MAX_ARGS - 1; i >= 0; i--) {
+        if (reg_args[i]->taken) {
+            _push(reg_to_str(i));
+            reg_args[i]->taken = 0;
+            saved_regs[saved_regs_ctx]++;
+        }
+    }
+    if (saved_regs[saved_regs_ctx] % 2 == 1) {
+        _sub_i_r(8, RSP.name);
+    }
+}
+
+void restore_regs() {
+    if (saved_regs[saved_regs_ctx] % 2 == 1) {
+        _add_i_r(8, RSP.name);
+    }
+    for (int i = 0; i < MAX_ARGS; i++) {
+        if (i < saved_regs[saved_regs_ctx]) {
+            _pop(reg_to_str(i));
+            reg_args[i]->taken = 1;
+        }
+    }
+    saved_regs[saved_regs_ctx] = 0;
+    saved_regs_ctx--;
+}
+
 void function_start(char *name, int varcount) {
     if (function_count == 0) {
         printf("\t.text\n");
@@ -175,7 +206,9 @@ void function_start(char *name, int varcount) {
     _lbl(name);
     _push(RBP.name);
     _mov_r_r(RSP.name, RBP.name);
-    _sub_i(varcount * QWORD_SIZE, RSP.name);
+    if (varcount > 0) {
+        _sub_i_r(varcount * QWORD_SIZE + (varcount * QWORD_SIZE % RSP_ALIGN), RSP.name);
+    }
 }
 
 void function_end() {
@@ -183,6 +216,10 @@ void function_end() {
     _ret();
     free_arg_regs();
     function_count++;
+}
+
+void call(char *label) {
+    printf("\tcall\t%s@PLT\n", label); // TODO: what is this @PLT ?
 }
 
 void push(char reg) {
@@ -401,6 +438,9 @@ void ret_e() {
 void _push(char *reg) {
     printf("\tpushq\t%%%s\n", reg);
 }
+void _pop(char *reg) {
+    printf("\tpopq\t%%%s\n", reg);
+}
 
 void _mov_d_r(char *src, char *dst) {
     printf("\tmovq\t%%%s, (%%%s)\n", src, dst);
@@ -486,7 +526,7 @@ void _add_i_r(long val, char *src_dst) {
     printf("\taddq\t$%ld, %%%s\n", val, src_dst);
 }
 
-void _sub_i(long val, char *src_dst) {
+void _sub_i_r(long val, char *src_dst) {
     printf("\tsubq\t$%ld, %%%s\n", val, src_dst);
 }
 

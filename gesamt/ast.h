@@ -31,8 +31,12 @@
 #define OP_BGN 26
 #define OP_ENT 27
 #define OP_PRS 29
-#define OP_PAR 30
-#define OP_NOP 31
+
+#define OP_CLL 31
+#define OP_ARG 32
+#define OP_EXP 33
+#define OP_SAV 34
+#define OP_NOP 35
 
 #ifdef USE_IBURG
 typedef struct burm_state *STATEPTR_TYPE;
@@ -64,6 +68,9 @@ typedef astnode *astnodep;
 /* gesamt */
 astnode *new_function_node(char *, int, astnode *, astnode *);
 astnode *new_parameters_node(int, astnode *);
+astnode *new_call_node(char *, astnode *);
+astnode *new_arguments_node(astnode *, astnode *);
+astnode *new_expression_node(astnode *);
 
 /* codeb */
 astnode *new_init_node(sym_tab *, astnode *);

@@ -4,6 +4,7 @@
 #define MAX_ARGS 6
 #define MAX_REGS 6
 #define QWORD_SIZE 8
+#define RSP_ALIGN 16
 
 void print_regs();
 
@@ -16,6 +17,11 @@ char ret_reg();
 char *next_label();
 void mark_taken(char reg);
 void free_reg(char reg);
+void free_arg_regs();
+void save_regs();
+void restore_regs();
+
+void call(char *label);
 
 void push(char reg);
 

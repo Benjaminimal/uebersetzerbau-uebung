@@ -80,13 +80,8 @@ extern void invoke_burm(NODEPTR_TYPE root);
 @attributes {
     @autoinh
     sym_tab *i_symtab;
-} expr_list
-
-@attributes {
-    @autoinh
-    sym_tab *i_symtab;
     astnode *s_node;
-} lexpr term expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel
+} expr_list lexpr term expr expr_unary expr_binary expr_add expr_mul expr_and expr_rel
 
 @traversal idcheck
 @traversal @lefttoright @preorder codegen
@@ -110,7 +105,6 @@ funcdef:
         @i @pars.i_position@ = 0;
         @i @stats.i_symtab@ = @pars.s_symtab@;
         @i @stats.i_position@ = @pars.s_position@;
-
         @i @funcdef.s_node@ = new_function_node(@ID.lexeme@, @stats.s_position@, @pars.s_node@, @stats.s_node@);
       @}
     ;
@@ -120,14 +114,12 @@ pars:
       @{
         @i @pars.s_symtab@ = @pars.i_symtab@;
         @i @pars.s_position@ = @pars.i_position@;
-
         @i @pars.s_node@ = new_nop_node();
       @}
     | ID                                /* name neu */  /* sichtbarkeit gesamte funktion */
       @{
         @i @pars.s_symtab@ = add_parameter(@pars.i_symtab@, @ID.lexeme@, @pars.i_position@);
         @i @pars.s_position@ = @pars.i_position@ + 1;
-
         @i @pars.s_node@ = new_parameters_node(@pars.0.i_position@, new_nop_node());
       @}
     | ID COMMA pars                       /* name neu */  /* sichtbarkeit gesamte funktion */
@@ -136,7 +128,6 @@ pars:
         @i @pars.1.i_symtab@ = add_parameter(@pars.0.i_symtab@, @ID.lexeme@, @pars.0.i_position@);
         @i @pars.1.i_position@ = @pars.0.i_position@ + 1;
         @i @pars.0.s_position@ = @pars.1.s_position@;
-
         @i @pars.0.s_node@ = new_parameters_node(@pars.0.i_position@, @pars.1.s_node@);
       @}
     ;
@@ -172,7 +163,6 @@ stat:
         @i @else_stats.i_position@ = @stats.s_position@;
         @i @stat.s_position@ = @else_stats.s_position@; // TODO: what about var defs in stats ???
         @i @stat.s_symtab@ = @stat.i_symtab@;
-
         @i @stat.s_node@ = new_if_node(@expr.s_node@, @stats.s_node@, @else_stats.s_node@, next_label(), next_label());
       @}
     | ID COLON LOOP stats END             /* label neu */ /* sichtbarkeit innerhalb der schleife */
@@ -195,7 +185,6 @@ stat:
         @idcheck check_label(@stat.i_symtab@, @ID.lexeme@);
         @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_position@ = @stat.i_position@;
-
         @i @stat.s_node@ = new_cont_node(get_label(@stat.i_symtab@, @ID.lexeme@));
       @}
     | VAR ID ASSIGN expr                /* name neu */  /* sichtbarkeit direkt folgende statements von stat */
@@ -214,7 +203,8 @@ stat:
       @{
         @i @stat.s_symtab@ = @stat.i_symtab@;
         @i @stat.s_position@ = @stat.i_position@;
-        @i @stat.s_node@ = new_nop_node();
+
+        @i @stat.s_node@ = new_expression_node(@expr.s_node@);
       @}
     ;
 
@@ -352,8 +342,17 @@ expr_rel:
 
 expr_list:
       /* empty */
+      @{
+        @i @expr_list.s_node@ = new_nop_node();
+      @}
     | expr
+      @{
+        @i @expr_list.s_node@ = new_arguments_node(@expr.s_node@, new_nop_node());
+      @}
     | expr COMMA expr_list
+      @{
+        @i @expr_list.0.s_node@ = new_arguments_node(@expr.s_node@, @expr_list.1.s_node@);
+      @}
     ;
 
 term:
@@ -372,7 +371,8 @@ term:
       @}
     | ID LPAREN expr_list RPAREN        /* funktion beliebig */
       @{
-        @i @term.s_node@ = new_nop_node();
+
+        @i @term.s_node@ = new_call_node(@ID.lexeme@, @expr_list.s_node@);
       @}
     ;
 
