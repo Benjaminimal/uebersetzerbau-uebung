@@ -31,7 +31,7 @@
 #define OP_BGN 26
 #define OP_ENT 27
 #define OP_PRS 29
-
+#define OP_PAR 30
 #define OP_CLL 31
 #define OP_ARG 32
 #define OP_EXP 33
